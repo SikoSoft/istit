@@ -1,0 +1,118 @@
+#istit-frame
+	{
+	
+	}
+#istit-game
+	{
+	float: left;
+	height: 700px;
+	}
+#istit-menu
+	{
+	float: left;
+	width: 400px;
+	height: 700px;
+	padding-left: 32px;
+	}
+#restart, #mp-start
+	{
+	font-family: Roboto Condensed;
+	font-size: 20px;
+	width: 300px;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+	padding: 5px;
+	background-color: #ddd;
+	border-radius: 8px;
+	box-shadow: 5px 5px 5px #888;
+	margin: 8px;
+	cursor: pointer;
+	color: #444;
+	}
+#restart:hover, #mp-start:hover
+	{
+	background-color: #ededed;
+	color: #000;
+	}
+#buttons
+	{
+	list-style: none;
+	font-family: Roboto Condensed;
+	font-size: 16px;
+	color: #006;
+	}
+#label
+	{
+	font-family: Roboto Condensed;
+	font-size: 24px;
+	font-style: italic;
+	color: #f00;
+	padding-left: 20px;
+	}
+#info
+	{
+	font-family: Roboto Condensed;
+	border-top: 1px #aaa dotted;
+	margin-top: 20px;
+	padding-top: 20px;
+
+	}
+#download
+	{
+	cursor: pointer;
+	font-size: 24px !important;
+	width: 50%;
+	position: relative;
+	background: #d00;
+	color: #fff;
+	padding: 8px;
+	text-align: center;
+	margin: auto;
+	margin-top: 24px;
+	text-transform: uppercase;
+	}
+#download:hover
+	{
+	color: #ff0;
+	}
+#download:before, #download:after
+	{
+	content: "";
+	position: absolute;
+	display: block;
+	bottom: -1em;
+	border: 1em solid #b00;
+	z-index: -1;
+	}
+#download:before
+	{
+	left: -2em;
+	border-right-width: 2.0em;
+	border-left-color: transparent;
+	}
+#download:after
+	{
+	right: -2em;
+	border-left-width: 2.0em;
+	border-right-color: transparent;
+	}
+#download-label:before, #download-label:after
+	{
+	content: "";
+	position: absolute;
+	display: block;
+	border-style: solid;
+	border-color: #900 transparent transparent transparent;
+	bottom: -1em;
+	}
+#download-label:before
+	{
+	left: 0;
+	border-width: 1em 0 0 1em;
+	}
+#download-label:after
+	{
+	right: 0;
+	border-width: 1em 1em 0 0;
+	}

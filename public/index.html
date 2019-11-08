@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta name="author" content="SikoSoft"/>
+		<meta name="description" content="I Swear This Isn't Tetris (R)  :-)"/>
+		<meta name="keywords" content="tetris, free tetris, open source tetris, i swear this isn't tetris, puzzle game, free puzzle game, fun, free fun, fun is free, get high, fuck the tetris holding company, code is free speech bitch"/>
+		<title>ISTiT</title>
+		<link href='istit.css' rel='stylesheet' type='text/css'/>
+		<link href='common.css' rel='stylesheet' type='text/css/'>
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'/>
+		<script type='text/javascript' src='common.js'></script>
+		<script type='text/javascript' src='jquery-1.9.1.min.js'></script>
+		<script type='text/javascript' src='js/istit.core.js'></script>
+		<script type='text/javascript' src='js/istit.input.js'></script>
+		<script type='text/javascript' src='js/istit.render.js'></script>
+		<script type='text/javascript' src='js/istit.mp.js'></script>
+		<script type='text/javascript'>
+			var j = jQuery.noConflict();
+			var g = new istit();
+			j(function()
+				{
+				g.init('istit-canvas');
+				j('#version').html('v'+g.version);
+				j('#restart').click(function (){g.restart();});
+				j('#mp-start').click(function (){g.mp.prepare();});
+				});
+		</script>
+	</head>
+	<body>
+		<div id='istit-frame'>
+			<div id='istit-game'>
+				<canvas id="istit-canvas" width="1" height="1">
+					<p>Your browser doesn't support canvas.</p>
+				</canvas>
+			</div>
+			<div id='istit-menu'>
+				<div id='label'>ISTiT / I Swear This isn't <span style='visibility:hidden;font-weight:bold;font-size:200%'>Tetris</span><span id='version'></span></div>
+				<div id='restart'>Restart</div>
+				<div id='mp-start'>Start Multi-Player Session</div>
+				<ul id='buttons'>
+					<li>[&uarr;] Rotate</li>
+					<li>[&larr;] Move piece left</li>
+					<li>[&rarr;] Move piece right</li>
+					<li>[&darr;] Move piece down (faster)</li>
+					<li>[SPACE] Drop piece to bottom</li>
+					<li>[H] Hold falling piece swap for "HOLD" piece</li>
+					<li>[P] Pause</li>
+				</ul>
+			</div>
+	</body>
+</html>
