@@ -1,0 +1,140 @@
+#ss-head
+	{
+	position: fixed;
+	z-index: 9990;
+	top: 0;
+	left: 0;
+	background-color: #fff;
+	height: 32px;
+	width: 100%;
+	border-bottom: 1px #333 solid;
+	box-shadow: 0 3px 5px rgba(0, 0, 0, 0.5);
+	font-family: Roboto Condensed;
+	}
+#ss-head-inner
+	{
+	position: relative;
+	width: 100%;
+	height: 100%;
+	}
+#ss-head-left
+	{
+	position: absolute;
+	top: 0;
+	left: 32px;
+	height: 32px;
+	line-height: 32px;
+	font-size: 22px;
+	letter-spacing: -1px;
+	font-family: Roboto Condensed;
+	color: #000;
+	}
+#ss-head-home
+	{
+	float: left;
+	height: 32px;
+	line-height: 32px;
+	font-size: 22px;
+	letter-spacing: -1px;
+	font-family: Roboto Condensed;
+	color: #000;
+	}
+#ss-head-home a, #ss-head-home a:active, #ss-head-home a:visited
+	{
+
+	color: #343434;
+	text-decoration: none;
+	}
+#ss-head-home a:hover
+	{
+	color: #000;
+	text-shadow: 0 0 2px #ddd;
+	}
+#ss-head-logo
+	{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 32px;
+	height: 32px;
+	background-size: 100%;
+	background-image: url('img/ss-head-48.png');
+	}
+#ss-head-load
+	{
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 32px;
+	height: 32px;
+	line-height: 32px;
+	font-size: 24px;
+	text-align: center;
+	}
+#ss-head-title
+	{
+	float: left;
+	color: #fff;
+	padding: 0 4px;
+	width: auto;
+	height: 32px;
+	background-color: #333;
+	margin: 0 48px;
+	font-size: 18px;
+	
+
+	}
+#ss-qr
+	{
+	position: absolute;
+	z-index: 9991;
+	bottom: -150px;
+	left: 0;
+	right: 0;
+	width: 150px;
+	height: 150px;
+	padding: 8px;
+	margin: auto;
+	background-color: #fff;
+	}
+#ss-qr-left, #ss-qr-code, #ss-qr-right
+	{
+	display: inline-block;
+	}
+#ss-qr-left
+	{
+	border-radius: 0 32px;
+	background-color:#fff;
+	}
+#ss-qr-code
+	{
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	text-align: center;
+	margin: auto;
+	margin-top: 19px;
+	padding: 0px;
+	border-radius: 0 0 8px 8px;
+	background-color: #fff;
+	}
+.ss-blurb
+	{
+    background-color: rgba(20, 40, 50, 0.5);
+    margin: 10px;
+    padding: 10px;
+    font-family: Georgia;
+    font-size: 12px;
+    font-style: oblique;
+    color: #e9e9e9;
+    border: 1px rgba(255,255,255,0.4) solid;
+    border-radius: 0 4px 4px 0;
+    box-shadow: 2px 2px 2px rgba(30,40,50,0.9);
+    border-left-width: 5px;
+	}
+.ss-blurb-twitter
+	{
+
+	}
