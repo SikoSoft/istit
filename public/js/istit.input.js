@@ -75,7 +75,6 @@ class input {
 
   setFloodTimer(key) {
     let floodTime = this.floodWait[key];
-    let dif = new Date().getTime() - this.keyState[key];
     if (this.lastFloodWait[key]) {
       floodTime =
         this.lastFloodWait[key] - this.lastFloodWait[key] * this.g.keyDecay;
@@ -93,7 +92,6 @@ class input {
 
   handleKeyDown(e) {
     if (!this.keyState[e.keyCode]) {
-      let c = String.fromCharCode(e.keyCode);
       if (g.paused && e.keyCode != 80 && !g.ended) {
         return;
       }
