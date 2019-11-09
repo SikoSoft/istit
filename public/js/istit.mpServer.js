@@ -2,12 +2,15 @@ var port = 76;
 var activeTime = 5000;
 var webSocketServer = require('websocket').server;
 var http = require('http');
+
 console.log('ISTIT SERVER STARTING...');
+
 process.title = 'istit-server';
 var clients = [],
   sessions = [];
 var httpServer = http.createServer();
 var wsServer = new webSocketServer({ httpServer: httpServer });
+
 setInterval(function() {
   var now = new Date().getTime();
   var numActiveSessions = 0,
@@ -31,6 +34,7 @@ setInterval(function() {
       ' active clients'
   );
 }, 10000);
+
 setInterval(function() {
   for (var i = 0; i < sessions.length; i++) {
     if (
@@ -44,10 +48,12 @@ setInterval(function() {
     }
   }
 }, 100);
+
 wsServer.on('request', function(request) {
   console.log(
     new Date().toTimeString() + ': new connection from ' + request.remoteAddress
   );
+
   var connection = request.accept(null, request.origin);
   var client = {
     index: clients.length,
@@ -59,6 +65,7 @@ wsServer.on('request', function(request) {
     lastPulse: 0
   };
   clients.push(client);
+
   var tmpSession = -1;
   for (var i = 0; i < sessions.length; i++) {
     if (sessions[i].player2 == -1 && sessions[i].isActive) {
@@ -90,6 +97,7 @@ wsServer.on('request', function(request) {
     client.session = sessions.length - 1;
     client.playerNum = 1;
   }
+
   connection.on('message', function(message) {
     if (message.type === 'utf8') {
       var json = JSON.parse(message.utf8Data);
@@ -117,6 +125,7 @@ wsServer.on('request', function(request) {
       }
     }
   });
+
   connection.on('close', function(connection) {
     console.log('Client ' + client.index + ' disconnected');
     if (client.oppIndex > -1) {
@@ -127,6 +136,7 @@ wsServer.on('request', function(request) {
     sessions[client.session].isActive = false;
   });
 });
+
 httpServer.listen(port, function() {
   console.log('Server is listening on port ' + port);
 });
