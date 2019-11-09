@@ -215,33 +215,32 @@ class istit {
   }
 
   run() {
-    var t = this;
     this.load().then(() => {
-      t.syncDefDimension();
-      t.resizeForSP();
-      t.input.init();
-      t.renderer.init();
-      t.getLevelScores(50);
-      t.start();
+      this.syncDefDimension();
+      this.resizeForSP();
+      this.input.init();
+      this.renderer.init();
+      this.getLevelScores(50);
+      this.start();
       window.addEventListener(
         'keydown',
         function(e) {
-          t.input.handleKeyDown(e);
+          this.input.handleKeyDown(e);
         },
         false
       );
       window.addEventListener(
         'keyup',
         function(e) {
-          t.input.handleKeyUp(e);
+          this.input.handleKeyUp(e);
         },
         false
       );
       setInterval(function() {
-        t.live();
+        this.live();
       }, 0);
       setInterval(function() {
-        t.renderer.draw();
+        this.renderer.draw();
       }, 0);
     });
   }
@@ -1310,7 +1309,6 @@ class istit {
     }
     this.showingNamePrompt = true;
     if (add) {
-      var t = this;
       var name = prompt(
         'Enter a name to be recorded to the Leader Board:',
         this.playerName
