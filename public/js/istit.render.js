@@ -77,8 +77,8 @@ class render {
   }
 
   draw() {
-    var now = new Date().getTime();
-    var drawOpponent = this.g.width > this.g.defWidth;
+    const now = new Date().getTime();
+    const drawOpponent = this.g.width > this.g.defWidth;
     this.g.ctx.clearRect(0, 0, this.g.c.width, this.g.c.height);
     this.drawLayout();
     this.drawGrid();
@@ -137,9 +137,9 @@ class render {
   }
 
   drawAnimationOverlay() {
-    var now = new Date().getTime();
+    const now = new Date().getTime();
     if (this.g.animateTo.lineBreak > now) {
-      var alpha =
+      const alpha =
         ((this.g.animateTo.lineBreak - now) /
           (this.g.animateCycle.lineBreak * this.g.linesToClear.length)) *
         1;
@@ -158,7 +158,7 @@ class render {
 
   drawSystemMessage(msg) {
     this.g.ctx.save();
-    var grad = this.g.ctx.createLinearGradient(
+    const grad = this.g.ctx.createLinearGradient(
       this.pStartX,
       this.pStartY,
       this.pStartX,
@@ -177,26 +177,26 @@ class render {
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
     this.g.ctx.textBaseline = 'top';
-    var pauseX =
+    const pauseX =
       this.pWidth / 2 - this.g.ctx.measureText(msg).width / 2 + this.g.halfTile;
     this.g.ctx.fillText(msg, pauseX, this.sysY);
     this.g.ctx.restore();
   }
 
   drawLayout() {
-    var drawOpponent = this.g.width > this.g.defWidth;
+    const drawOpponent = this.g.width > this.g.defWidth;
     this.g.ctx.save();
     this.g.ctx.fillStyle = this.g.theme.frame;
     this.g.ctx.fillRect(0, 0, this.g.width, this.g.height);
     this.g.ctx.restore();
 
     if (this.g.images.frameTexture) {
-      var numH = Math.ceil(this.g.width / this.g.images.frameTexture.width);
-      var numV = Math.ceil(this.g.height / this.g.images.frameTexture.height);
-      for (var v = 0; v < numV; v++) {
-        for (var h = 0; h < numH; h++) {
-          var x = h * this.g.images.frameTexture.width;
-          var y = v * this.g.images.frameTexture.height;
+      const numH = Math.ceil(this.g.width / this.g.images.frameTexture.width);
+      const numV = Math.ceil(this.g.height / this.g.images.frameTexture.height);
+      for (let v = 0; v < numV; v++) {
+        for (let h = 0; h < numH; h++) {
+          let x = h * this.g.images.frameTexture.width;
+          let y = v * this.g.images.frameTexture.height;
           this.ctx.drawImage(this.g.images.frameTexture, x, y);
         }
       }
@@ -216,7 +216,7 @@ class render {
     this.g.ctx.restore();
     this.g.ctx.save();
     this.g.ctx.globalAlpha = 0.6;
-    var img = false;
+    let img = false;
     if (typeof this.g.images.bg[this.g.pState.level] != 'undefined') {
       img = this.g.images.bg[this.g.pState.level];
     } else if (typeof this.g.images.bg['default'] != 'undefined') {
@@ -233,9 +233,9 @@ class render {
     }
     if (drawOpponent) {
       if (typeof this.g.images.bg[this.g.oState.level] != 'undefined') {
-        var img = this.g.images.bg[this.g.oState.level];
+        img = this.g.images.bg[this.g.oState.level];
       } else {
-        var img = this.g.images.bg['default'];
+        img = this.g.images.bg['default'];
       }
       this.g.ctx.drawImage(
         img,
@@ -286,11 +286,11 @@ class render {
     );
     this.ctx.restore();
     if (!this.g.mp.wait) {
-      var pW = this.g.getPieceDimension(this.g.nextPieces[0], 1, 0);
-      var pH = this.g.getPieceDimension(this.g.nextPieces[0], 1, 1);
-      var npStartX = this.mStartX + (this.mW - pW * this.g.tile) / 2;
-      var npStartY = this.mStartY + (this.mW - pH * this.g.tile) / 2;
-      for (var b = 0; b < 4; b++) {
+      const pW = this.g.getPieceDimension(this.g.nextPieces[0], 1, 0);
+      const pH = this.g.getPieceDimension(this.g.nextPieces[0], 1, 1);
+      let npStartX = this.mStartX + (this.mW - pW * this.g.tile) / 2;
+      let npStartY = this.mStartY + (this.mW - pH * this.g.tile) / 2;
+      for (let b = 0; b < 4; b++) {
         this.drawBlock(
           this.g.nextPieces[0],
           npStartX +
@@ -303,19 +303,19 @@ class render {
       }
       npStartX -= this.g.tile;
       npStartY += 196;
-      var npStartX2 =
+      const npStartX2 =
         this.g.tile * (this.g.hTiles + 2) +
         this.mStartX +
         (this.mW - pW * this.g.tile) / 2 -
         this.g.tile * 0.5;
-      var npStartX3 =
+      const npStartX3 =
         this.g.tile * (this.g.hTiles + 2) +
         this.mStartX +
         (this.mW - pW * this.g.tile) / 2 +
         this.g.tile * 4;
-      var npStartY =
+      npStartY =
         this.mStartY + (this.mW - pH * this.g.tile) / 2 + this.g.tile * 6;
-      for (var b = 0; b < 4; b++) {
+      for (let b = 0; b < 4; b++) {
         this.drawBlock(
           this.g.nextPieces[1],
           npStartX2 +
@@ -330,7 +330,7 @@ class render {
           true
         );
       }
-      for (var b = 0; b < 4; b++) {
+      for (let b = 0; b < 4; b++) {
         this.drawBlock(
           this.g.nextPieces[2],
           npStartX3 +
@@ -369,11 +369,11 @@ class render {
     );
     this.ctx.restore();
     if (!this.g.mp.wait && this.g.holdPiece) {
-      var pW = this.g.getPieceDimension(this.g.holdPiece, 1, 0);
-      var pH = this.g.getPieceDimension(this.g.holdPiece, 1, 1);
-      var npStartX = this.mStartX + (this.mW - pW * this.g.tile) / 2;
-      var npStartY = this.hStartY + (this.mW - pH * this.g.tile) / 2;
-      for (var b = 0; b < 4; b++) {
+      const pW = this.g.getPieceDimension(this.g.holdPiece, 1, 0);
+      const pH = this.g.getPieceDimension(this.g.holdPiece, 1, 1);
+      const npStartX = this.mStartX + (this.mW - pW * this.g.tile) / 2;
+      const npStartY = this.hStartY + (this.mW - pH * this.g.tile) / 2;
+      for (let b = 0; b < 4; b++) {
         this.drawBlock(
           this.g.holdPiece,
           npStartX +
@@ -388,19 +388,19 @@ class render {
   }
 
   drawScore(now) {
-    var fontSize = this.scoreNormal;
+    let fontSize = this.scoreNormal;
     if (this.g.animateTo.score > now) {
-      var dif = this.g.animateTo.score - now;
-      var percent = Math.round((dif / this.g.animateCycle.score) * 100);
-      var counter = percent * (Math.PI / 100);
-      var v = (Math.sin(counter) * this.scoreDif) | 0;
+      const dif = this.g.animateTo.score - now;
+      const percent = Math.round((dif / this.g.animateCycle.score) * 100);
+      const counter = percent * (Math.PI / 100);
+      const v = (Math.sin(counter) * this.scoreDif) | 0;
       fontSize = this.scoreNormal + v;
     }
     this.g.ctx.save();
-    var rX = this.mStartX;
-    var rW = this.mW;
-    var rY = this.g.height - 96;
-    var rH = 48;
+    const rX = this.mStartX;
+    const rW = this.mW;
+    const rY = this.g.height - 96;
+    const rH = 48;
     this.ctx.fillStyle = this.g.theme.scoreFrame;
     this.ctx.strokeStyle = this.g.theme.scoreOutline;
     this.ctx.fillRect(rX, rY, rW, rH);
@@ -422,10 +422,10 @@ class render {
 
   drawLevel() {
     this.g.ctx.save();
-    var rX = this.mStartX;
-    var rW = this.mW;
-    var rY = this.g.height - 48;
-    var rH = 32;
+    const rX = this.mStartX;
+    const rW = this.mW;
+    const rY = this.g.height - 48;
+    const rH = 32;
     this.ctx.fillStyle = this.g.theme.levelFrame;
     this.ctx.strokeStyle = this.g.theme.levelOutline;
     this.ctx.fillRect(rX, rY, rW, rH);
@@ -433,7 +433,7 @@ class render {
     this.g.ctx.font = this.g.theme.font.level;
     this.g.ctx.fillStyle = this.g.theme.level;
     this.g.ctx.textBaseline = 'top';
-    var str = 'LEVEL ' + this.g.pState.level;
+    const str = 'LEVEL ' + this.g.pState.level;
     this.ctx.shadowColor = this.g.theme.levelShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
@@ -447,16 +447,16 @@ class render {
   }
 
   drawTime() {
-    var fTime = this.g.parseMiliSeconds(this.g.runTime);
-    var minutes = fTime[2];
-    var seconds = fTime[3];
+    const fTime = this.g.parseMiliSeconds(this.g.runTime);
+    let minutes = fTime[2];
+    let seconds = fTime[3];
     if (String(minutes).length == 1) {
       minutes = '0' + minutes;
     }
     if (String(seconds).length == 1) {
       seconds = '0' + seconds;
     }
-    var time = minutes + ':' + seconds;
+    const time = minutes + ':' + seconds;
     this.g.ctx.save();
     this.g.ctx.font = this.g.theme.font.time;
     this.g.ctx.fillStyle = this.g.theme.time;
@@ -470,23 +470,23 @@ class render {
   }
 
   drawGrid(opponent) {
-    var sx = this.pStartX;
-    var sy = this.pStartY;
+    let sx = this.pStartX;
+    let sy = this.pStartY;
     if (opponent) {
-      var sx = this.oStartX;
-      var sy = this.oStartY;
+      sx = this.oStartX;
+      sy = this.oStartY;
     }
     this.ctx.save();
     this.ctx.beginPath();
     this.ctx.strokeStyle = this.g.theme.gridLine;
     this.ctx.lineWidth = 1;
-    for (var v = 1; v <= this.g.vTiles - 1; v++) {
-      var y = this.g.tile * v + sy;
+    for (let v = 1; v <= this.g.vTiles - 1; v++) {
+      let y = this.g.tile * v + sy;
       this.ctx.moveTo(sx, y - 0.5);
       this.ctx.lineTo(sx + this.pWidth, y - 0.5);
     }
-    for (var h = 1; h <= this.g.hTiles - 1; h++) {
-      var x = this.g.tile * h + sx;
+    for (let h = 1; h <= this.g.hTiles - 1; h++) {
+      let x = this.g.tile * h + sx;
       this.ctx.moveTo(x - 0.5, sy);
       this.ctx.lineTo(x - 0.5, sy + this.pHeight);
     }
@@ -496,9 +496,9 @@ class render {
   }
 
   drawFallingPiece(opponent) {
-    var fp = this.g.pFallingPiece;
-    var sX = this.pStartX;
-    var sY = this.pStartY;
+    let fp = this.g.pFallingPiece;
+    let sX = this.pStartX;
+    let sY = this.pStartY;
     if (opponent) {
       fp = this.g.oFallingPiece;
       sX = this.oStartX;
@@ -516,9 +516,9 @@ class render {
       ', ' +
       this.g.pieces[fp.type].color.blue +
       ', 1)';
-    var blocks = this.g.getFallingBlocks(opponent);
-    for (var b = 0; b < 4; b++) {
-      var block = blocks[b];
+    const blocks = this.g.getFallingBlocks(opponent);
+    for (let b = 0; b < 4; b++) {
+      let block = blocks[b];
       this.drawBlock(
         fp.type,
         block.c * this.g.tile + sX,
@@ -529,36 +529,37 @@ class render {
   }
 
   drawFixedBlocks(opponent) {
-    var sX = this.pStartX;
-    var sY = this.pStartY;
-    var grid = this.g.pState.grid;
+    let sX = this.pStartX;
+    let sY = this.pStartY;
+    let grid = this.g.pState.grid;
     if (opponent) {
       sX = this.oStartX;
       sY = this.oStartY;
       grid = this.g.oState.grid;
     }
-    var x = 0,
+    let x = 0,
       y = 0;
-    var now = new Date().getTime();
+    const now = new Date().getTime();
+    let mPer = 0;
     if (this.g.animateTo.lineBreak > now) {
-      var dif = this.g.animateTo.lineBreak - now;
-      var mod = dif % this.g.animateCycle.lineBreak;
-      var opMod = this.g.animateCycle.lineBreak - mod;
-      var mPer = opMod / this.g.animateCycle.lineBreak;
+      const dif = this.g.animateTo.lineBreak - now;
+      const mod = dif % this.g.animateCycle.lineBreak;
+      const opMod = this.g.animateCycle.lineBreak - mod;
+      mPer = opMod / this.g.animateCycle.lineBreak;
     }
-    var md2x = this.scoreX - this.pStartX;
-    for (var h = 0; h < this.g.hTiles; h++) {
-      for (var v = 0; v < this.g.vTiles; v++) {
-        var a = 1;
+    let md2x = this.scoreX - this.pStartX;
+    for (let h = 0; h < this.g.hTiles; h++) {
+      for (let v = 0; v < this.g.vTiles; v++) {
+        let a = 1;
         if (grid[h][v] != false) {
-          var offset = this.g.getPieceOffset(h, v);
+          let offset = this.g.getPieceOffset(h, v);
           x = offset[0];
           y = offset[1];
           if (!opponent && this.g.rowIsCleared(v)) {
-            var d2x = this.scoreX - this.g.tile - x;
-            var d2y = this.scoreY - 30 - y;
-            var cDif = 10 - h;
-            var tPer = mPer + h * 0.01;
+            let d2x = this.scoreX - this.g.tile - x;
+            let d2y = this.scoreY - 30 - y;
+            let cDif = 10 - h;
+            let tPer = mPer + h * 0.01;
             if (mPer > 0) {
               x = x + d2x * tPer;
               y = y + d2y * tPer;
@@ -574,20 +575,20 @@ class render {
               a = 0;
             }
           }
-          var p = 0;
+          let p = 0;
           if (typeof this.g.placedBlocks[v + ':' + h] == 'number') {
-            var dif = this.g.placedBlocks[v + ':' + h] - new Date().getTime();
-            var percent = dif / this.g.dropDelay;
+            let dif = this.g.placedBlocks[v + ':' + h] - new Date().getTime();
+            let percent = dif / this.g.dropDelay;
             p = percent;
             if (p > 0) {
-              var percent = ((new Date().getTime() % 1000) / 1000) * 100;
-              var counter = percent * (Math.PI / 100);
-              var ver = (Math.sin(counter) * 4) | 0;
+              percent = ((new Date().getTime() % 1000) / 1000) * 100;
+              let counter = percent * (Math.PI / 100);
+              let ver = (Math.sin(counter) * 4) | 0;
               x -= ver;
               y -= ver;
             }
           }
-          var bType = grid[h][v];
+          let bType = grid[h][v];
           if (
             typeof this.g.pState.special[v + ':' + h] != 'undefined' &&
             !opponent
@@ -603,14 +604,14 @@ class render {
   }
 
   drawLoader() {
-    var percent = (new Date().getTime() % 1000) / 1000;
-    var counter = percent * (Math.PI / 100);
-    var v = Math.sin(counter) * Math.PI;
-    var x = 450,
+    const percent = (new Date().getTime() % 1000) / 1000;
+    const counter = percent * (Math.PI / 100);
+    const v = Math.sin(counter) * Math.PI;
+    const x = 450,
       y = 110,
       r = 50;
-    var start = percent * 360 * (Math.PI / 180);
-    var end = start - Math.PI * 1.5;
+    const start = percent * 360 * (Math.PI / 180);
+    const end = start - Math.PI * 1.5;
     this.ctx.save();
     this.ctx.beginPath();
     this.ctx.arc(x, y, r, start, end);
@@ -623,7 +624,7 @@ class render {
   }
 
   drawCountDown(now) {
-    var remaining = Math.ceil((this.g.mp.countUntil - now) / 1000);
+    const remaining = Math.ceil((this.g.mp.countUntil - now) / 1000);
     if (remaining != this.g.lastCountDown) {
       if (typeof this.g.sounds['countDown'] != 'undefined') {
         this.g.sounds['countDown'].currentTime = 0;
@@ -634,7 +635,7 @@ class render {
     this.ctx.font = '50px Lucida Console';
     this.ctx.fillStyle = this.g.theme.countDown;
     this.ctx.textBaseline = 'middle';
-    var num = remaining.toString();
+    const num = remaining.toString();
     this.ctx.fillText(num, 450 - this.g.ctx.measureText(num).width / 2, 110);
     this.ctx.restore();
   }
@@ -649,7 +650,7 @@ class render {
     if (y < this.g.pStartX) {
       return;
     }
-    var color = this.g.pieces[t].color;
+    const color = this.g.pieces[t].color;
     this.ctx.save();
     if (s) {
       this.ctx.scale(0.5, 0.5);
@@ -718,18 +719,18 @@ class render {
   drawSpecialEffects() {
     this.ctx.save();
 
-    var percent = (((this.g.runTime / 1000) % 2) / 2) * 100;
-    var counter = percent * (Math.PI / 100);
-    var counter2 = percent * 0.123 * (Math.PI / 100);
-    var v = (Math.sin(counter) * (this.g.tile * 0.75)) | 0;
-    var defXOffset = 0; //(Math.sin(counter)*this.g.halfTile) | 0;
-    var defYOffset = 0; //(Math.sin(counter2)*this.g.halfTile) | 0;
-    var a = Math.sin(counter);
-    var fillAlpha = 0.2 * a;
+    const percent = (((this.g.runTime / 1000) % 2) / 2) * 100;
+    const counter = percent * (Math.PI / 100);
+    const counter2 = percent * 0.123 * (Math.PI / 100);
+    const v = (Math.sin(counter) * (this.g.tile * 0.75)) | 0;
+    const defXOffset = 0; //(Math.sin(counter)*this.g.halfTile) | 0;
+    const defYOffset = 0; //(Math.sin(counter2)*this.g.halfTile) | 0;
+    const a = Math.sin(counter);
+    let fillAlpha = 0.2 * a;
     if (fillAlpha > 1) {
       fillAlpha = 1;
     }
-    var shadowAlpha = 0.2 * a;
+    let shadowAlpha = 0.2 * a;
     if (shadowAlpha > 1) {
       shadowAlpha = 1;
     }
@@ -738,13 +739,13 @@ class render {
     this.ctx.shadowOffsetX = 0;
     this.ctx.shadowOffsetY = 0;
     this.ctx.fillStyle = 'rgba(240, 210, 0, ' + fillAlpha + ')';
-    var x = 0,
+    let x = 0,
       y = 0;
-    for (var key in this.g.pState.special) {
-      var pair = key.split(':');
-      var r = parseInt(pair[0]);
-      var c = parseInt(pair[1]);
-      var offset = this.g.getPieceOffset(c, r);
+    for (let key in this.g.pState.special) {
+      let pair = key.split(':');
+      let r = parseInt(pair[0]);
+      let c = parseInt(pair[1]);
+      let offset = this.g.getPieceOffset(c, r);
       x = offset[0] + this.g.tile;
       y = offset[1] + this.g.tile;
       this.ctx.beginPath();
@@ -757,16 +758,16 @@ class render {
       );
       this.ctx.fill();
       this.ctx.closePath();
-      var lastVal = 0;
-      var xOffset = defXOffset,
+      let lastVal = 0;
+      let xOffset = defXOffset,
         yOffset = defYOffset;
-      for (var i = 0; i < 10; i++) {
+      for (let i = 0; i < 10; i++) {
         this.ctx.beginPath();
-        var xFac = Math.round((Math.PI * i * 1000) % 100);
-        var xCounter = xFac * (Math.PI / 100);
+        let xFac = Math.round((Math.PI * i * 1000) % 100);
+        let xCounter = xFac * (Math.PI / 100);
         xOffset = defXOffset + ((Math.sin(xCounter) * this.g.halfTile) | 0);
-        var yFac = Math.round((Math.PI * i * 1000000) % 100);
-        var yCounter = yFac * (Math.PI / 100);
+        let yFac = Math.round((Math.PI * i * 1000000) % 100);
+        let yCounter = yFac * (Math.PI / 100);
         yOffset = defYOffset + ((Math.sin(yCounter) * this.g.halfTile) | 0);
         this.ctx.globalCompositeOperation = 'xor';
         this.ctx.arc(
@@ -796,17 +797,17 @@ class render {
   }
 
   drawGhost() {
-    var ghost = this.g.getGhostBlocks();
-    var fBlocks = this.g.getFallingBlocks();
-    var tmpAlpha = this.g.ghostAlpha * 100;
-    var percent = ((this.g.runTime % 1000) / 1000) * 100;
-    var counter = percent * (Math.PI / 100);
-    var v = (Math.sin(counter) * (tmpAlpha * 1)) | 0;
+    const ghost = this.g.getGhostBlocks();
+    const fBlocks = this.g.getFallingBlocks();
+    let tmpAlpha = this.g.ghostAlpha * 100;
+    const percent = ((this.g.runTime % 1000) / 1000) * 100;
+    const counter = percent * (Math.PI / 100);
+    const v = (Math.sin(counter) * (tmpAlpha * 1)) | 0;
     tmpAlpha = tmpAlpha * 0.5 + v * 0.5;
-    var alpha = tmpAlpha / 100;
+    const alpha = tmpAlpha / 100;
     if (fBlocks[0].r < ghost[0].r) {
-      for (var i = 0; i < ghost.length; i++) {
-        var o = this.g.getPieceOffset(ghost[i].c, ghost[i].r);
+      for (let i = 0; i < ghost.length; i++) {
+        let o = this.g.getPieceOffset(ghost[i].c, ghost[i].r);
         this.drawBlock(
           this.g.pFallingPiece.type,
           o[0] + this.pStartX,
@@ -820,20 +821,20 @@ class render {
   drawMessages() {
     this.ctx.save();
     this.ctx.textBaseline = 'bottom';
-    var rX = this.mStartX;
-    var rW = this.mW;
-    var rY = this.g.height - 112;
-    var rH = 32;
-    for (var i = 0; i < this.g.messages.length; i++) {
-      var o = this.g.messages.length - i;
-      var msg = this.g.messages[i];
-      var offset = (o - 1) * this.msgH;
-      var p = this.getMsgPos(msg);
-      var percent =
+    let rX = this.mStartX;
+    let rW = this.mW;
+    let rY = this.g.height - 112;
+    let rH = 32;
+    for (let i = 0; i < this.g.messages.length; i++) {
+      let o = this.g.messages.length - i;
+      let msg = this.g.messages[i];
+      let offset = (o - 1) * this.msgH;
+      let p = this.getMsgPos(msg);
+      let percent =
         (this.g.scoreMsgTime - (msg.expiration - this.g.runTime)) /
         this.g.scoreMsgTime;
       offset += percent * this.g.scoreMsgDrift;
-      var a = Math.sin((1 - percent) * 100 * (Math.PI / 100)) * 2;
+      let a = Math.sin((1 - percent) * 100 * (Math.PI / 100)) * 2;
       if (a > 1) {
         a = 1;
       } else if (a < 0) {
@@ -844,12 +845,12 @@ class render {
       this.ctx.shadowBlur = 5;
       this.ctx.shadowOffsetX = 0;
       this.ctx.shadowOffsetY = 0;
-      var points = msg.text.replace(/(\+[0-9]+)\b.*/, '$1');
-      var label = msg.text.replace(/(\+[0-9]+)\b(.*)/, '$2');
+      let points = msg.text.replace(/(\+[0-9]+)\b.*/, '$1');
+      let label = msg.text.replace(/(\+[0-9]+)\b(.*)/, '$2');
       this.ctx.font = this.g.theme.font.scoreMsgPoints;
-      var sW = this.g.ctx.measureText(points).width;
+      let sW = this.g.ctx.measureText(points).width;
       this.ctx.font = this.g.theme.font.scoreMsgLabel;
-      var lW = this.g.ctx.measureText(label).width;
+      let lW = this.g.ctx.measureText(label).width;
       this.ctx.font = this.g.theme.scoreMsgPoints;
       this.ctx.fillStyle = this.g.theme.scoreMsgPoints;
       this.ctx.fillText(points, p.x, p.y - offset); //-((sW+lW)/2)
@@ -861,15 +862,16 @@ class render {
   }
 
   getMsgPos(msg) {
-    var r = msg.r;
-    var c = msg.c;
+    const r = msg.r;
+    let c = msg.c;
+    let x, y;
     if (r && c) {
       if (c > 6) {
         c = 6;
       }
-      var p = this.g.getPieceOffset(c, r);
-      var x = p[0] + this.pStartX;
-      var y = p[1] + this.pStartY;
+      const p = this.g.getPieceOffset(c, r);
+      x = p[0] + this.pStartX;
+      y = p[1] + this.pStartY;
     } else {
       y = this.g.height - g.tile * 1;
       x = this.pStartX + g.tile * 3;
@@ -883,7 +885,7 @@ class render {
     }
     this.ctx.save();
     this.ctx.font = font;
-    var width = this.ctx.measureText(text).width;
+    const width = this.ctx.measureText(text).width;
     this.ctx.restore();
     return width;
   }
@@ -894,13 +896,13 @@ class render {
       this.ctx.textBaseline = 'top';
       this.ctx.font = this.g.theme.font.leaderBoard;
       this.ctx.globalAlpha = this.lbPer;
-      var x = 0,
+      let x = 0,
         y = 0;
-      var rank = '',
+      let rank = '',
         pad = '000',
         score = '';
-      for (var i = 0; i < 25; i++) {
-        var r = this.g.leaderBoard[i];
+      for (let i = 0; i < 25; i++) {
+        let r = this.g.leaderBoard[i];
         if (r) {
           if (i % 2) {
             x = this.lbLeftX;
@@ -953,8 +955,8 @@ class render {
   }
 
   drawWave() {
-    var wavePower = 40;
-    var force = 0;
+    const wavePower = 40;
+    const force = 0;
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
     this.ctx.fillRect(0, 0, Waves.width, Waves.height);
     this.ctx.fillStyle = 'rgba(' + $colour + ', ' + this.alpha + ')';

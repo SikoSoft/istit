@@ -27,10 +27,10 @@ class input {
   }
 
   reset() {
-    for (var key in this.keyState) {
+    for (let key in this.keyState) {
       this.keyState[key] = false;
     }
-    for (var key in this.lastFloodWait) {
+    for (let key in this.lastFloodWait) {
       this.lastFloodWait[key] = 0;
     }
   }
@@ -74,8 +74,8 @@ class input {
   }
 
   setFloodTimer(key) {
-    var floodTime = this.floodWait[key];
-    var dif = new Date().getTime() - this.keyState[key];
+    let floodTime = this.floodWait[key];
+    let dif = new Date().getTime() - this.keyState[key];
     if (this.lastFloodWait[key]) {
       floodTime =
         this.lastFloodWait[key] - this.lastFloodWait[key] * this.g.keyDecay;
@@ -86,14 +86,14 @@ class input {
       floodTime = this.g.minKeyRepeat;
     }
     this.lastFloodWait[key] = floodTime;
-    this.floodTimers[key] = setTimeout(function() {
+    this.floodTimers[key] = setTimeout(() => {
       delete this.floodTimers[key];
     }, floodTime);
   }
 
   handleKeyDown(e) {
     if (!this.keyState[e.keyCode]) {
-      var c = String.fromCharCode(e.keyCode);
+      let c = String.fromCharCode(e.keyCode);
       if (g.paused && e.keyCode != 80 && !g.ended) {
         return;
       }
@@ -113,7 +113,7 @@ class input {
   handleKeyUp(e) {
     this.keyState[e.keyCode] = false;
     this.lastFloodWait[e.keyCode] = 0;
-    for (var mi = 37; mi <= 40; mi++) {
+    for (let mi = 37; mi <= 40; mi++) {
       if (this.keyState[mi]) {
         e.preventDefault();
         this.handleKeyDown({ keyCode: mi });

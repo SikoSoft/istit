@@ -33,7 +33,7 @@ class mp {
   }
 
   handleMessage(msg) {
-    var json = JSON.parse(msg.data);
+    const json = JSON.parse(msg.data);
     if (json.event == 'sessionReady') {
       this.startSession(json.session);
     } else if (json.event == 'end') {
@@ -46,7 +46,7 @@ class mp {
       this.g.oFallingPiece = json.fallingPiece;
     } else if (json.event == 'sync') {
       if (!this.wait) {
-        var now = new Date().getTime();
+        const now = new Date().getTime();
         this.syncTimes++;
         this.g.runTime = now - this.g.startTime;
         this.lastSync = new Date().getTime();
