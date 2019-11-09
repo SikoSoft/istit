@@ -596,17 +596,6 @@ class istit {
         validYAdjust = true;
         yAdjustDifFromExp = yAdjust - 1;
       }
-
-      //trace('yAdjust>'+yAdjust);
-      // for (var i = 1; i <= yAdjust; i++)
-      // {
-      // if (this.collides(0, i, 0) == false)
-      // {
-      // validYAdjust = true;
-      // yAdjustDifFromExp = yAdjust - i;
-      // break;
-      // }
-      // }
       if (validYAdjust) {
         adjust = true;
       } else {
@@ -788,13 +777,10 @@ class istit {
       tmpX = blocks[b].c + xAdjust;
       tmpY = blocks[b].r + yAdjust;
       if (tmpX < 0) {
-        //trace('1');
         collidesWith = 'left';
       } else if (tmpX > this.hTiles - 1) {
-        //trace('2');
         collidesWith = 'right';
       } else if (tmpY > this.vTiles - 1) {
-        //trace('3');
         collidesWith = 'bottom';
       }
       if (
@@ -804,7 +790,6 @@ class istit {
         tmpY < this.vTiles &&
         this.pState.grid[tmpX][tmpY] != false
       ) {
-        //trace('4');
         collidesWith = 'bottom';
       }
     }
@@ -1080,7 +1065,6 @@ class istit {
       if (dif <= this.lastScoreThreshold) {
         const remainder = this.lastScoreThreshold - dif;
         speedBonus = Math.round(remainder * this.lastScoreMultiplier * p);
-        //p += lsb;
       }
     }
     let tp = p + levelBonus;
@@ -1146,7 +1130,6 @@ class istit {
 
   placeFallingPieceAtBottom() {
     const offset = this.vTiles;
-    //for (var i = 0; i
     this.pFallingPiece.offset = offset;
   }
 
@@ -1189,14 +1172,6 @@ class istit {
 
   random(from, to) {
     return Math.floor(Math.random() * (to - from + 1) + from);
-  }
-
-  randomWithSeed(mZ, mW) {
-    //let mZ = m_w,
-    //  mW = m_w;
-    let m_z = 36969 * (m_z & 65535) + (m_z >> 16);
-    let m_w = 18000 * (m_w & 65535) + (m_w >> 16);
-    return (m_z << 16) + m_w;
   }
 
   getPieceDimension(t, o, d) {

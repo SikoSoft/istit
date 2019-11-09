@@ -22,10 +22,8 @@ class render {
     this.npStartY = this.pStartY + this.g.tile / 2;
     this.npH = this.mW + this.g.tile * 2;
     this.hStartY = this.npStartY + this.mW + this.g.tile * 2;
-
     this.scoreX = this.pEndX + this.g.tile * 0.5 + this.g.tile * 3;
     this.scoreY = this.g.defHeight - this.g.tile * 0.5;
-
     this.scoreNormal = parseInt(
       this.g.theme.font.scoreNormal.replace(/\b([0-9]+)(px|pt).*/, '$1')
     );
@@ -33,7 +31,6 @@ class render {
       this.g.theme.font.scoreNormal.replace(/\b([0-9]+)(px|pt).*/, '$1')
     );
     this.scoreDif = this.scoreLarge - this.scoreNormal;
-
     this.levelX = this.pEndX + this.g.tile * 2;
     this.levelY = this.g.defHeight - 100;
     this.timeX =
@@ -47,7 +44,6 @@ class render {
           '$1'
         )
       ) * 1.25;
-
     this.hScoresX = this.pStartX + this.pWidth * 0.1;
     this.hScoresY = this.pStartY + this.pHeight * 0.5;
     this.hScoresW = this.pWidth * 0.8;
@@ -61,19 +57,15 @@ class render {
     this.lbY = this.lbYTop;
     this.lbRankX = 0;
     this.lbScoreX = this.pWidth - this.g.tile;
-
     this.lbLeftXDef = this.pStartX + this.g.tile * 0.5 - this.pWidth;
     this.lbLeftXEnd = this.pStartX + this.g.tile * 0.5;
     this.lbLeftXDif = this.lbLeftXEnd - this.lbLeftXDef;
     this.lbLeftX = this.lbLeftDef;
-
     this.lbRightXDef = this.pStartX - this.g.tile * 0.5 + this.pWidth;
     this.lbRightXEnd = this.pStartX + this.g.tile * 0.5;
     this.lbRightXDif = this.lbRightXEnd - this.lbRightXDef;
     this.lbRightX = this.lbRightDef;
-
     this.noEdgeTile = this.g.tile - this.g.edgeThickness;
-    //this.frameTextureWidth = this.frameTexture.width;
   }
 
   draw() {
@@ -189,7 +181,6 @@ class render {
     this.g.ctx.fillStyle = this.g.theme.frame;
     this.g.ctx.fillRect(0, 0, this.g.width, this.g.height);
     this.g.ctx.restore();
-
     if (this.g.images.frameTexture) {
       const numH = Math.ceil(this.g.width / this.g.images.frameTexture.width);
       const numV = Math.ceil(this.g.height / this.g.images.frameTexture.height);
@@ -201,7 +192,6 @@ class render {
         }
       }
     }
-
     this.g.ctx.save();
     this.g.ctx.fillStyle = this.g.theme.grid;
     this.g.ctx.fillRect(this.pStartX, this.pStartY, this.pWidth, this.pHeight);
@@ -348,13 +338,12 @@ class render {
     }
   }
 
-  drawHoldPiece(now) {
+  drawHoldPiece() {
     this.ctx.save();
     this.ctx.fillStyle = this.g.theme.holdFrame;
     this.ctx.fillRect(this.mStartX, this.hStartY, this.mW, this.mW);
     this.ctx.strokeStyle = this.g.theme.holdOutline;
     this.ctx.strokeRect(this.mStartX, this.hStartY, this.mW, this.mW);
-
     this.ctx.font = this.g.theme.font.hold;
     this.ctx.textBaseline = 'top';
     this.ctx.fillStyle = this.g.theme.holdLabel;
@@ -547,7 +536,6 @@ class render {
       const opMod = this.g.animateCycle.lineBreak - mod;
       mPer = opMod / this.g.animateCycle.lineBreak;
     }
-    let md2x = this.scoreX - this.pStartX;
     for (let h = 0; h < this.g.hTiles; h++) {
       for (let v = 0; v < this.g.vTiles; v++) {
         let a = 1;
@@ -558,7 +546,6 @@ class render {
           if (!opponent && this.g.rowIsCleared(v)) {
             let d2x = this.scoreX - this.g.tile - x;
             let d2y = this.scoreY - 30 - y;
-            let cDif = 10 - h;
             let tPer = mPer + h * 0.01;
             if (mPer > 0) {
               x = x + d2x * tPer;
@@ -654,8 +641,6 @@ class render {
     this.ctx.save();
     if (s) {
       this.ctx.scale(0.5, 0.5);
-      // x *= 2;
-      // y *= 2;
     }
     this.ctx.globalAlpha = a;
     this.ctx.fillStyle =
@@ -718,13 +703,12 @@ class render {
 
   drawSpecialEffects() {
     this.ctx.save();
-
     const percent = (((this.g.runTime / 1000) % 2) / 2) * 100;
     const counter = percent * (Math.PI / 100);
     const counter2 = percent * 0.123 * (Math.PI / 100);
     const v = (Math.sin(counter) * (this.g.tile * 0.75)) | 0;
-    const defXOffset = 0; //(Math.sin(counter)*this.g.halfTile) | 0;
-    const defYOffset = 0; //(Math.sin(counter2)*this.g.halfTile) | 0;
+    const defXOffset = 0;
+    const defYOffset = 0;
     const a = Math.sin(counter);
     let fillAlpha = 0.2 * a;
     if (fillAlpha > 1) {
@@ -758,7 +742,6 @@ class render {
       );
       this.ctx.fill();
       this.ctx.closePath();
-      let lastVal = 0;
       let xOffset = defXOffset,
         yOffset = defYOffset;
       for (let i = 0; i < 10; i++) {
@@ -821,10 +804,6 @@ class render {
   drawMessages() {
     this.ctx.save();
     this.ctx.textBaseline = 'bottom';
-    let rX = this.mStartX;
-    let rW = this.mW;
-    let rY = this.g.height - 112;
-    let rH = 32;
     for (let i = 0; i < this.g.messages.length; i++) {
       let o = this.g.messages.length - i;
       let msg = this.g.messages[i];
@@ -850,13 +829,12 @@ class render {
       this.ctx.font = this.g.theme.font.scoreMsgPoints;
       let sW = this.g.ctx.measureText(points).width;
       this.ctx.font = this.g.theme.font.scoreMsgLabel;
-      let lW = this.g.ctx.measureText(label).width;
       this.ctx.font = this.g.theme.scoreMsgPoints;
       this.ctx.fillStyle = this.g.theme.scoreMsgPoints;
-      this.ctx.fillText(points, p.x, p.y - offset); //-((sW+lW)/2)
+      this.ctx.fillText(points, p.x, p.y - offset);
       this.ctx.font = this.g.theme.font.scoreMsgLabel;
       this.ctx.fillStyle = this.g.theme.scoreMsgLabel;
-      this.ctx.fillText(label, p.x + sW, p.y - offset); //
+      this.ctx.fillText(label, p.x + sW, p.y - offset);
     }
     this.ctx.restore();
   }
@@ -912,7 +890,6 @@ class render {
           y = this.lbY + 22 * i;
           rank = pad.substr(0, pad.length - r.rank.toString().length) + r.rank;
           score = r.score.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
           if (r.id == this.g.selfLBRowID) {
             this.ctx.fillStyle = this.g.theme.lbHighlight;
             this.ctx.fillRect(

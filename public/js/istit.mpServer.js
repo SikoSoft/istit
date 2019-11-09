@@ -125,7 +125,7 @@ wsServer.on('request', function(request) {
     }
   });
 
-  connection.on('close', function(connection) {
+  connection.on('close', function() {
     console.log('Client ' + client.index + ' disconnected');
     if (client.oppIndex > -1) {
       clients[client.oppIndex].connection.sendUTF(
