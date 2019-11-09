@@ -1,4 +1,4 @@
-class mp {
+export default class mp {
   constructor(g) {
     this.g = g;
     this.wait = false;

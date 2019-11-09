@@ -7,14 +7,12 @@
 		<title>ISTiT</title>
 		<link href='istit.css' rel='stylesheet' type='text/css'/>
 		<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'/>
-		<script type='text/javascript' src='js/istit.core.js'></script>
-		<script type='text/javascript' src='js/istit.input.js'></script>
-		<script type='text/javascript' src='js/istit.render.js'></script>
-		<script type='text/javascript' src='js/istit.mp.js'></script>
-		<script type='text/javascript'>
+		<script async type="module">
+			import istit from './js/istit.js';
+
 			const g = new istit();
 			document.onreadystatechange = function () {
-				if (document.readyState ==="interactive") {
+				if (document.readyState ==="complete") {
 					g.init('istit-canvas');
 					document.getElementById('version').innerHTML = 'v'+g.version;
 					document.getElementById('restart').addEventListener('click', function () {

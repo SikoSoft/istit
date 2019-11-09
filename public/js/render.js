@@ -1,4 +1,4 @@
-class render {
+export default class render {
   constructor(g) {
     this.g = g;
     this.ctx = this.g.ctx;
@@ -851,8 +851,8 @@ class render {
       x = p[0] + this.pStartX;
       y = p[1] + this.pStartY;
     } else {
-      y = this.g.height - g.tile * 1;
-      x = this.pStartX + g.tile * 3;
+      y = this.g.height - this.g.tile * 1;
+      x = this.pStartX + this.g.tile * 3;
     }
     return { x: x, y: y };
   }

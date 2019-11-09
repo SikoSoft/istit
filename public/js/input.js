@@ -1,4 +1,4 @@
-class input {
+export default class input {
   constructor(g) {
     this.g = g;
     this.keyState = {};
@@ -92,7 +92,7 @@ class input {
 
   handleKeyDown(e) {
     if (!this.keyState[e.keyCode]) {
-      if (g.paused && e.keyCode != 80 && !g.ended) {
+      if (this.g.paused && e.keyCode != 80 && !this.g.ended) {
         return;
       }
       this.keyState[e.keyCode] = new Date().getTime();
