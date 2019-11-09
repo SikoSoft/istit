@@ -208,7 +208,7 @@ istit.prototype.syncDefDimension = function() {
 
 istit.prototype.run = function() {
   var t = this;
-  jQuery.when(this.load()).then(function() {
+  this.load().then(() => {
     t.syncDefDimension();
     t.resizeForSP();
     t.input.init();
@@ -337,81 +337,98 @@ istit.prototype.end = function(isWinner) {
 };
 
 istit.prototype.load = function() {
-  var dfd = jQuery.Deferred();
-  var t = this;
-  jQuery.when(this.loadCFG()).then(function() {
-    jQuery.when(t.loadImages(), t.loadSounds()).then(function() {
-      dfd.resolve();
-    });
+  return new Promise(resolve => {
+    this.loadCFG()
+      .then(() => {
+        return this.loadImages();
+      })
+      .then(() => {
+        return this.loadSounds();
+      })
+      .then(() => {
+        resolve();
+      })
+      .catch(error => {
+        console.log('Encountered an error while loading!', error);
+      });
   });
-  return dfd.promise();
 };
 
 istit.prototype.loadImages = function() {
-  var dfd = jQuery.Deferred();
-  var t = this;
-  var imgsLoaded = 0,
-    numImages = 0;
-  this.images.bg = {};
-  if (this.theme.frameTexture) {
-    numImages++;
-    this.images.frameTexture = new Image();
-    this.images.frameTexture.src = this.theme.frameTexture;
-    j(this.images.frameTexture).load(function() {
-      imgsLoaded++;
-      if (imgsLoaded == numImages) {
-        dfd.resolve();
-      }
-    });
-  }
-  for (var l in this.theme.bgImages) {
-    numImages++;
-    t.images.bg[l] = new Image();
-    t.images.bg[l].src = t.theme.bgImages[l];
-    j(t.images.bg[l]).load(function() {
-      imgsLoaded++;
-      if (imgsLoaded == numImages) {
-        dfd.resolve();
-      }
-    });
-  }
-  if (numImages == 0) {
-    dfd.resolve();
-  }
-  return dfd.promise();
+  return new Promise((resolve, reject) => {
+    var imagesLoaded = 0,
+      numImages = 0;
+    this.images.bg = {};
+    if (this.theme.frameTexture) {
+      numImages++;
+      this.images.frameTexture = new Image();
+      this.images.frameTexture.src = this.theme.frameTexture;
+      this.images.frameTexture.onload = () => {
+        imagesLoaded++;
+        if (imagesLoaded === numImages) {
+          resolve();
+        }
+      };
+      this.images.frameTexture.onerror = reject;
+    }
+    for (var l in this.theme.bgImages) {
+      numImages++;
+      this.images.bg[l] = new Image();
+      this.images.bg[l].src = this.theme.bgImages[l];
+      this.images.bg[l].onload = () => {
+        imagesLoaded++;
+        if (imagesLoaded === numImages) {
+          resolve();
+        }
+      };
+    }
+    if (numImages == 0) {
+      resolve();
+    }
+  });
 };
 
 istit.prototype.loadSounds = function() {
-  var dfd = jQuery.Deferred();
-  var sndsLoaded = 0,
-    numSounds = 0;
-  this.sounds = {};
-  for (var snd in this.theme.sounds) {
-    numSounds++;
-    this.sounds[snd] = new Audio(this.theme.sounds[snd]);
-    this.sounds[snd].volume = this.defVolume;
-  }
-  dfd.resolve();
-  return dfd.promise();
+  return new Promise((resolve, reject) => {
+    let soundsLoaded = 0,
+      numSounds = 0;
+    this.sounds = {};
+    for (var snd in this.theme.sounds) {
+      numSounds++;
+      this.sounds[snd] = new Audio(this.theme.sounds[snd]);
+      this.sounds[snd].volume = this.defVolume;
+      this.sounds[snd].onloadeddata = () => {
+        soundsLoaded++;
+        if (soundsLoaded === numSounds) {
+          resolve();
+        }
+      };
+      this.sounds[snd].onerror = reject;
+    }
+  });
 };
 
 istit.prototype.loadCFG = function() {
-  var dfd = jQuery.Deferred();
-  var t = this;
-  jQuery.getJSON('core.json', function(json) {
-    t.cfg = json;
-    for (var key in t.cfg) {
-      if (key == 'input') {
-        for (var iKey in t.cfg[key]) {
-          t.input[iKey] = t.cfg[key][iKey];
+  return new Promise((resolve, reject) => {
+    fetch('core.json')
+      .then(response => response.json())
+      .then(data => {
+        this.cfg = data;
+        for (var key in this.cfg) {
+          if (key == 'input') {
+            for (var iKey in this.cfg[key]) {
+              this.input[iKey] = this.cfg[key][iKey];
+            }
+          } else {
+            this[key] = this.cfg[key];
+          }
         }
-      } else {
-        t[key] = t.cfg[key];
-      }
-    }
-    dfd.resolve();
+        resolve();
+      })
+      .catch(() => {
+        reject();
+      });
   });
-  return dfd.promise();
 };
 
 istit.prototype.pause = function() {
@@ -1259,53 +1276,9 @@ istit.prototype.addNextPiece = function() {
   }
 };
 
-istit.prototype.getLeaderBoard = function() {
-  var offset = this.selfLBRank - 12;
-  if (offset < 0) {
-    offset = 0;
-  }
-  var maxOffset = this.numLBRows - 13;
-  if (offset >= maxOffset) {
-    offset = this.numLBRows - 25;
-  }
-  var t = this;
-  var dfd = jQuery.Deferred();
-  jQuery.post(
-    this.lbGet,
-    { offset: offset },
-    function(json) {
-      t.leaderBoard = json.leaderBoard;
-      dfd.resolve();
-    },
-    'json'
-  );
-  return dfd.promise();
-};
+istit.prototype.getLeaderBoard = function() {};
 
-istit.prototype.addToLeaderBoard = function() {
-  var t = this;
-  var dfd = jQuery.Deferred();
-  if (this.pState.score > 0) {
-    jQuery.post(
-      this.lbAdd,
-      {
-        score: this.pState.score,
-        duration: this.runTime,
-        player: this.playerName
-      },
-      function(json) {
-        t.selfLBRowID = json.rowID;
-        t.selfLBRank = json.rankOffset;
-        t.numLBRows = json.numRows;
-        dfd.resolve();
-      },
-      'json'
-    );
-  } else {
-    dfd.resolve();
-  }
-  return dfd.promise();
-};
+istit.prototype.addToLeaderBoard = function() {};
 
 istit.prototype.useLeaderBoard = function() {
   if (this.lbGet != '' && this.lbAdd != '') {
@@ -1328,11 +1301,6 @@ istit.prototype.queueLeaderBoard = function(add) {
     if (name && name.replace(/\s/g, '') != '') {
       this.playerName = name;
     }
-    jQuery.when(t.addToLeaderBoard()).then(function() {
-      jQuery.when(t.getLeaderBoard()).then(function() {
-        t.launchLeaderBoard();
-      });
-    });
   } else {
     this.launchLeaderBoard();
   }
