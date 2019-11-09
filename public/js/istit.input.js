@@ -74,20 +74,20 @@ class input {
   }
 
   setFloodTimer(key) {
-    var t = this;
-    var floodTime = t.floodWait[key];
+    var floodTime = this.floodWait[key];
     var dif = new Date().getTime() - this.keyState[key];
-    if (t.lastFloodWait[key]) {
-      floodTime = t.lastFloodWait[key] - t.lastFloodWait[key] * this.g.keyDecay;
+    if (this.lastFloodWait[key]) {
+      floodTime =
+        this.lastFloodWait[key] - this.lastFloodWait[key] * this.g.keyDecay;
     } else {
-      floodTime = t.floodWait[key];
+      floodTime = this.floodWait[key];
     }
     if (floodTime < this.g.minKeyRepeat) {
       floodTime = this.g.minKeyRepeat;
     }
     this.lastFloodWait[key] = floodTime;
     this.floodTimers[key] = setTimeout(function() {
-      delete t.floodTimers[key];
+      delete this.floodTimers[key];
     }, floodTime);
   }
 

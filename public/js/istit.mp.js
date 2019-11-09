@@ -20,15 +20,14 @@ class mp {
     this.wait = true;
     this.oppIsAlive = true;
     this.ws = new WebSocket(this.g.mpServer);
-    var t = this;
-    this.ws.onopen = function() {
-      t.connected = true;
+    this.ws.onopen = () => {
+      this.connected = true;
     };
-    this.ws.onclose = function() {
-      t.connected = false;
+    this.ws.onclose = () => {
+      this.connected = false;
     };
-    this.ws.onmessage = function(msg) {
-      t.handleMessage(msg);
+    this.ws.onmessage = msg => {
+      this.handleMessage(msg);
     };
     this.g.resizeForMP();
   }
@@ -62,12 +61,11 @@ class mp {
   startSession(sID) {
     this.countingDown = true;
     this.countUntil = new Date().getTime() + this.g.mpCountDown;
-    var t = this;
-    setTimeout(function() {
+    setTimeout(() => {
       this.g.start();
-      t.countingDown = false;
-      t.wait = false;
-      t.session = sID;
+      this.countingDown = false;
+      this.wait = false;
+      this.session = sID;
     }, this.g.mpCountDown);
   }
 
