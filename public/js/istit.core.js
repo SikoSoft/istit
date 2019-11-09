@@ -224,36 +224,36 @@ class istit {
       this.start();
       window.addEventListener(
         'keydown',
-        function(e) {
+        e => {
           this.input.handleKeyDown(e);
         },
         false
       );
       window.addEventListener(
         'keyup',
-        function(e) {
+        e => {
           this.input.handleKeyUp(e);
         },
         false
       );
-      setInterval(function() {
+      setInterval(() => {
         this.live();
       }, 0);
-      setInterval(function() {
+      setInterval(() => {
         this.renderer.draw();
       }, 0);
     });
   }
 
   parseMiliSeconds(ms) {
-    var x = ms / 1000;
-    var seconds = Math.floor(x % 60);
+    let x = ms / 1000;
+    const seconds = Math.floor(x % 60);
     x /= 60;
-    var minutes = Math.floor(x % 60);
+    const minutes = Math.floor(x % 60);
     x /= 60;
-    var hours = Math.floor(x % 24);
+    const hours = Math.floor(x % 24);
     x /= 24;
-    var days = Math.floor(x);
+    const days = Math.floor(x);
     return [days, hours, minutes, seconds];
   }
 
@@ -314,10 +314,10 @@ class istit {
       elapsed: 0,
       placed: false
     };
-    for (var h = 0; h < this.hTiles; h++) {
+    for (let h = 0; h < this.hTiles; h++) {
       this.pState.grid[h] = [];
       this.oState.grid[h] = [];
-      for (var v = 0; v < this.vTiles; v++) {
+      for (let v = 0; v < this.vTiles; v++) {
         this.pState.grid[h][v] = 0;
         this.oState.grid[h][v] = 0;
       }
@@ -363,7 +363,7 @@ class istit {
 
   loadImages() {
     return new Promise((resolve, reject) => {
-      var imagesLoaded = 0,
+      let imagesLoaded = 0,
         numImages = 0;
       this.images.bg = {};
       if (this.theme.frameTexture) {
@@ -378,7 +378,7 @@ class istit {
         };
         this.images.frameTexture.onerror = reject;
       }
-      for (var l in this.theme.bgImages) {
+      for (let l in this.theme.bgImages) {
         numImages++;
         this.images.bg[l] = new Image();
         this.images.bg[l].src = this.theme.bgImages[l];
@@ -400,7 +400,7 @@ class istit {
       let soundsLoaded = 0,
         numSounds = 0;
       this.sounds = {};
-      for (var snd in this.theme.sounds) {
+      for (let snd in this.theme.sounds) {
         numSounds++;
         this.sounds[snd] = new Audio(this.theme.sounds[snd]);
         this.sounds[snd].volume = this.defVolume;
@@ -421,9 +421,9 @@ class istit {
         .then(response => response.json())
         .then(data => {
           this.cfg = data;
-          for (var key in this.cfg) {
+          for (let key in this.cfg) {
             if (key == 'input') {
-              for (var iKey in this.cfg[key]) {
+              for (let iKey in this.cfg[key]) {
                 this.input[iKey] = this.cfg[key][iKey];
               }
             } else {
@@ -454,7 +454,7 @@ class istit {
   }
 
   inputIsLocked() {
-    var now = new Date().getTime();
+    const now = new Date().getTime();
     if (now < this.animateTo.lineBreak || now < this.animateTo.lineAdd) {
       return true;
     }
@@ -463,7 +463,7 @@ class istit {
 
   live() {
     if (this.mp.countingDown) {
-      var remaining = Math.ceil(
+      const remaining = Math.ceil(
         (this.mp.countUntil - new Date().getTime()) / 1000
       );
       if (remaining != this.lastCountDown) {
@@ -472,6 +472,7 @@ class istit {
           this.sounds['countDown'].play();
         }
       }
+      this.lastCountDown = remaining;
     }
     if (this.inPlay()) {
       this.lastDelta = new Date().getTime() - this.lastTick;
@@ -490,15 +491,14 @@ class istit {
         }
       }
       this.adjustFallingHeight();
-      var now = new Date().getTime();
       if (
         this.runTime > this.dropAt &&
         this.pFallingPiece.start < this.dropAt
       ) {
         this.dropPiece();
       }
-      for (var i = this.messages.length - 1; i >= 0; i--) {
-        var m = this.messages[i];
+      for (let i = this.messages.length - 1; i >= 0; i--) {
+        let m = this.messages[i];
         if (this.runTime > m.expiration) {
           this.messages.splice(i, 1);
         }
@@ -507,24 +507,24 @@ class istit {
         this.spawnSpecial();
         this.nextSpecialTime = this.runTime + this.specialInterval;
       }
-      for (var i in this.pState.special) {
+      for (let i in this.pState.special) {
         if (this.runTime > this.pState.special[i]) {
           delete this.pState.special[i];
         }
       }
       if (this.runTime > this.nextSpecialJitterTime) {
-        var joa = [-1, 0, 1];
+        let joa = [-1, 0, 1];
         this.xSpecialJitter = joa[this.random(1, joa.length) - 1];
         this.ySpecialJitter = joa[this.random(1, joa.length) - 1];
         this.nextSpecialJitterTime = this.runTime + this.specialJitter;
       }
     }
-    var now = new Date().getTime();
+    const now = new Date().getTime();
     if (this.lbIsShowing) {
-      var sysPer =
+      let sysPer =
         (this.animateCycle.sysUp - (this.animateTo.sysUp - now)) /
         this.animateCycle.sysUp;
-      var lbPer = 0;
+      let lbPer = 0;
       if (sysPer > 1) {
         sysPer = 1;
         lbPer =
@@ -550,21 +550,19 @@ class istit {
     ) {
       this.queueLeaderBoard(true);
     }
-    var dif = new Date().getTime() - this.lastWeightTime;
-    this.lastCountDown = remaining;
     this.lastTick = new Date().getTime();
     this.input.process();
   }
 
   setVolume(v) {
     this.volume = v;
-    for (var snd in this.sounds) {
+    for (let snd in this.sounds) {
       this.sounds[snd].volume = v;
     }
   }
 
   rowIsCleared(r) {
-    for (var i = 0; i < this.linesToClear.length; i++) {
+    for (let i = 0; i < this.linesToClear.length; i++) {
       if (this.linesToClear[i] == r) {
         return true;
       }
@@ -573,18 +571,17 @@ class istit {
   }
 
   adjustFallingHeight() {
-    //trace('afh');
-    var validYAdjust = false;
-    var yAdjust = true;
-    var yAdjustDifFromExp = 0;
-    var adjust = true;
-    var place = false;
-    var h = 0;
-    var dif = this.runTime - this.pFallingPiece.start;
+    let validYAdjust = false;
+    let yAdjust = true;
+    let yAdjustDifFromExp = 0;
+    let adjust = true;
+    let place = false;
+    let h = 0;
+    const dif = this.runTime - this.pFallingPiece.start;
     if (dif >= this.fallTime) {
       h = this.vTiles;
     } else {
-      var percent = dif / this.fallTime;
+      const percent = dif / this.fallTime;
       h = Math.floor(percent * this.vTiles);
     }
     h += this.pFallingPiece.offset;
@@ -617,7 +614,7 @@ class istit {
       }
     }
     if (adjust) {
-      var sendState = false;
+      let sendState = false;
       if (h - yAdjustDifFromExp != this.pFallingPiece.lastY) {
         sendState = true;
       }
@@ -639,39 +636,38 @@ class istit {
 
   adjustTime(dif) {
     this.time += dif;
-    var elapsed = this.time - this.timeStart;
   }
 
   spawnSpecial() {
-    var num = 0,
+    let num = 0,
       low = this.vTiles;
-    for (var c = 0; c < this.hTiles; c++) {
+    for (let c = 0; c < this.hTiles; c++) {
       num = this.getClosestToTopInColumn(c);
       if (num < low) {
         low = num;
       }
     }
-    var perRow = this.vTiles / (this.vTiles - low);
-    var chance = 0;
-    var rows = [];
-    for (var r = low; r < this.vTiles; r++) {
+    const perRow = this.vTiles / (this.vTiles - low);
+    let chance = 0;
+    const rows = [];
+    for (let r = low; r < this.vTiles; r++) {
       chance += perRow;
-      var percent = chance / this.vTiles;
-      var rand = this.random(1, 100);
+      const percent = chance / this.vTiles;
+      const rand = this.random(1, 100);
       if (rand <= percent * 100) {
         rows.push(r);
       }
     }
-    var index = this.random(1, rows.length) - 1;
-    var r = rows[index];
-    var cells = [];
-    for (var c = 0; c < this.hTiles; c++) {
+    const rowIndex = this.random(1, rows.length) - 1;
+    const r = rows[rowIndex];
+    const cells = [];
+    for (let c = 0; c < this.hTiles; c++) {
       if (this.pState.grid[c][r]) {
         cells.push(c);
       }
     }
-    var index = this.random(1, cells.length) - 1;
-    var c = cells[index];
+    const columnIndex = this.random(1, cells.length) - 1;
+    const c = cells[columnIndex];
     if (r && c) {
       this.pState.special[r + ':' + c] = this.runTime + this.specialDuration;
     }
@@ -679,17 +675,17 @@ class istit {
 
   randomPiece() {
     if (this.bffrPiece) {
-      var bffr = this.bffrPiece;
+      const bffr = this.bffrPiece;
       this.bffrPiece = false;
       return bffr;
     }
-    var wSum = 0;
-    for (var key in this.pieces) {
+    let wSum = 0;
+    for (let key in this.pieces) {
       wSum += this.pieces[key].weight;
     }
-    var seed = Math.floor(Math.random() * wSum + 1);
-    for (key in this.pieces) {
-      var w = this.pieces[key].weight;
+    let seed = Math.floor(Math.random() * wSum + 1);
+    for (let key in this.pieces) {
+      const w = this.pieces[key].weight;
       if (seed <= w) {
         return key * 1;
       } else {
@@ -701,12 +697,12 @@ class istit {
 
   dropPiece() {
     if (!this.ended) {
-      var startX = this.hTiles / 2 - 1,
+      const startX = this.hTiles / 2 - 1,
         startY = -1;
-      var x = 0;
-      var y = 0;
-      var blocks = [];
-      for (var b = 0; b < 4; b++) {
+      let x = 0;
+      let y = 0;
+      const blocks = [];
+      for (let b = 0; b < 4; b++) {
         x = startX + this.pieces[this.nextPieces[0]].orientations[1][b][0] - 1;
         y = startY + this.pieces[this.nextPieces[0]].orientations[1][b][1] - 1;
         blocks[b] = [x, y];
@@ -728,13 +724,13 @@ class istit {
       this.pFallingPiece.elapsed = 0;
       this.nextPieces.splice(0, 1);
       this.addNextPiece();
-      var cWeight = this.getCompoundedWeight();
+      const cWeight = this.getCompoundedWeight();
       if (cWeight >= this.safetyThreshold && this.runTime > this.nextSafetyAt) {
         this.safetyTimes++;
         this.nextSafetyAt = this.runTime + this.safetyInterval;
         this.nextPieces[this.nextPiece.length - 1] = this.safetyPiece;
       } else if (this.gridWeightHistory.length > 0) {
-        var wDif = cWeight - this.gridWeightHistory[0].weight;
+        const wDif = cWeight - this.gridWeightHistory[0].weight;
         if (wDif > this.safetyShift && this.runTime > this.nextSafetyAt) {
           this.safetyTimes++;
           this.nextSafetyAt = this.runTime + this.safetyInterval;
@@ -760,13 +756,13 @@ class istit {
     if (typeof update == 'undefined') {
       update = true;
     }
-    var collides = false;
-    var newPosition = this.pFallingPiece.position + 1;
+    let collides = false;
+    let newPosition = this.pFallingPiece.position + 1;
     if (newPosition > 4) {
       newPosition = 1;
     }
-    for (var c = 0; c >= -4; c--) {
-      var xAdjust = c;
+    for (let c = 0; c >= -4; c--) {
+      let xAdjust = c;
       collides = this.collides(xAdjust, 0, newPosition);
       if (update && !collides) {
         this.pFallingPiece.x += xAdjust;
@@ -784,11 +780,11 @@ class istit {
     if (typeof rAdjust == 'undefined' || rAdjust == 0) {
       rAdjust = this.pFallingPiece.position;
     }
-    var collidesWith = false;
-    var tmpX = -1;
-    var tmpY = -1;
-    var blocks = this.getFallingBlocks(false, rAdjust, type);
-    for (var b = 0; b < blocks.length; b++) {
+    let collidesWith = false;
+    let tmpX = -1;
+    let tmpY = -1;
+    const blocks = this.getFallingBlocks(false, rAdjust, type);
+    for (let b = 0; b < blocks.length; b++) {
       tmpX = blocks[b].c + xAdjust;
       tmpY = blocks[b].r + yAdjust;
       if (tmpX < 0) {
@@ -816,7 +812,7 @@ class istit {
   }
 
   getFallingBlocks(opponent, p, t) {
-    var fp = this.pFallingPiece;
+    const fp = this.pFallingPiece;
     if (opponent) {
       fp = this.oFallingPiece;
     }
@@ -826,10 +822,10 @@ class istit {
     if (typeof t == 'undefined') {
       t = fp.type;
     }
-    var r = 0;
-    var c = 0;
-    var blocks = [];
-    for (var b = 0; b < 4; b++) {
+    let r = 0;
+    let c = 0;
+    const blocks = [];
+    for (let b = 0; b < 4; b++) {
       c = fp.x + this.pieces[t].orientations[p][b][0] - 1;
       r = fp.y + this.pieces[t].orientations[p][b][1] - 1;
       blocks[b] = { r: r, c: c };
@@ -874,22 +870,21 @@ class istit {
       time: new Date().getTime(),
       weight: this.getCompoundedWeight()
     });
-    var now = new Date().getTime();
-    var expiry = now - this.safetyTime;
-    for (var i = this.gridWeightHistory.length - 1; i >= 0; i--) {
-      var h = this.gridWeightHistory[i];
-      if (h.time < expiry) {
+    const now = new Date().getTime();
+    const expiry = now - this.safetyTime;
+    for (let i = this.gridWeightHistory.length - 1; i >= 0; i--) {
+      if (this.gridWeightHistory[i].time < expiry) {
         this.gridWeightHistory.splice(i, 1);
       }
     }
   }
 
   getHotPiece(lines) {
-    for (var key in this.placedBlocks) {
-      var bPair = key.split(':');
-      var r = parseInt(bPair[0]);
-      var c = parseInt(bPair[1]);
-      for (var l = 0; l < lines.length; l++) {
+    for (let key in this.placedBlocks) {
+      const bPair = key.split(':');
+      const r = parseInt(bPair[0]);
+      const c = parseInt(bPair[1]);
+      for (let l = 0; l < lines.length; l++) {
         if (lines[l] == r) {
           return { r: r, c: c };
         }
@@ -901,9 +896,8 @@ class istit {
   placePiece() {
     if (!this.pFallingPiece.placed) {
       this.placedBlocks = {};
-      var end = false;
-      var blocks = this.getFallingBlocks();
-      for (var b = 0; b < 4; b++) {
+      const blocks = this.getFallingBlocks();
+      for (let b = 0; b < 4; b++) {
         this.pState.grid[blocks[b].c][blocks[b].r] = parseInt(
           this.pFallingPiece.type
         );
@@ -913,7 +907,7 @@ class istit {
       if (this.getCompoundedWeight() > this.clearRequirement) {
         this.okForClearBonus = true;
       }
-      var lines = this.getCompleteLines();
+      const lines = this.getCompleteLines();
       if (lines.length > 0) {
         this.clearLines(lines);
       }
@@ -924,10 +918,10 @@ class istit {
   }
 
   getCompleteLines() {
-    var lines = [];
-    for (var v = 0; v < this.vTiles; v++) {
-      var solid = true;
-      for (var h = 0; h < this.hTiles; h++) {
+    const lines = [];
+    for (let v = 0; v < this.vTiles; v++) {
+      let solid = true;
+      for (let h = 0; h < this.hTiles; h++) {
         if (!this.pState.grid[h][v]) {
           solid = false;
           break;
@@ -941,21 +935,21 @@ class istit {
   }
 
   destroyLines() {
-    var lines = this.linesToClear;
-    var numLines = lines.length;
-    for (var l = 0; l < numLines; l++) {
-      var line = lines[l];
-      for (var v = 0; v < this.vTiles; v++) {
+    const lines = this.linesToClear;
+    const numLines = lines.length;
+    for (let l = 0; l < numLines; l++) {
+      let line = lines[l];
+      for (let v = 0; v < this.vTiles; v++) {
         if (v == line) {
-          for (var h = 0; h < this.hTiles; h++) {
+          for (let h = 0; h < this.hTiles; h++) {
             this.pState.grid[h][v] = 0;
           }
         }
       }
-      for (var v = this.vTiles - 1; v >= 0; v--) {
+      for (let v = this.vTiles - 1; v >= 0; v--) {
         if (v < line) {
-          for (var c = 0; c < this.hTiles; c++) {
-            var tmpVal = this.pState.grid[c][v];
+          for (let c = 0; c < this.hTiles; c++) {
+            let tmpVal = this.pState.grid[c][v];
             this.pState.grid[c][v] = 0;
             this.pState.grid[c][v + 1] = tmpVal;
             if (typeof this.pState.special[v + ':' + c] != 'undefined') {
@@ -968,9 +962,9 @@ class istit {
         }
       }
     }
-    var isCleared = true;
-    for (var v = 0; v < this.vTiles; v++) {
-      for (var h = 0; h < this.hTiles; h++) {
+    let isCleared = true;
+    for (let v = 0; v < this.vTiles; v++) {
+      for (let h = 0; h < this.hTiles; h++) {
         if (this.pState.grid[h][v]) {
           isCleared = false;
           break;
@@ -994,18 +988,13 @@ class istit {
   }
 
   clearLines(lines) {
-    var str = 'line';
-    if (lines.length > 1) {
-      str = 'lines';
-    }
-    var msg = 'lines cleared X' + lines.length;
-    var hotPiece = this.getHotPiece(lines);
+    const msg = 'lines cleared X' + lines.length;
+    const hotPiece = this.getHotPiece(lines);
     if (lines.length == 4) {
       this.adjustScore(800, { text: msg, r: hotPiece.r, c: hotPiece.c });
       this.chainCount++;
       if (this.chainCount > 1) {
-        var bonus = 800 * this.chainCount;
-        this.adjustScore(bonus, {
+        this.adjustScore(800 * this.chainCount, {
           text: 'ISTiT chain',
           r: hotPiece.r,
           c: hotPiece.c
@@ -1019,9 +1008,9 @@ class istit {
         c: hotPiece.c
       });
     }
-    for (var i = 0; i < lines.length; i++) {
-      for (var s in this.pState.special) {
-        for (var c = 0; c < this.hTiles; c++) {
+    for (let i = 0; i < lines.length; i++) {
+      for (let s in this.pState.special) {
+        for (let c = 0; c < this.hTiles; c++) {
           if (typeof this.pState.special[lines[i] + ':' + c] != 'undefined') {
             delete this.pState.special[lines[i] + ':' + c];
             this.adjustScore(
@@ -1057,16 +1046,16 @@ class istit {
   }
 
   insertLines() {
-    for (var i = 0; i < this.linesToGet; i++) {
-      for (var v = 0; v < this.vTiles; v++) {
-        for (var h = 0; h < this.hTiles; h++) {
-          var tmpVal = this.pState.grid[h][v];
+    for (let i = 0; i < this.linesToGet; i++) {
+      for (let v = 0; v < this.vTiles; v++) {
+        for (let h = 0; h < this.hTiles; h++) {
+          let tmpVal = this.pState.grid[h][v];
           this.pState.grid[h][v] = false;
           this.pState.grid[h][v - 1] = tmpVal;
         }
       }
-      var empty = this.random(1, this.hTiles);
-      for (var li = 0; li < this.hTiles; li++) {
+      const empty = this.random(1, this.hTiles);
+      for (let li = 0; li < this.hTiles; li++) {
         if (li != empty) {
           this.pState.grid[li][19] = 8;
         }
@@ -1081,26 +1070,26 @@ class istit {
       giveSpeedBonus = true;
     }
     this.animateTo.score = new Date().getTime() + this.animateCycle.score;
-    var now = new Date().getTime();
-    var levelBonus = Math.round(
+    const now = new Date().getTime();
+    const levelBonus = Math.round(
       (parseInt(this.pState.level) - 1) * this.levelBonusMultiplier * p
     );
-    var speedBonus = 0;
+    let speedBonus = 0;
     if (this.lastScoreTime > 0) {
-      var dif = Math.floor((now - this.lastScoreTime) / 1000);
+      const dif = Math.floor((now - this.lastScoreTime) / 1000);
       if (dif <= this.lastScoreThreshold) {
-        var remainder = this.lastScoreThreshold - dif;
+        const remainder = this.lastScoreThreshold - dif;
         speedBonus = Math.round(remainder * this.lastScoreMultiplier * p);
         //p += lsb;
       }
     }
-    var tp = p + levelBonus;
+    let tp = p + levelBonus;
     if (giveSpeedBonus) {
       tp += speedBonus;
     }
     this.pState.score += tp;
-    var lastLevel = 1;
-    for (var key in this.levels) {
+    let lastLevel = 1;
+    for (let key in this.levels) {
       if (this.pState.score < this.levels[key]) {
         if (lastLevel != this.pState.level) {
           this.setLevel(lastLevel);
@@ -1125,31 +1114,29 @@ class istit {
   }
 
   getGhostBlocks() {
-    var ghost = [];
-    var blocks = this.getFallingBlocks();
-    var mostDif = this.vTiles,
+    const ghost = [];
+    const blocks = this.getFallingBlocks();
+    let mostDif = this.vTiles,
       tmpDif = 0;
-    for (var i = 0; i < blocks.length; i++) {
-      var c = blocks[i].c;
-      var h = this.getClosestToTopInColumn(c);
+    for (let i = 0; i < blocks.length; i++) {
+      let c = blocks[i].c;
+      let h = this.getClosestToTopInColumn(c);
       tmpDif = h - blocks[i].r - 1;
       if (tmpDif < mostDif) {
         mostDif = tmpDif;
       }
     }
-    for (var i = 0; i < blocks.length; i++) {
-      var c = blocks[i].c;
-      var r = blocks[i].r;
-      var h = this.getClosestToTopInColumn(c);
-      var newR = r + mostDif;
+    for (let i = 0; i < blocks.length; i++) {
+      let c = blocks[i].c;
+      let r = blocks[i].r;
+      let newR = r + mostDif;
       ghost.push({ c: c, r: newR });
     }
     return ghost;
   }
 
   getClosestToTopInColumn(c) {
-    var lowest = this.vTiles;
-    for (var i = 0; i < this.vTiles; i++) {
+    for (let i = 0; i < this.vTiles; i++) {
       if (this.pState.grid[c][i]) {
         return i;
       }
@@ -1158,7 +1145,7 @@ class istit {
   }
 
   placeFallingPieceAtBottom() {
-    var offset = this.vTiles;
+    const offset = this.vTiles;
     //for (var i = 0; i
     this.pFallingPiece.offset = offset;
   }
@@ -1166,15 +1153,15 @@ class istit {
   getLargestDrop() {}
 
   getPieceOffset(x, y) {
-    var xOffset = x * this.tile;
-    var yOffset = y * this.tile;
+    const xOffset = x * this.tile;
+    const yOffset = y * this.tile;
     return [xOffset, yOffset];
   }
 
   setLevel(l) {
     this.pState.level = l;
-    var fallTime = this.maxFallTime;
-    for (var i = 1; i < l; i++) {
+    let fallTime = this.maxFallTime;
+    for (let i = 1; i < l; i++) {
       fallTime -= fallTime * this.lSpeedDecay;
     }
     this.fallTime = fallTime;
@@ -1182,10 +1169,10 @@ class istit {
   }
 
   getLevelScores(mLevel) {
-    var score;
-    var lastScore = 0;
+    let score;
+    let lastScore = 0;
     this.levels[1] = 0;
-    for (var l = 2; l <= mLevel; l++) {
+    for (let l = 2; l <= mLevel; l++) {
       if (l == 2) {
         score = this.levelIncreaseThreshold;
       } else {
@@ -1205,19 +1192,19 @@ class istit {
   }
 
   randomWithSeed(mZ, mW) {
-    var mZ = m_w,
-      mW = m_w;
-    var m_z = 36969 * (m_z & 65535) + (m_z >> 16);
-    var m_w = 18000 * (m_w & 65535) + (m_w >> 16);
+    //let mZ = m_w,
+    //  mW = m_w;
+    let m_z = 36969 * (m_z & 65535) + (m_z >> 16);
+    let m_w = 18000 * (m_w & 65535) + (m_w >> 16);
     return (m_z << 16) + m_w;
   }
 
   getPieceDimension(t, o, d) {
-    var blocks = this.pieces[t].orientations[o];
-    var min = 9,
+    const blocks = this.pieces[t].orientations[o];
+    let min = 9,
       max = 0;
-    for (var i = 0; i < 4; i++) {
-      var n = blocks[i][d];
+    for (let i = 0; i < 4; i++) {
+      let n = blocks[i][d];
       if (n < min) {
         min = n;
       }
@@ -1243,10 +1230,10 @@ class istit {
   }
 
   getCompoundedWeight() {
-    var numFilled = 0,
+    let numFilled = 0,
       total = 0;
-    for (var c = 0; c < this.hTiles; c++) {
-      for (var r = 0; r < this.vTiles; r++) {
+    for (let c = 0; c < this.hTiles; c++) {
+      for (let r = 0; r < this.vTiles; r++) {
         total++;
         if (this.pState.grid[c][r]) {
           numFilled++;
@@ -1257,13 +1244,12 @@ class istit {
   }
 
   addScoreMessage(text, r, c) {
-    var m = {
+    this.messages.push({
       text: text,
       expiration: this.runTime + this.scoreMsgTime,
       r: r,
       c: c
-    };
-    this.messages.push(m);
+    });
   }
 
   toggleHold() {
@@ -1271,12 +1257,12 @@ class istit {
       this.holdPiece = this.pFallingPiece.type;
       this.dropPiece();
     } else {
-      var cFP = this.pFallingPiece.type;
-      var cHP = this.holdPiece;
+      const cFP = this.pFallingPiece.type;
+      const cHP = this.holdPiece;
       this.holdPiece = cFP;
-      for (var c = 0; c >= -4; c--) {
-        var xAdjust = c;
-        var collides = this.collides(c, 0, 0, cHP);
+      for (let c = 0; c >= -4; c--) {
+        let xAdjust = c;
+        let collides = this.collides(c, 0, 0, cHP);
         if (!collides) {
           this.pFallingPiece.x += xAdjust;
           break;
@@ -1309,7 +1295,7 @@ class istit {
     }
     this.showingNamePrompt = true;
     if (add) {
-      var name = prompt(
+      let name = prompt(
         'Enter a name to be recorded to the Leader Board:',
         this.playerName
       );

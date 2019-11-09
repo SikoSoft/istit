@@ -1,26 +1,26 @@
-var port = 76;
-var activeTime = 5000;
-var webSocketServer = require('websocket').server;
-var http = require('http');
+const port = 76;
+const activeTime = 5000;
+const webSocketServer = require('websocket').server;
+const http = require('http');
 
 console.log('ISTIT SERVER STARTING...');
 
 process.title = 'istit-server';
-var clients = [],
+const clients = [],
   sessions = [];
-var httpServer = http.createServer();
-var wsServer = new webSocketServer({ httpServer: httpServer });
+const httpServer = http.createServer();
+const wsServer = new webSocketServer({ httpServer: httpServer });
 
 setInterval(function() {
-  var now = new Date().getTime();
-  var numActiveSessions = 0,
+  const now = new Date().getTime();
+  let numActiveSessions = 0,
     numActiveClients = 0;
-  for (var i = 0; i < sessions.length; i++) {
+  for (let i = 0; i < sessions.length; i++) {
     if (sessions[i].isActive) {
       numActiveSessions++;
     }
   }
-  for (var i = 0; i < clients.length; i++) {
+  for (let i = 0; i < clients.length; i++) {
     if (now - clients[i].lastPulse <= activeTime) {
       clients[i].connection.sendUTF(JSON.stringify({ event: 'elapsed' }));
       numActiveClients++;
@@ -36,13 +36,13 @@ setInterval(function() {
 }, 10000);
 
 setInterval(function() {
-  for (var i = 0; i < sessions.length; i++) {
+  for (let i = 0; i < sessions.length; i++) {
     if (
       sessions[i].isActive &&
       sessions[i].player1 > -1 &&
       sessions[i].player2 > -1
     ) {
-      var data = JSON.stringify({ event: 'sync' });
+      const data = JSON.stringify({ event: 'sync' });
       clients[sessions[i].player1].connection.sendUTF(data);
       clients[sessions[i].player2].connection.sendUTF(data);
     }
@@ -54,8 +54,8 @@ wsServer.on('request', function(request) {
     new Date().toTimeString() + ': new connection from ' + request.remoteAddress
   );
 
-  var connection = request.accept(null, request.origin);
-  var client = {
+  const connection = request.accept(null, request.origin);
+  const client = {
     index: clients.length,
     oppIndex: -1,
     connection: connection,
@@ -66,8 +66,8 @@ wsServer.on('request', function(request) {
   };
   clients.push(client);
 
-  var tmpSession = -1;
-  for (var i = 0; i < sessions.length; i++) {
+  let tmpSession = -1;
+  for (let i = 0; i < sessions.length; i++) {
     if (sessions[i].player2 == -1 && sessions[i].isActive) {
       tmpSession = i;
       break;
@@ -86,21 +86,20 @@ wsServer.on('request', function(request) {
       JSON.stringify({ event: 'sessionReady', session: tmpSession })
     );
   } else {
-    var session = {
+    sessions.push({
       player1: client.index,
       player1LastPulse: new Date().getTime(),
       player2: -1,
       player2LastPulse: 0,
       isActive: true
-    };
-    sessions.push(session);
+    });
     client.session = sessions.length - 1;
     client.playerNum = 1;
   }
 
   connection.on('message', function(message) {
     if (message.type === 'utf8') {
-      var json = JSON.parse(message.utf8Data);
+      const json = JSON.parse(message.utf8Data);
       if (json.event == 'end') {
         clients[client.oppIndex].connection.sendUTF('{"event": "end"}');
       } else if (json.event == 'linesPut') {
@@ -116,8 +115,8 @@ wsServer.on('request', function(request) {
           JSON.stringify({ event: 'fpPull', fallingPiece: json.fallingPiece })
         );
       } else if (json.event == 'pulse') {
-        var now = new Date().getTime();
-        var isAlive = now - clients[client.oppIndex].lastPulse <= activeTime;
+        const now = new Date().getTime();
+        const isAlive = now - clients[client.oppIndex].lastPulse <= activeTime;
         client.lastPulse = now;
         clients[client.oppIndex].connection.sendUTF(
           JSON.stringify({ event: 'pulseStatus', oppIsAlive: isAlive })
