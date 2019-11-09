@@ -1,29 +1,32 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<meta name="author" content="SikoSoft"/>
-		<meta name="description" content="I Swear This Isn't Tetris (R)  :-)"/>
+		<meta name="author" content="Aaron Wright / SikoSoft"/>
+		<meta name="description" content="I Swear This Isn't Tetris :-)"/>
 		<meta name="keywords" content="tetris, free tetris, open source tetris, i swear this isn't tetris, puzzle game, free puzzle game, fun, free fun, fun is free, get high, fuck the tetris holding company, code is free speech bitch"/>
 		<title>ISTiT</title>
 		<link href='istit.css' rel='stylesheet' type='text/css'/>
 		<link href='common.css' rel='stylesheet' type='text/css/'>
 		<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'/>
 		<script type='text/javascript' src='common.js'></script>
-		<script type='text/javascript' src='jquery-1.9.1.min.js'></script>
 		<script type='text/javascript' src='js/istit.core.js'></script>
 		<script type='text/javascript' src='js/istit.input.js'></script>
 		<script type='text/javascript' src='js/istit.render.js'></script>
 		<script type='text/javascript' src='js/istit.mp.js'></script>
 		<script type='text/javascript'>
-			var j = jQuery.noConflict();
 			var g = new istit();
-			j(function()
-				{
-				g.init('istit-canvas');
-				j('#version').html('v'+g.version);
-				j('#restart').click(function (){g.restart();});
-				j('#mp-start').click(function (){g.mp.prepare();});
-				});
+			document.onreadystatechange = function () {
+				if (document.readyState ==="interactive") {
+					g.init('istit-canvas');
+					document.getElementById('version').innerHTML = 'v'+g.version;
+					document.getElementById('restart').addEventListener('click', function () {
+						g.restart();
+					});
+					document.getElementById('mp-start').addEventListener('click', function () {
+						g.mp.prepare();
+					});
+				}
+			}
 		</script>
 	</head>
 	<body>
