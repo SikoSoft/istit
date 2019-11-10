@@ -1,6 +1,6 @@
 {
   "name": "istit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "I Swear This Isn't Tetr*s",
   "main": "serve.js",
   "dependencies": {

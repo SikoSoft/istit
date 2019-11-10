@@ -5,7 +5,7 @@ import render from './render.js';
 
 export default class istit {
   constructor(cfg) {
-    this.version = '1.0.0';
+    this.version = '1.1.0';
     this.config = new config(cfg);
     // variables used to store dynamic values (these will change during runtime)
     this.animateTo = {
