@@ -5,41 +5,42 @@ export default class render {
   }
 
   init() {
-    this.pWidth = this.g.hTiles * this.g.tile;
-    this.pHeight = this.g.vTiles * this.g.tile;
-    this.pStartX = this.g.tile / 2;
-    this.pStartY = this.g.tile / 2;
+    this.pWidth = this.g.config.hTiles * this.g.config.tile;
+    this.pHeight = this.g.config.vTiles * this.g.config.tile;
+    this.pStartX = this.g.config.tile / 2;
+    this.pStartY = this.g.config.tile / 2;
     this.pEndX = this.pStartX + this.pWidth;
     this.pEndY = this.pStaryY + this.pHeight;
     this.oStartX = this.g.defWidth;
     this.oStartY = this.pStartY;
     this.mW = this.g.defWidth - this.pEndX;
-    this.mW = this.g.tile * 6;
-    this.mStartX = this.pEndX + this.g.tile / 2;
-    this.mStartY = this.g.tile / 2;
-    this.mEndX = this.g.defWidth - this.g.tile / 2;
-    this.npStartX = this.pEndX + this.g.tile + this.g.tile / 2;
-    this.npStartY = this.pStartY + this.g.tile / 2;
-    this.npH = this.mW + this.g.tile * 2;
-    this.hStartY = this.npStartY + this.mW + this.g.tile * 2;
-    this.scoreX = this.pEndX + this.g.tile * 0.5 + this.g.tile * 3;
-    this.scoreY = this.g.defHeight - this.g.tile * 0.5;
+    this.mW = this.g.config.tile * 6;
+    this.mStartX = this.pEndX + this.g.config.tile / 2;
+    this.mStartY = this.g.config.tile / 2;
+    this.mEndX = this.g.defWidth - this.g.config.tile / 2;
+    this.npStartX = this.pEndX + this.g.config.tile + this.g.config.tile / 2;
+    this.npStartY = this.pStartY + this.g.config.tile / 2;
+    this.npH = this.mW + this.g.config.tile * 2;
+    this.hStartY = this.npStartY + this.mW + this.g.config.tile * 2;
+    this.scoreX =
+      this.pEndX + this.g.config.tile * 0.5 + this.g.config.tile * 3;
+    this.scoreY = this.g.defHeight - this.g.config.tile * 0.5;
     this.scoreNormal = parseInt(
-      this.g.theme.font.scoreNormal.replace(/\b([0-9]+)(px|pt).*/, '$1')
+      this.g.config.theme.font.scoreNormal.replace(/\b([0-9]+)(px|pt).*/, '$1')
     );
     this.scoreLarge = parseInt(
-      this.g.theme.font.scoreNormal.replace(/\b([0-9]+)(px|pt).*/, '$1')
+      this.g.config.theme.font.scoreNormal.replace(/\b([0-9]+)(px|pt).*/, '$1')
     );
     this.scoreDif = this.scoreLarge - this.scoreNormal;
-    this.levelX = this.pEndX + this.g.tile * 2;
+    this.levelX = this.pEndX + this.g.config.tile * 2;
     this.levelY = this.g.defHeight - 100;
     this.timeX =
-      this.scoreX - this.textWidth('00:00', this.g.theme.font.time) / 2;
-    this.timeY = this.g.defHeight - 5 * this.g.tile;
+      this.scoreX - this.textWidth('00:00', this.g.config.theme.font.time) / 2;
+    this.timeY = this.g.defHeight - 5 * this.g.config.tile;
     this.msgX = this.scoreX;
     this.msgH =
       parseInt(
-        this.g.theme.font.scoreMsgPoints.replace(
+        this.g.config.theme.font.scoreMsgPoints.replace(
           /bold +([0-9]+)(px|pt).*/,
           '$1'
         )
@@ -47,25 +48,26 @@ export default class render {
     this.hScoresX = this.pStartX + this.pWidth * 0.1;
     this.hScoresY = this.pStartY + this.pHeight * 0.5;
     this.hScoresW = this.pWidth * 0.8;
-    this.sysYDef = this.pStartY + this.g.tile * (this.g.vTiles * 0.4);
-    this.sysYTop = this.pStartY + this.g.tile;
+    this.sysYDef =
+      this.pStartY + this.g.config.tile * (this.g.config.vTiles * 0.4);
+    this.sysYTop = this.pStartY + this.g.config.tile;
     this.sysY = this.sysYDef;
     this.sysYDif = this.sysYDef - this.sysYTop;
     this.lbYDef = this.g.height;
-    this.lbYTop = this.pStartY + this.g.tile * 2.5;
+    this.lbYTop = this.pStartY + this.g.config.tile * 2.5;
     this.lbYDif = this.lbYDef - this.lbYTop;
     this.lbY = this.lbYTop;
     this.lbRankX = 0;
-    this.lbScoreX = this.pWidth - this.g.tile;
-    this.lbLeftXDef = this.pStartX + this.g.tile * 0.5 - this.pWidth;
-    this.lbLeftXEnd = this.pStartX + this.g.tile * 0.5;
+    this.lbScoreX = this.pWidth - this.g.config.tile;
+    this.lbLeftXDef = this.pStartX + this.g.config.tile * 0.5 - this.pWidth;
+    this.lbLeftXEnd = this.pStartX + this.g.config.tile * 0.5;
     this.lbLeftXDif = this.lbLeftXEnd - this.lbLeftXDef;
     this.lbLeftX = this.lbLeftDef;
-    this.lbRightXDef = this.pStartX - this.g.tile * 0.5 + this.pWidth;
-    this.lbRightXEnd = this.pStartX + this.g.tile * 0.5;
+    this.lbRightXDef = this.pStartX - this.g.config.tile * 0.5 + this.pWidth;
+    this.lbRightXEnd = this.pStartX + this.g.config.tile * 0.5;
     this.lbRightXDif = this.lbRightXEnd - this.lbRightXDef;
     this.lbRightX = this.lbRightDef;
-    this.noEdgeTile = this.g.tile - this.g.edgeThickness;
+    this.noEdgeTile = this.g.config.tile - this.g.config.edgeThickness;
   }
 
   draw() {
@@ -133,7 +135,7 @@ export default class render {
     if (this.g.animateTo.lineBreak > now) {
       const alpha =
         ((this.g.animateTo.lineBreak - now) /
-          (this.g.animateCycle.lineBreak * this.g.linesToClear.length)) *
+          (this.g.config.animateCycle.lineBreak * this.g.linesToClear.length)) *
         1;
       this.g.ctx.save();
       this.g.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
@@ -162,9 +164,9 @@ export default class render {
     this.g.ctx.fillRect(0, 0, this.g.width, this.g.height);
     this.g.ctx.restore();
     this.g.ctx.save();
-    this.g.ctx.font = this.g.theme.font.systemMessage;
-    this.g.ctx.fillStyle = this.g.theme.systemMessage;
-    this.ctx.shadowColor = this.g.theme.systemMessageShadow;
+    this.g.ctx.font = this.g.config.theme.font.systemMessage;
+    this.g.ctx.fillStyle = this.g.config.theme.systemMessage;
+    this.ctx.shadowColor = this.g.config.theme.systemMessageShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
@@ -178,7 +180,7 @@ export default class render {
   drawLayout() {
     const drawOpponent = this.g.width > this.g.defWidth;
     this.g.ctx.save();
-    this.g.ctx.fillStyle = this.g.theme.frame;
+    this.g.ctx.fillStyle = this.g.config.theme.frame;
     this.g.ctx.fillRect(0, 0, this.g.width, this.g.height);
     this.g.ctx.restore();
     if (this.g.images.frameTexture) {
@@ -193,7 +195,7 @@ export default class render {
       }
     }
     this.g.ctx.save();
-    this.g.ctx.fillStyle = this.g.theme.grid;
+    this.g.ctx.fillStyle = this.g.config.theme.grid;
     this.g.ctx.fillRect(this.pStartX, this.pStartY, this.pWidth, this.pHeight);
     if (drawOpponent) {
       this.g.ctx.fillRect(
@@ -238,7 +240,7 @@ export default class render {
     this.g.ctx.restore();
     this.g.ctx.save();
     this.ctx.lineWidth = 1;
-    this.g.ctx.strokeStyle = this.g.theme.gridOutline;
+    this.g.ctx.strokeStyle = this.g.config.theme.gridOutline;
     this.g.ctx.strokeRect(
       this.pStartX - 1,
       this.pStartY - 1,
@@ -258,14 +260,14 @@ export default class render {
 
   drawNextPieces() {
     this.ctx.save();
-    this.ctx.fillStyle = this.g.theme.nextFrame;
+    this.ctx.fillStyle = this.g.config.theme.nextFrame;
     this.ctx.fillRect(this.mStartX, this.pStartY, this.mW, this.npH);
-    this.ctx.strokeStyle = this.g.theme.nextOutline;
+    this.ctx.strokeStyle = this.g.config.theme.nextOutline;
     this.ctx.strokeRect(this.mStartX, this.pStartY, this.mW, this.npH);
-    this.ctx.font = this.g.theme.font.next;
+    this.ctx.font = this.g.config.theme.font.next;
     this.ctx.textBaseline = 'top';
-    this.ctx.fillStyle = this.g.theme.nextLabel;
-    this.ctx.shadowColor = this.g.theme.nextLabelShadow;
+    this.ctx.fillStyle = this.g.config.theme.nextLabel;
+    this.ctx.shadowColor = this.g.config.theme.nextLabelShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
@@ -278,43 +280,49 @@ export default class render {
     if (!this.g.mp.wait) {
       const pW = this.g.getPieceDimension(this.g.nextPieces[0], 1, 0);
       const pH = this.g.getPieceDimension(this.g.nextPieces[0], 1, 1);
-      let npStartX = this.mStartX + (this.mW - pW * this.g.tile) / 2;
-      let npStartY = this.mStartY + (this.mW - pH * this.g.tile) / 2;
+      let npStartX = this.mStartX + (this.mW - pW * this.g.config.tile) / 2;
+      let npStartY = this.mStartY + (this.mW - pH * this.g.config.tile) / 2;
       for (let b = 0; b < 4; b++) {
         this.drawBlock(
           this.g.nextPieces[0],
           npStartX +
-            (this.g.pieces[this.g.nextPieces[0]].orientations[1][b][0] - 1) *
-              this.g.tile,
+            (this.g.config.pieces[this.g.nextPieces[0]].orientations[1][b][0] -
+              1) *
+              this.g.config.tile,
           npStartY +
-            (this.g.pieces[this.g.nextPieces[0]].orientations[1][b][1] - 1) *
-              this.g.tile
+            (this.g.config.pieces[this.g.nextPieces[0]].orientations[1][b][1] -
+              1) *
+              this.g.config.tile
         );
       }
-      npStartX -= this.g.tile;
+      npStartX -= this.g.config.tile;
       npStartY += 196;
       const npStartX2 =
-        this.g.tile * (this.g.hTiles + 2) +
+        this.g.config.tile * (this.g.config.hTiles + 2) +
         this.mStartX +
-        (this.mW - pW * this.g.tile) / 2 -
-        this.g.tile * 0.5;
+        (this.mW - pW * this.g.config.tile) / 2 -
+        this.g.config.tile * 0.5;
       const npStartX3 =
-        this.g.tile * (this.g.hTiles + 2) +
+        this.g.config.tile * (this.g.config.hTiles + 2) +
         this.mStartX +
-        (this.mW - pW * this.g.tile) / 2 +
-        this.g.tile * 4;
+        (this.mW - pW * this.g.config.tile) / 2 +
+        this.g.config.tile * 4;
       npStartY =
-        this.mStartY + (this.mW - pH * this.g.tile) / 2 + this.g.tile * 6;
+        this.mStartY +
+        (this.mW - pH * this.g.config.tile) / 2 +
+        this.g.config.tile * 6;
       for (let b = 0; b < 4; b++) {
         this.drawBlock(
           this.g.nextPieces[1],
           npStartX2 +
-            (this.g.pieces[this.g.nextPieces[1]].orientations[1][b][0] - 1) *
-              this.g.tile,
+            (this.g.config.pieces[this.g.nextPieces[1]].orientations[1][b][0] -
+              1) *
+              this.g.config.tile,
           npStartY +
             120 +
-            (this.g.pieces[this.g.nextPieces[1]].orientations[1][b][1] - 1) *
-              this.g.tile,
+            (this.g.config.pieces[this.g.nextPieces[1]].orientations[1][b][1] -
+              1) *
+              this.g.config.tile,
           1,
           0,
           true
@@ -324,12 +332,14 @@ export default class render {
         this.drawBlock(
           this.g.nextPieces[2],
           npStartX3 +
-            (this.g.pieces[this.g.nextPieces[2]].orientations[1][b][0] - 1) *
-              this.g.tile,
+            (this.g.config.pieces[this.g.nextPieces[2]].orientations[1][b][0] -
+              1) *
+              this.g.config.tile,
           npStartY +
             120 +
-            (this.g.pieces[this.g.nextPieces[2]].orientations[1][b][1] - 1) *
-              this.g.tile,
+            (this.g.config.pieces[this.g.nextPieces[2]].orientations[1][b][1] -
+              1) *
+              this.g.config.tile,
           1,
           0,
           true
@@ -340,14 +350,14 @@ export default class render {
 
   drawHoldPiece() {
     this.ctx.save();
-    this.ctx.fillStyle = this.g.theme.holdFrame;
+    this.ctx.fillStyle = this.g.config.theme.holdFrame;
     this.ctx.fillRect(this.mStartX, this.hStartY, this.mW, this.mW);
-    this.ctx.strokeStyle = this.g.theme.holdOutline;
+    this.ctx.strokeStyle = this.g.config.theme.holdOutline;
     this.ctx.strokeRect(this.mStartX, this.hStartY, this.mW, this.mW);
-    this.ctx.font = this.g.theme.font.hold;
+    this.ctx.font = this.g.config.theme.font.hold;
     this.ctx.textBaseline = 'top';
-    this.ctx.fillStyle = this.g.theme.holdLabel;
-    this.ctx.shadowColor = this.g.theme.holdLabelShadow;
+    this.ctx.fillStyle = this.g.config.theme.holdLabel;
+    this.ctx.shadowColor = this.g.config.theme.holdLabelShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
@@ -360,17 +370,17 @@ export default class render {
     if (!this.g.mp.wait && this.g.holdPiece) {
       const pW = this.g.getPieceDimension(this.g.holdPiece, 1, 0);
       const pH = this.g.getPieceDimension(this.g.holdPiece, 1, 1);
-      const npStartX = this.mStartX + (this.mW - pW * this.g.tile) / 2;
-      const npStartY = this.hStartY + (this.mW - pH * this.g.tile) / 2;
+      const npStartX = this.mStartX + (this.mW - pW * this.g.config.tile) / 2;
+      const npStartY = this.hStartY + (this.mW - pH * this.g.config.tile) / 2;
       for (let b = 0; b < 4; b++) {
         this.drawBlock(
           this.g.holdPiece,
           npStartX +
-            (this.g.pieces[this.g.holdPiece].orientations[1][b][0] - 1) *
-              this.g.tile,
+            (this.g.config.pieces[this.g.holdPiece].orientations[1][b][0] - 1) *
+              this.g.config.tile,
           npStartY +
-            (this.g.pieces[this.g.holdPiece].orientations[1][b][1] - 1) *
-              this.g.tile
+            (this.g.config.pieces[this.g.holdPiece].orientations[1][b][1] - 1) *
+              this.g.config.tile
         );
       }
     }
@@ -380,7 +390,9 @@ export default class render {
     let fontSize = this.scoreNormal;
     if (this.g.animateTo.score > now) {
       const dif = this.g.animateTo.score - now;
-      const percent = Math.round((dif / this.g.animateCycle.score) * 100);
+      const percent = Math.round(
+        (dif / this.g.config.animateCycle.score) * 100
+      );
       const counter = percent * (Math.PI / 100);
       const v = (Math.sin(counter) * this.scoreDif) | 0;
       fontSize = this.scoreNormal + v;
@@ -390,14 +402,14 @@ export default class render {
     const rW = this.mW;
     const rY = this.g.height - 96;
     const rH = 48;
-    this.ctx.fillStyle = this.g.theme.scoreFrame;
-    this.ctx.strokeStyle = this.g.theme.scoreOutline;
+    this.ctx.fillStyle = this.g.config.theme.scoreFrame;
+    this.ctx.strokeStyle = this.g.config.theme.scoreOutline;
     this.ctx.fillRect(rX, rY, rW, rH);
     this.ctx.strokeRect(rX, rY, rW, rH);
     this.g.ctx.font = fontSize + 'px Roboto Condensed';
-    this.g.ctx.fillStyle = this.g.theme.score;
+    this.g.ctx.fillStyle = this.g.config.theme.score;
     this.g.ctx.textBaseline = 'middle';
-    this.ctx.shadowColor = this.g.theme.scoreShadow;
+    this.ctx.shadowColor = this.g.config.theme.scoreShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
@@ -415,15 +427,15 @@ export default class render {
     const rW = this.mW;
     const rY = this.g.height - 48;
     const rH = 32;
-    this.ctx.fillStyle = this.g.theme.levelFrame;
-    this.ctx.strokeStyle = this.g.theme.levelOutline;
+    this.ctx.fillStyle = this.g.config.theme.levelFrame;
+    this.ctx.strokeStyle = this.g.config.theme.levelOutline;
     this.ctx.fillRect(rX, rY, rW, rH);
     this.ctx.strokeRect(rX, rY, rW, rH);
-    this.g.ctx.font = this.g.theme.font.level;
-    this.g.ctx.fillStyle = this.g.theme.level;
+    this.g.ctx.font = this.g.config.theme.font.level;
+    this.g.ctx.fillStyle = this.g.config.theme.level;
     this.g.ctx.textBaseline = 'top';
     const str = 'LEVEL ' + this.g.pState.level;
-    this.ctx.shadowColor = this.g.theme.levelShadow;
+    this.ctx.shadowColor = this.g.config.theme.levelShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
@@ -447,10 +459,10 @@ export default class render {
     }
     const time = minutes + ':' + seconds;
     this.g.ctx.save();
-    this.g.ctx.font = this.g.theme.font.time;
-    this.g.ctx.fillStyle = this.g.theme.time;
+    this.g.ctx.font = this.g.config.theme.font.time;
+    this.g.ctx.fillStyle = this.g.config.theme.time;
     this.g.ctx.textBaseline = 'top';
-    this.ctx.shadowColor = this.g.theme.timeShadow;
+    this.ctx.shadowColor = this.g.config.theme.timeShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 3;
     this.ctx.shadowOffsetY = 3;
@@ -467,15 +479,15 @@ export default class render {
     }
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.strokeStyle = this.g.theme.gridLine;
+    this.ctx.strokeStyle = this.g.config.theme.gridLine;
     this.ctx.lineWidth = 1;
-    for (let v = 1; v <= this.g.vTiles - 1; v++) {
-      let y = this.g.tile * v + sy;
+    for (let v = 1; v <= this.g.config.vTiles - 1; v++) {
+      let y = this.g.config.tile * v + sy;
       this.ctx.moveTo(sx, y - 0.5);
       this.ctx.lineTo(sx + this.pWidth, y - 0.5);
     }
-    for (let h = 1; h <= this.g.hTiles - 1; h++) {
-      let x = this.g.tile * h + sx;
+    for (let h = 1; h <= this.g.config.hTiles - 1; h++) {
+      let x = this.g.config.tile * h + sx;
       this.ctx.moveTo(x - 0.5, sy);
       this.ctx.lineTo(x - 0.5, sy + this.pHeight);
     }
@@ -499,19 +511,19 @@ export default class render {
     this.ctx.save();
     this.ctx.fillStyle =
       'rgba(' +
-      this.g.pieces[fp.type].color.red +
+      this.g.config.pieces[fp.type].color.red +
       ', ' +
-      this.g.pieces[fp.type].color.green +
+      this.g.config.pieces[fp.type].color.green +
       ', ' +
-      this.g.pieces[fp.type].color.blue +
+      this.g.config.pieces[fp.type].color.blue +
       ', 1)';
     const blocks = this.g.getFallingBlocks(opponent);
     for (let b = 0; b < 4; b++) {
       let block = blocks[b];
       this.drawBlock(
         fp.type,
-        block.c * this.g.tile + sX,
-        block.r * this.g.tile + sY
+        block.c * this.g.config.tile + sX,
+        block.r * this.g.config.tile + sY
       );
     }
     this.ctx.restore();
@@ -532,27 +544,27 @@ export default class render {
     let mPer = 0;
     if (this.g.animateTo.lineBreak > now) {
       const dif = this.g.animateTo.lineBreak - now;
-      const mod = dif % this.g.animateCycle.lineBreak;
-      const opMod = this.g.animateCycle.lineBreak - mod;
-      mPer = opMod / this.g.animateCycle.lineBreak;
+      const mod = dif % this.g.config.animateCycle.lineBreak;
+      const opMod = this.g.config.animateCycle.lineBreak - mod;
+      mPer = opMod / this.g.config.animateCycle.lineBreak;
     }
-    for (let h = 0; h < this.g.hTiles; h++) {
-      for (let v = 0; v < this.g.vTiles; v++) {
+    for (let h = 0; h < this.g.config.hTiles; h++) {
+      for (let v = 0; v < this.g.config.vTiles; v++) {
         let a = 1;
         if (grid[h][v] != false) {
           let offset = this.g.getPieceOffset(h, v);
           x = offset[0];
           y = offset[1];
           if (!opponent && this.g.rowIsCleared(v)) {
-            let d2x = this.scoreX - this.g.tile - x;
+            let d2x = this.scoreX - this.g.config.tile - x;
             let d2y = this.scoreY - 30 - y;
             let tPer = mPer + h * 0.01;
             if (mPer > 0) {
               x = x + d2x * tPer;
               y = y + d2y * tPer;
             }
-            if (x > this.scoreX - this.g.tile) {
-              x = this.scoreX - this.g.tile;
+            if (x > this.scoreX - this.g.config.tile) {
+              x = this.scoreX - this.g.config.tile;
             }
             if (y > this.scoreY) {
               y = this.scoreY - 30 - y;
@@ -565,7 +577,7 @@ export default class render {
           let p = 0;
           if (typeof this.g.placedBlocks[v + ':' + h] == 'number') {
             let dif = this.g.placedBlocks[v + ':' + h] - new Date().getTime();
-            let percent = dif / this.g.dropDelay;
+            let percent = dif / this.g.config.dropDelay;
             p = percent;
             if (p > 0) {
               percent = ((new Date().getTime() % 1000) / 1000) * 100;
@@ -603,7 +615,7 @@ export default class render {
     this.ctx.beginPath();
     this.ctx.arc(x, y, r, start, end);
     this.ctx.lineWidth = 30;
-    this.ctx.strokeStyle = this.g.theme.loader;
+    this.ctx.strokeStyle = this.g.config.theme.loader;
     this.ctx.rotate((Math.PI * 2) / 12);
     this.ctx.stroke();
     this.ctx.closePath();
@@ -620,7 +632,7 @@ export default class render {
     }
     this.ctx.save();
     this.ctx.font = '50px Lucida Console';
-    this.ctx.fillStyle = this.g.theme.countDown;
+    this.ctx.fillStyle = this.g.config.theme.countDown;
     this.ctx.textBaseline = 'middle';
     const num = remaining.toString();
     this.ctx.fillText(num, 450 - this.g.ctx.measureText(num).width / 2, 110);
@@ -637,7 +649,7 @@ export default class render {
     if (y < this.g.pStartX) {
       return;
     }
-    const color = this.g.pieces[t].color;
+    const color = this.g.config.pieces[t].color;
     this.ctx.save();
     if (s) {
       this.ctx.scale(0.5, 0.5);
@@ -645,7 +657,7 @@ export default class render {
     this.ctx.globalAlpha = a;
     this.ctx.fillStyle =
       'rgba(' + color.red + ', ' + color.green + ', ' + color.blue + ', 0.9)';
-    this.ctx.fillRect(x, y, this.g.tile, this.g.tile);
+    this.ctx.fillRect(x, y, this.g.config.tile, this.g.config.tile);
     if (p > 0) {
       if (p > 1) {
         p = 1;
@@ -655,16 +667,19 @@ export default class render {
       this.ctx.shadowOffsetX = 0;
       this.ctx.shadowOffsetY = 0;
     }
-    this.ctx.strokeStyle = this.g.theme.blockEdge;
+    this.ctx.strokeStyle = this.g.config.theme.blockEdge;
     this.ctx.lineWidth = 1;
-    this.ctx.strokeRect(x, y, this.g.tile, this.g.tile);
+    this.ctx.strokeRect(x, y, this.g.config.tile, this.g.config.tile);
     // top edge
     this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
-    this.ctx.lineTo(x + this.g.edgeThickness, y + this.g.edgeThickness);
-    this.ctx.lineTo(x + this.noEdgeTile, y + this.g.edgeThickness);
-    this.ctx.lineTo(x + this.g.tile, y);
+    this.ctx.lineTo(
+      x + this.g.config.edgeThickness,
+      y + this.g.config.edgeThickness
+    );
+    this.ctx.lineTo(x + this.noEdgeTile, y + this.g.config.edgeThickness);
+    this.ctx.lineTo(x + this.g.config.tile, y);
     this.ctx.lineTo(x, y);
     this.ctx.fill();
     this.ctx.closePath();
@@ -672,30 +687,33 @@ export default class render {
     this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
-    this.ctx.lineTo(x + this.g.edgeThickness, y + this.g.edgeThickness);
-    this.ctx.lineTo(x + this.g.edgeThickness, y + this.noEdgeTile);
-    this.ctx.lineTo(x + this.g.tile, y);
-    this.ctx.lineTo(x, y + this.g.tile);
+    this.ctx.lineTo(
+      x + this.g.config.edgeThickness,
+      y + this.g.config.edgeThickness
+    );
+    this.ctx.lineTo(x + this.g.config.edgeThickness, y + this.noEdgeTile);
+    this.ctx.lineTo(x + this.g.config.tile, y);
+    this.ctx.lineTo(x, y + this.g.config.tile);
     this.ctx.fill();
     this.ctx.closePath();
     // right edge
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
     this.ctx.beginPath();
-    this.ctx.moveTo(x + this.g.tile, y);
-    this.ctx.lineTo(x + this.noEdgeTile, y + this.g.edgeThickness);
+    this.ctx.moveTo(x + this.g.config.tile, y);
+    this.ctx.lineTo(x + this.noEdgeTile, y + this.g.config.edgeThickness);
     this.ctx.lineTo(x + this.noEdgeTile, y + this.noEdgeTile);
-    this.ctx.lineTo(x + this.g.tile, y + this.g.tile);
-    this.ctx.lineTo(x + this.g.tile, y);
+    this.ctx.lineTo(x + this.g.config.tile, y + this.g.config.tile);
+    this.ctx.lineTo(x + this.g.config.tile, y);
     this.ctx.fill();
     this.ctx.closePath();
     // bottom edge
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
     this.ctx.beginPath();
-    this.ctx.moveTo(x, y + this.g.tile);
-    this.ctx.lineTo(x + this.g.edgeThickness, y + this.noEdgeTile);
+    this.ctx.moveTo(x, y + this.g.config.tile);
+    this.ctx.lineTo(x + this.g.config.edgeThickness, y + this.noEdgeTile);
     this.ctx.lineTo(x + this.noEdgeTile, y + this.noEdgeTile);
-    this.ctx.lineTo(x + this.g.tile, y + this.g.tile);
-    this.ctx.lineTo(x, y + this.g.tile);
+    this.ctx.lineTo(x + this.g.config.tile, y + this.g.config.tile);
+    this.ctx.lineTo(x, y + this.g.config.tile);
     this.ctx.fill();
     this.ctx.closePath();
     this.ctx.restore();
@@ -706,7 +724,7 @@ export default class render {
     const percent = (((this.g.runTime / 1000) % 2) / 2) * 100;
     const counter = percent * (Math.PI / 100);
     const counter2 = percent * 0.123 * (Math.PI / 100);
-    const v = (Math.sin(counter) * (this.g.tile * 0.75)) | 0;
+    const v = (Math.sin(counter) * (this.g.config.tile * 0.75)) | 0;
     const defXOffset = 0;
     const defYOffset = 0;
     const a = Math.sin(counter);
@@ -719,7 +737,7 @@ export default class render {
       shadowAlpha = 1;
     }
     this.ctx.shadowColor = 'rgba(255, 255, 255, ' + shadowAlpha + ')';
-    this.ctx.shadowBlur = this.g.tile;
+    this.ctx.shadowBlur = this.g.config.tile;
     this.ctx.shadowOffsetX = 0;
     this.ctx.shadowOffsetY = 0;
     this.ctx.fillStyle = 'rgba(240, 210, 0, ' + fillAlpha + ')';
@@ -730,8 +748,8 @@ export default class render {
       let r = parseInt(pair[0]);
       let c = parseInt(pair[1]);
       let offset = this.g.getPieceOffset(c, r);
-      x = offset[0] + this.g.tile;
-      y = offset[1] + this.g.tile;
+      x = offset[0] + this.g.config.tile;
+      y = offset[1] + this.g.config.tile;
       this.ctx.beginPath();
       this.ctx.arc(
         x + this.g.xSpecialJitter,
@@ -769,7 +787,7 @@ export default class render {
           (160 + 7 * i) +
           ', 0.147)';
         this.ctx.shadowColor = 'rgba(255, 255, 255, ' + shadowAlpha + ')';
-        this.ctx.shadowBlur = this.g.tile * 3;
+        this.ctx.shadowBlur = this.g.config.tile * 3;
         this.ctx.shadowOffsetX = 0;
         this.ctx.shadowOffsetY = 0;
         this.ctx.fill();
@@ -782,7 +800,7 @@ export default class render {
   drawGhost() {
     const ghost = this.g.getGhostBlocks();
     const fBlocks = this.g.getFallingBlocks();
-    let tmpAlpha = this.g.ghostAlpha * 100;
+    let tmpAlpha = this.g.config.ghostAlpha * 100;
     const percent = ((this.g.runTime % 1000) / 1000) * 100;
     const counter = percent * (Math.PI / 100);
     const v = (Math.sin(counter) * (tmpAlpha * 1)) | 0;
@@ -810,9 +828,9 @@ export default class render {
       let offset = (o - 1) * this.msgH;
       let p = this.getMsgPos(msg);
       let percent =
-        (this.g.scoreMsgTime - (msg.expiration - this.g.runTime)) /
-        this.g.scoreMsgTime;
-      offset += percent * this.g.scoreMsgDrift;
+        (this.g.config.scoreMsgTime - (msg.expiration - this.g.runTime)) /
+        this.g.config.scoreMsgTime;
+      offset += percent * this.g.config.scoreMsgDrift;
       let a = Math.sin((1 - percent) * 100 * (Math.PI / 100)) * 2;
       if (a > 1) {
         a = 1;
@@ -820,20 +838,20 @@ export default class render {
         a = 0;
       }
       this.ctx.globalAlpha = a;
-      this.ctx.shadowColor = this.g.theme.scoreMsgShadow;
+      this.ctx.shadowColor = this.g.config.theme.scoreMsgShadow;
       this.ctx.shadowBlur = 5;
       this.ctx.shadowOffsetX = 0;
       this.ctx.shadowOffsetY = 0;
       let points = msg.text.replace(/(\+[0-9]+)\b.*/, '$1');
       let label = msg.text.replace(/(\+[0-9]+)\b(.*)/, '$2');
-      this.ctx.font = this.g.theme.font.scoreMsgPoints;
+      this.ctx.font = this.g.config.theme.font.scoreMsgPoints;
       let sW = this.g.ctx.measureText(points).width;
-      this.ctx.font = this.g.theme.font.scoreMsgLabel;
-      this.ctx.font = this.g.theme.scoreMsgPoints;
-      this.ctx.fillStyle = this.g.theme.scoreMsgPoints;
+      this.ctx.font = this.g.config.theme.font.scoreMsgLabel;
+      this.ctx.font = this.g.config.theme.scoreMsgPoints;
+      this.ctx.fillStyle = this.g.config.theme.scoreMsgPoints;
       this.ctx.fillText(points, p.x, p.y - offset);
-      this.ctx.font = this.g.theme.font.scoreMsgLabel;
-      this.ctx.fillStyle = this.g.theme.scoreMsgLabel;
+      this.ctx.font = this.g.config.theme.font.scoreMsgLabel;
+      this.ctx.fillStyle = this.g.config.theme.scoreMsgLabel;
       this.ctx.fillText(label, p.x + sW, p.y - offset);
     }
     this.ctx.restore();
@@ -851,8 +869,8 @@ export default class render {
       x = p[0] + this.pStartX;
       y = p[1] + this.pStartY;
     } else {
-      y = this.g.height - this.g.tile * 1;
-      x = this.pStartX + this.g.tile * 3;
+      y = this.g.height - this.g.config.tile * 1;
+      x = this.pStartX + this.g.config.tile * 3;
     }
     return { x: x, y: y };
   }
@@ -872,7 +890,7 @@ export default class render {
     if (this.g.lbIsShowing) {
       this.ctx.save();
       this.ctx.textBaseline = 'top';
-      this.ctx.font = this.g.theme.font.leaderBoard;
+      this.ctx.font = this.g.config.theme.font.leaderBoard;
       this.ctx.globalAlpha = this.lbPer;
       let x = 0,
         y = 0;
@@ -890,14 +908,14 @@ export default class render {
           y = this.lbY + 22 * i;
           rank = pad.substr(0, pad.length - r.rank.toString().length) + r.rank;
           score = r.score.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          this.ctx.fillStyle = this.g.theme.lbRank;
-          this.ctx.shadowColor = this.g.theme.lbRankShadow;
+          this.ctx.fillStyle = this.g.config.theme.lbRank;
+          this.ctx.shadowColor = this.g.config.theme.lbRankShadow;
           this.ctx.shadowBlur = 3;
           this.ctx.shadowOffsetX = 2;
           this.ctx.shadowOffsetY = 2;
           this.ctx.fillText(rank, x + this.lbRankX, y);
-          this.ctx.fillStyle = this.g.theme.lbName;
-          this.ctx.shadowColor = this.g.theme.lbNameShadow;
+          this.ctx.fillStyle = this.g.config.theme.lbName;
+          this.ctx.shadowColor = this.g.config.theme.lbNameShadow;
           this.ctx.shadowBlur = 3;
           this.ctx.shadowOffsetX = 2;
           this.ctx.shadowOffsetY = 2;
@@ -906,8 +924,8 @@ export default class render {
             x + this.lbRankX + this.textWidth(rank) + 8,
             y
           );
-          this.ctx.fillStyle = this.g.theme.lbScore;
-          this.ctx.shadowColor = this.g.theme.lbScoreShadow;
+          this.ctx.fillStyle = this.g.config.theme.lbScore;
+          this.ctx.shadowColor = this.g.config.theme.lbScoreShadow;
           this.ctx.shadowBlur = 3;
           this.ctx.shadowOffsetX = 2;
           this.ctx.shadowOffsetY = 2;
