@@ -1,61 +1,12 @@
+import config from './config.js';
 import input from './input.js';
 import mp from './mp.js';
 import render from './render.js';
-import piecesMatrix from './piecesMatrix.js';
 
 export default class istit {
   constructor(cfg) {
     this.version = '1.0.0';
-    this.hTiles = 10;
-    this.vTiles = 20;
-    this.maxFallTime = 15000;
-    this.tile = 32;
-    this.edgeThickness = 10;
-    this.lSpeedDecay = 0.075;
-    this.levelBonusMultiplier = 0.07;
-    this.levelIncreaseThreshold = 1000;
-    this.levelIncreaseMultiplier = 0.455;
-    this.lastScoreMultiplier = 0.125;
-    this.lastScoreThreshold = 8;
-    this.ghostAlpha = 0.3;
-    this.defVolume = 0.15;
-    this.safetyShift = 0.2;
-    this.safetyTime = 8000;
-    this.safetyThreshold = 0.6;
-    this.safetyPiece = 1;
-    this.safetyInterval = 8000;
-    this.mpServer = 'ws://localhost:76';
-    this.mpCountDown = 5000;
-    this.dropDelay = 100;
-    this.clearBonus = 1000;
-    this.clearRequirement = 0.5;
-    this.scoreMsgTime = 2000;
-    this.scoreMsgDrift = 150;
-    this.specialInterval = 60000;
-    this.specialDuration = 40000;
-    this.specialBonus = 1000;
-    this.specialJitter = 80;
-    this.lbGet = '';
-    this.lbAdd = '';
-    this.coolDown = {
-      left: 115,
-      right: 115,
-      rotate: 200,
-      down: 50,
-      drop: 300,
-      pause: 200,
-      hold: 300
-    };
-    this.minKeyRepeat = 20;
-    this.keyDecay = 0.25;
-    this.pieces = piecesMatrix;
-    this.animateCycle = {
-      score: 400,
-      lineBreak: 400,
-      lineAdd: 400,
-      sysUp: 300,
-      lbShow: 500
-    };
+    this.config = new config(cfg);
     // variables used to store dynamic values (these will change during runtime)
     this.animateTo = {
       score: 0,
@@ -75,7 +26,7 @@ export default class istit {
     this.linesToClear = [];
     this.linesToGet = 0;
     this.lastCounDown = 0;
-    this.volume = this.defVolume;
+    this.volume = this.config.defVolume;
     this.gridWeightHistory = [];
     this.messages = [];
     this.nextSafetyAt = 0;
@@ -91,16 +42,11 @@ export default class istit {
     this.lbIsShowing = false;
     this.playerName = 'Player';
     this.showingNamePrompt = false;
-    if (typeof cfg != 'undefined') {
-      for (key in cfg) {
-        this[key] = cfg[key];
-      }
-    }
   }
 
   init(canvasID) {
     this.halfPI = Math.PI / 2;
-    this.halfTile = this.tile / 2;
+    this.halfTile = this.config.tile / 2;
     this.syncDefDimension();
     this.c = document.getElementById(canvasID);
     if (this.c.getContext) {
@@ -114,8 +60,10 @@ export default class istit {
 
   syncDefDimension() {
     this.defWidth =
-      this.hTiles * this.tile + this.tile * 6 + (this.tile / 2) * 3;
-    this.defHeight = this.vTiles * this.tile + this.tile;
+      this.config.hTiles * this.config.tile +
+      this.config.tile * 6 +
+      (this.config.tile / 2) * 3;
+    this.defHeight = this.config.vTiles * this.config.tile + this.config.tile;
   }
 
   run() {
@@ -217,10 +165,10 @@ export default class istit {
       elapsed: 0,
       placed: false
     };
-    for (let h = 0; h < this.hTiles; h++) {
+    for (let h = 0; h < this.config.hTiles; h++) {
       this.pState.grid[h] = [];
       this.oState.grid[h] = [];
-      for (let v = 0; v < this.vTiles; v++) {
+      for (let v = 0; v < this.config.vTiles; v++) {
         this.pState.grid[h][v] = 0;
         this.oState.grid[h][v] = 0;
       }
@@ -248,7 +196,8 @@ export default class istit {
 
   load() {
     return new Promise(resolve => {
-      this.loadCFG()
+      this.config
+        .load()
         .then(() => {
           return this.loadImages();
         })
@@ -269,10 +218,10 @@ export default class istit {
       let imagesLoaded = 0,
         numImages = 0;
       this.images.bg = {};
-      if (this.theme.frameTexture) {
+      if (this.config.theme.frameTexture) {
         numImages++;
         this.images.frameTexture = new Image();
-        this.images.frameTexture.src = this.theme.frameTexture;
+        this.images.frameTexture.src = this.config.theme.frameTexture;
         this.images.frameTexture.onload = () => {
           imagesLoaded++;
           if (imagesLoaded === numImages) {
@@ -281,10 +230,10 @@ export default class istit {
         };
         this.images.frameTexture.onerror = reject;
       }
-      for (let l in this.theme.bgImages) {
+      for (let l in this.config.theme.bgImages) {
         numImages++;
         this.images.bg[l] = new Image();
-        this.images.bg[l].src = this.theme.bgImages[l];
+        this.images.bg[l].src = this.config.theme.bgImages[l];
         this.images.bg[l].onload = () => {
           imagesLoaded++;
           if (imagesLoaded === numImages) {
@@ -303,10 +252,10 @@ export default class istit {
       let soundsLoaded = 0,
         numSounds = 0;
       this.sounds = {};
-      for (let snd in this.theme.sounds) {
+      for (let snd in this.config.theme.sounds) {
         numSounds++;
-        this.sounds[snd] = new Audio(this.theme.sounds[snd]);
-        this.sounds[snd].volume = this.defVolume;
+        this.sounds[snd] = new Audio(this.config.theme.sounds[snd]);
+        this.sounds[snd].volume = this.config.defVolume;
         this.sounds[snd].onloadeddata = () => {
           soundsLoaded++;
           if (soundsLoaded === numSounds) {
@@ -315,29 +264,6 @@ export default class istit {
         };
         this.sounds[snd].onerror = reject;
       }
-    });
-  }
-
-  loadCFG() {
-    return new Promise((resolve, reject) => {
-      fetch('config.json')
-        .then(response => response.json())
-        .then(data => {
-          this.cfg = data;
-          for (let key in this.cfg) {
-            if (key == 'input') {
-              for (let iKey in this.cfg[key]) {
-                this.input[iKey] = this.cfg[key][iKey];
-              }
-            } else {
-              this[key] = this.cfg[key];
-            }
-          }
-          resolve();
-        })
-        .catch(() => {
-          reject();
-        });
     });
   }
 
@@ -408,7 +334,7 @@ export default class istit {
       }
       if (this.runTime > this.nextSpecialTime) {
         this.spawnSpecial();
-        this.nextSpecialTime = this.runTime + this.specialInterval;
+        this.nextSpecialTime = this.runTime + this.config.specialInterval;
       }
       for (let i in this.pState.special) {
         if (this.runTime > this.pState.special[i]) {
@@ -419,21 +345,21 @@ export default class istit {
         let joa = [-1, 0, 1];
         this.xSpecialJitter = joa[this.random(1, joa.length) - 1];
         this.ySpecialJitter = joa[this.random(1, joa.length) - 1];
-        this.nextSpecialJitterTime = this.runTime + this.specialJitter;
+        this.nextSpecialJitterTime = this.runTime + this.config.specialJitter;
       }
     }
     const now = new Date().getTime();
     if (this.lbIsShowing) {
       let sysPer =
-        (this.animateCycle.sysUp - (this.animateTo.sysUp - now)) /
-        this.animateCycle.sysUp;
+        (this.config.animateCycle.sysUp - (this.animateTo.sysUp - now)) /
+        this.config.animateCycle.sysUp;
       let lbPer = 0;
       if (sysPer > 1) {
         sysPer = 1;
         lbPer =
-          (this.animateCycle.lbShow -
-            (this.animateTo.sysUp + this.animateCycle.lbShow - now)) /
-          this.animateCycle.lbShow;
+          (this.config.animateCycle.lbShow -
+            (this.animateTo.sysUp + this.config.animateCycle.lbShow - now)) /
+          this.config.animateCycle.lbShow;
         if (lbPer > 1) {
           lbPer = 1;
         }
@@ -475,14 +401,14 @@ export default class istit {
     let h = 0;
     const dif = this.runTime - this.pFallingPiece.start;
     if (dif >= this.fallTime) {
-      h = this.vTiles;
+      h = this.config.vTiles;
     } else {
       const percent = dif / this.fallTime;
-      h = Math.floor(percent * this.vTiles);
+      h = Math.floor(percent * this.config.vTiles);
     }
     h += this.pFallingPiece.offset;
-    if (h >= this.vTiles) {
-      h = this.vTiles;
+    if (h >= this.config.vTiles) {
+      h = this.config.vTiles;
     }
     if (this.pFallingPiece.lastY != h) {
       yAdjust = h - this.pFallingPiece.lastY;
@@ -525,19 +451,19 @@ export default class istit {
 
   spawnSpecial() {
     let num = 0,
-      low = this.vTiles;
-    for (let c = 0; c < this.hTiles; c++) {
+      low = this.config.vTiles;
+    for (let c = 0; c < this.config.hTiles; c++) {
       num = this.getClosestToTopInColumn(c);
       if (num < low) {
         low = num;
       }
     }
-    const perRow = this.vTiles / (this.vTiles - low);
+    const perRow = this.config.vTiles / (this.config.vTiles - low);
     let chance = 0;
     const rows = [];
-    for (let r = low; r < this.vTiles; r++) {
+    for (let r = low; r < this.config.vTiles; r++) {
       chance += perRow;
-      const percent = chance / this.vTiles;
+      const percent = chance / this.config.vTiles;
       const rand = this.random(1, 100);
       if (rand <= percent * 100) {
         rows.push(r);
@@ -546,7 +472,7 @@ export default class istit {
     const rowIndex = this.random(1, rows.length) - 1;
     const r = rows[rowIndex];
     const cells = [];
-    for (let c = 0; c < this.hTiles; c++) {
+    for (let c = 0; c < this.config.hTiles; c++) {
       if (this.pState.grid[c][r]) {
         cells.push(c);
       }
@@ -554,18 +480,19 @@ export default class istit {
     const columnIndex = this.random(1, cells.length) - 1;
     const c = cells[columnIndex];
     if (r && c) {
-      this.pState.special[r + ':' + c] = this.runTime + this.specialDuration;
+      this.pState.special[r + ':' + c] =
+        this.runTime + this.config.specialDuration;
     }
   }
 
   randomPiece() {
     let wSum = 0;
-    for (let key in this.pieces) {
-      wSum += this.pieces[key].weight;
+    for (let key in this.config.pieces) {
+      wSum += this.config.pieces[key].weight;
     }
     let seed = Math.floor(Math.random() * wSum + 1);
-    for (let key in this.pieces) {
-      const w = this.pieces[key].weight;
+    for (let key in this.config.pieces) {
+      const w = this.config.pieces[key].weight;
       if (seed <= w) {
         return key * 1;
       } else {
@@ -577,14 +504,20 @@ export default class istit {
 
   dropPiece() {
     if (!this.ended) {
-      const startX = this.hTiles / 2 - 1,
+      const startX = this.config.hTiles / 2 - 1,
         startY = -1;
       let x = 0;
       let y = 0;
       const blocks = [];
       for (let b = 0; b < 4; b++) {
-        x = startX + this.pieces[this.nextPieces[0]].orientations[1][b][0] - 1;
-        y = startY + this.pieces[this.nextPieces[0]].orientations[1][b][1] - 1;
+        x =
+          startX +
+          this.config.pieces[this.nextPieces[0]].orientations[1][b][0] -
+          1;
+        y =
+          startY +
+          this.config.pieces[this.nextPieces[0]].orientations[1][b][1] -
+          1;
         blocks[b] = [x, y];
         if (this.pState.grid[x][y]) {
           this.end();
@@ -605,14 +538,20 @@ export default class istit {
       this.nextPieces.splice(0, 1);
       this.addNextPiece();
       const cWeight = this.getCompoundedWeight();
-      if (cWeight >= this.safetyThreshold && this.runTime > this.nextSafetyAt) {
-        this.nextSafetyAt = this.runTime + this.safetyInterval;
-        this.nextPieces[this.nextPiece.length - 1] = this.safetyPiece;
+      if (
+        cWeight >= this.config.safetyThreshold &&
+        this.runTime > this.nextSafetyAt
+      ) {
+        this.nextSafetyAt = this.runTime + this.config.safetyInterval;
+        this.nextPieces[this.nextPiece.length - 1] = this.config.safetyPiece;
       } else if (this.gridWeightHistory.length > 0) {
         const wDif = cWeight - this.gridWeightHistory[0].weight;
-        if (wDif > this.safetyShift && this.runTime > this.nextSafetyAt) {
-          this.nextSafetyAt = this.runTime + this.safetyInterval;
-          this.nextPieces[this.nextPiece.length - 1] = this.safetyPiece;
+        if (
+          wDif > this.config.safetyShift &&
+          this.runTime > this.nextSafetyAt
+        ) {
+          this.nextSafetyAt = this.runTime + this.config.safetyInterval;
+          this.nextPieces[this.nextPiece.length - 1] = this.config.safetyPiece;
         }
       }
       if (this.mp.session > -1) {
@@ -667,16 +606,16 @@ export default class istit {
       tmpY = blocks[b].r + yAdjust;
       if (tmpX < 0) {
         collidesWith = 'left';
-      } else if (tmpX > this.hTiles - 1) {
+      } else if (tmpX > this.config.hTiles - 1) {
         collidesWith = 'right';
-      } else if (tmpY > this.vTiles - 1) {
+      } else if (tmpY > this.config.vTiles - 1) {
         collidesWith = 'bottom';
       }
       if (
         tmpX > -1 &&
-        tmpX < this.hTiles &&
+        tmpX < this.config.hTiles &&
         tmpY > -1 &&
-        tmpY < this.vTiles &&
+        tmpY < this.config.vTiles &&
         this.pState.grid[tmpX][tmpY] != false
       ) {
         collidesWith = 'bottom';
@@ -700,8 +639,8 @@ export default class istit {
     let c = 0;
     const blocks = [];
     for (let b = 0; b < 4; b++) {
-      c = fp.x + this.pieces[t].orientations[p][b][0] - 1;
-      r = fp.y + this.pieces[t].orientations[p][b][1] - 1;
+      c = fp.x + this.config.pieces[t].orientations[p][b][0] - 1;
+      r = fp.y + this.config.pieces[t].orientations[p][b][1] - 1;
       blocks[b] = { r: r, c: c };
     }
     return [blocks[0], blocks[1], blocks[2], blocks[3]];
@@ -716,7 +655,7 @@ export default class istit {
       weight: this.getCompoundedWeight()
     });
     const now = new Date().getTime();
-    const expiry = now - this.safetyTime;
+    const expiry = now - this.config.safetyTime;
     for (let i = this.gridWeightHistory.length - 1; i >= 0; i--) {
       if (this.gridWeightHistory[i].time < expiry) {
         this.gridWeightHistory.splice(i, 1);
@@ -747,16 +686,16 @@ export default class istit {
           this.pFallingPiece.type
         );
         this.placedBlocks[blocks[b].r + ':' + blocks[b].c] =
-          new Date().getTime() + this.dropDelay;
+          new Date().getTime() + this.config.dropDelay;
       }
-      if (this.getCompoundedWeight() > this.clearRequirement) {
+      if (this.getCompoundedWeight() > this.config.clearRequirement) {
         this.okForClearBonus = true;
       }
       const lines = this.getCompleteLines();
       if (lines.length > 0) {
         this.clearLines(lines);
       }
-      this.dropAt = this.runTime + this.dropDelay;
+      this.dropAt = this.runTime + this.config.dropDelay;
       this.pFallingPiece.placed = true;
       this.handleGridChange();
     }
@@ -764,9 +703,9 @@ export default class istit {
 
   getCompleteLines() {
     const lines = [];
-    for (let v = 0; v < this.vTiles; v++) {
+    for (let v = 0; v < this.config.vTiles; v++) {
       let solid = true;
-      for (let h = 0; h < this.hTiles; h++) {
+      for (let h = 0; h < this.config.hTiles; h++) {
         if (!this.pState.grid[h][v]) {
           solid = false;
           break;
@@ -784,16 +723,16 @@ export default class istit {
     const numLines = lines.length;
     for (let l = 0; l < numLines; l++) {
       let line = lines[l];
-      for (let v = 0; v < this.vTiles; v++) {
+      for (let v = 0; v < this.config.vTiles; v++) {
         if (v == line) {
-          for (let h = 0; h < this.hTiles; h++) {
+          for (let h = 0; h < this.config.hTiles; h++) {
             this.pState.grid[h][v] = 0;
           }
         }
       }
-      for (let v = this.vTiles - 1; v >= 0; v--) {
+      for (let v = this.config.vTiles - 1; v >= 0; v--) {
         if (v < line) {
-          for (let c = 0; c < this.hTiles; c++) {
+          for (let c = 0; c < this.config.hTiles; c++) {
             let tmpVal = this.pState.grid[c][v];
             this.pState.grid[c][v] = 0;
             this.pState.grid[c][v + 1] = tmpVal;
@@ -808,8 +747,8 @@ export default class istit {
       }
     }
     let isCleared = true;
-    for (let v = 0; v < this.vTiles; v++) {
-      for (let h = 0; h < this.hTiles; h++) {
+    for (let v = 0; v < this.config.vTiles; v++) {
+      for (let h = 0; h < this.config.hTiles; h++) {
         if (this.pState.grid[h][v]) {
           isCleared = false;
           break;
@@ -820,7 +759,7 @@ export default class istit {
       }
     }
     if (isCleared && this.okForClearBonus) {
-      this.adjustScore(this.clearBonus, { text: 'all clear' });
+      this.adjustScore(this.config.clearBonus, { text: 'all clear' });
     }
     this.linesToClear = [];
     if (this.mp.session > -1) {
@@ -852,11 +791,11 @@ export default class istit {
     }
     for (let i = 0; i < lines.length; i++) {
       for (let s in this.pState.special) {
-        for (let c = 0; c < this.hTiles; c++) {
+        for (let c = 0; c < this.config.hTiles; c++) {
           if (typeof this.pState.special[lines[i] + ':' + c] != 'undefined') {
             delete this.pState.special[lines[i] + ':' + c];
             this.adjustScore(
-              this.specialBonus,
+              this.config.specialBonus,
               { text: 'golden block' },
               false
             );
@@ -875,7 +814,7 @@ export default class istit {
     this.pState.lines += lines.length;
     this.linesToClear = lines;
     this.animateTo.lineBreak =
-      new Date().getTime() + this.animateCycle.lineBreak;
+      new Date().getTime() + this.config.animateCycle.lineBreak;
   }
 
   getLines(num) {
@@ -884,20 +823,21 @@ export default class istit {
       this.sounds['newLine'].currentTime = 0;
       this.sounds['newLine'].play();
     }
-    this.animateTo.lineAdd = new Date().getTime() + this.animateCycle.lineAdd;
+    this.animateTo.lineAdd =
+      new Date().getTime() + this.config.animateCycle.lineAdd;
   }
 
   insertLines() {
     for (let i = 0; i < this.linesToGet; i++) {
-      for (let v = 0; v < this.vTiles; v++) {
-        for (let h = 0; h < this.hTiles; h++) {
+      for (let v = 0; v < this.config.vTiles; v++) {
+        for (let h = 0; h < this.config.hTiles; h++) {
           let tmpVal = this.pState.grid[h][v];
           this.pState.grid[h][v] = false;
           this.pState.grid[h][v - 1] = tmpVal;
         }
       }
-      const empty = this.random(1, this.hTiles);
-      for (let li = 0; li < this.hTiles; li++) {
+      const empty = this.random(1, this.config.hTiles);
+      for (let li = 0; li < this.config.hTiles; li++) {
         if (li != empty) {
           this.pState.grid[li][19] = 8;
         }
@@ -911,17 +851,20 @@ export default class istit {
     if (typeof giveSpeedBonus == 'undefined') {
       giveSpeedBonus = true;
     }
-    this.animateTo.score = new Date().getTime() + this.animateCycle.score;
+    this.animateTo.score =
+      new Date().getTime() + this.config.animateCycle.score;
     const now = new Date().getTime();
     const levelBonus = Math.round(
-      (parseInt(this.pState.level) - 1) * this.levelBonusMultiplier * p
+      (parseInt(this.pState.level) - 1) * this.config.levelBonusMultiplier * p
     );
     let speedBonus = 0;
     if (this.lastScoreTime > 0) {
       const dif = Math.floor((now - this.lastScoreTime) / 1000);
-      if (dif <= this.lastScoreThreshold) {
-        const remainder = this.lastScoreThreshold - dif;
-        speedBonus = Math.round(remainder * this.lastScoreMultiplier * p);
+      if (dif <= this.config.lastScoreThreshold) {
+        const remainder = this.config.lastScoreThreshold - dif;
+        speedBonus = Math.round(
+          remainder * this.config.lastScoreMultiplier * p
+        );
       }
     }
     let tp = p + levelBonus;
@@ -954,7 +897,7 @@ export default class istit {
   getGhostBlocks() {
     const ghost = [];
     const blocks = this.getFallingBlocks();
-    let mostDif = this.vTiles,
+    let mostDif = this.config.vTiles,
       tmpDif = 0;
     for (let i = 0; i < blocks.length; i++) {
       let c = blocks[i].c;
@@ -974,30 +917,30 @@ export default class istit {
   }
 
   getClosestToTopInColumn(c) {
-    for (let i = 0; i < this.vTiles; i++) {
+    for (let i = 0; i < this.config.vTiles; i++) {
       if (this.pState.grid[c][i]) {
         return i;
       }
     }
-    return this.vTiles;
+    return this.config.vTiles;
   }
 
   placeFallingPieceAtBottom() {
-    const offset = this.vTiles;
+    const offset = this.config.vTiles;
     this.pFallingPiece.offset = offset;
   }
 
   getPieceOffset(x, y) {
-    const xOffset = x * this.tile;
-    const yOffset = y * this.tile;
+    const xOffset = x * this.config.tile;
+    const yOffset = y * this.config.tile;
     return [xOffset, yOffset];
   }
 
   setLevel(l) {
     this.pState.level = l;
-    let fallTime = this.maxFallTime;
+    let fallTime = this.config.maxFallTime;
     for (let i = 1; i < l; i++) {
-      fallTime -= fallTime * this.lSpeedDecay;
+      fallTime -= fallTime * this.config.lSpeedDecay;
     }
     this.fallTime = fallTime;
     return this.fallTime;
@@ -1009,12 +952,12 @@ export default class istit {
     this.levels[1] = 0;
     for (let l = 2; l <= mLevel; l++) {
       if (l == 2) {
-        score = this.levelIncreaseThreshold;
+        score = this.config.levelIncreaseThreshold;
       } else {
         score =
           lastScore +
-          this.levelIncreaseThreshold +
-          Math.floor(lastScore * this.levelIncreaseMultiplier);
+          this.config.levelIncreaseThreshold +
+          Math.floor(lastScore * this.config.levelIncreaseMultiplier);
       }
       this.levels[l] = score;
       lastScore = score;
@@ -1027,7 +970,7 @@ export default class istit {
   }
 
   getPieceDimension(t, o, d) {
-    const blocks = this.pieces[t].orientations[o];
+    const blocks = this.config.pieces[t].orientations[o];
     let min = 9,
       max = 0;
     for (let i = 0; i < 4; i++) {
@@ -1050,7 +993,10 @@ export default class istit {
   }
 
   resizeForMP() {
-    this.width = this.defWidth + this.hTiles * this.tile + this.tile / 2;
+    this.width =
+      this.defWidth +
+      this.config.hTiles * this.config.tile +
+      this.config.tile / 2;
     this.height = this.defHeight;
     this.c.width = this.width;
     this.c.height = this.height;
@@ -1059,8 +1005,8 @@ export default class istit {
   getCompoundedWeight() {
     let numFilled = 0,
       total = 0;
-    for (let c = 0; c < this.hTiles; c++) {
-      for (let r = 0; r < this.vTiles; r++) {
+    for (let c = 0; c < this.config.hTiles; c++) {
+      for (let r = 0; r < this.config.vTiles; r++) {
         total++;
         if (this.pState.grid[c][r]) {
           numFilled++;
@@ -1073,7 +1019,7 @@ export default class istit {
   addScoreMessage(text, r, c) {
     this.messages.push({
       text: text,
-      expiration: this.runTime + this.scoreMsgTime,
+      expiration: this.runTime + this.config.scoreMsgTime,
       r: r,
       c: c
     });
@@ -1110,7 +1056,7 @@ export default class istit {
   addToLeaderBoard() {}
 
   useLeaderBoard() {
-    if (this.lbGet !== '' && this.lbAdd !== '') {
+    if (this.config.lbGet !== '' && this.config.lbAdd !== '') {
       return true;
     }
     return false;
@@ -1137,6 +1083,7 @@ export default class istit {
   launchLeaderBoard() {
     this.lbIsShowing = true;
     this.showingNamePrompt = false;
-    this.animateTo.sysUp = new Date().getTime() + this.animateCycle.sysUp;
+    this.animateTo.sysUp =
+      new Date().getTime() + this.config.animateCycle.sysUp;
   }
 }

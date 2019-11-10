@@ -7,13 +7,13 @@ export default class input {
 
   init() {
     this.floodWait = {
-      80: this.g.coolDown.pause,
-      32: this.g.coolDown.drop,
-      37: this.g.coolDown.left,
-      38: this.g.coolDown.rotate,
-      39: this.g.coolDown.right,
-      40: this.g.coolDown.down,
-      72: this.g.coolDown.hold
+      80: this.g.config.coolDown.pause,
+      32: this.g.config.coolDown.drop,
+      37: this.g.config.coolDown.left,
+      38: this.g.config.coolDown.rotate,
+      39: this.g.config.coolDown.right,
+      40: this.g.config.coolDown.down,
+      72: this.g.config.coolDown.hold
     };
     this.lastFloodWait = {
       80: 0,
@@ -77,12 +77,13 @@ export default class input {
     let floodTime = this.floodWait[key];
     if (this.lastFloodWait[key]) {
       floodTime =
-        this.lastFloodWait[key] - this.lastFloodWait[key] * this.g.keyDecay;
+        this.lastFloodWait[key] -
+        this.lastFloodWait[key] * this.g.config.keyDecay;
     } else {
       floodTime = this.floodWait[key];
     }
-    if (floodTime < this.g.minKeyRepeat) {
-      floodTime = this.g.minKeyRepeat;
+    if (floodTime < this.g.config.minKeyRepeat) {
+      floodTime = this.g.config.minKeyRepeat;
     }
     this.lastFloodWait[key] = floodTime;
     this.floodTimers[key] = setTimeout(() => {

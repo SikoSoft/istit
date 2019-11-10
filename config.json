@@ -12,7 +12,6 @@
     "pause": 200,
     "hold": 300
   },
-  "minKeyDelay": 20,
   "keyDecay": 0.4,
   "theme": {
     "frame": "#456",

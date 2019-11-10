@@ -19,7 +19,7 @@ export default class mp {
     this.g.reset();
     this.wait = true;
     this.oppIsAlive = true;
-    this.ws = new WebSocket(this.g.mpServer);
+    this.ws = new WebSocket(this.g.config.mpServer);
     this.ws.onopen = () => {
       this.connected = true;
     };
@@ -60,13 +60,13 @@ export default class mp {
 
   startSession(sID) {
     this.countingDown = true;
-    this.countUntil = new Date().getTime() + this.g.mpCountDown;
+    this.countUntil = new Date().getTime() + this.g.config.mpCountDown;
     setTimeout(() => {
       this.g.start();
       this.countingDown = false;
       this.wait = false;
       this.session = sID;
-    }, this.g.mpCountDown);
+    }, this.g.config.mpCountDown);
   }
 
   endSession() {
