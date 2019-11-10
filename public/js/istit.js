@@ -413,7 +413,6 @@ export default class istit {
     if (this.pFallingPiece.lastY != h) {
       yAdjust = h - this.pFallingPiece.lastY;
       adjust = false;
-
       if (this.collides(0, 1, 0) == false) {
         validYAdjust = true;
         yAdjustDifFromExp = yAdjust - 1;
@@ -625,7 +624,7 @@ export default class istit {
   }
 
   getFallingBlocks(opponent, p, t) {
-    const fp = this.pFallingPiece;
+    let fp = this.pFallingPiece;
     if (opponent) {
       fp = this.oFallingPiece;
     }
