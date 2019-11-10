@@ -49,25 +49,20 @@ export default class istit {
     this.minKeyRepeat = 20;
     this.keyDecay = 0.25;
     this.pieces = piecesMatrix;
-    // variables used to store dynamic values (these will change during runtime)
-    this.animateTo = {
-      score: 0,
-      level: 0,
-      lineBreak: 0,
-      lineAdd: 0,
-      sysUp: 0,
-      lbShow: 0
-    };
     this.animateCycle = {
       score: 400,
-      level: 400,
       lineBreak: 400,
       lineAdd: 400,
       sysUp: 300,
       lbShow: 500
     };
-    this.lastFrame = 0;
-    this.wasPaused = false;
+    // variables used to store dynamic values (these will change during runtime)
+    this.animateTo = {
+      score: 0,
+      lineBreak: 0,
+      lineAdd: 0,
+      sysUp: 0
+    };
     this.runTime = 0;
     this.startTime = 0;
     this.paused = false;
@@ -77,18 +72,12 @@ export default class istit {
     this.lastScoreTime = 0;
     this.levels = {};
     this.images = {};
-    this.callbacks = {};
     this.linesToClear = [];
     this.linesToGet = 0;
     this.lastCounDown = 0;
-    this.numTicks = 0;
-    this.numDraws = 0;
     this.volume = this.defVolume;
-    this.lastWeight = 0;
-    this.lastWeightTime = 0;
     this.gridWeightHistory = [];
     this.messages = [];
-    this.safetyTimes = 0;
     this.nextSafetyAt = 0;
     this.placedBlocks = {};
     this.okForClearBonus = false;
@@ -96,16 +85,12 @@ export default class istit {
     this.nextPieces = [];
     this.nextPiece = false;
     this.holdPiece = false;
-    this.bffrPiece = false;
     this.nextSpecialTime = 0;
     this.nextSpecialJitterTime = 0;
     this.leaderBoard = [];
     this.lbIsShowing = false;
     this.playerName = 'Player';
-    this.opponentName = 'Opponent';
     this.showingNamePrompt = false;
-    this.selfLBRowID = -1;
-    this.selfLBRank = -1;
     if (typeof cfg != 'undefined') {
       for (key in cfg) {
         this[key] = cfg[key];
@@ -195,7 +180,6 @@ export default class istit {
     this.renderer.init();
     this.ended = false;
     this.runTime = 0;
-    this.numTicks = 0;
     this.lastTick = new Date().getTime();
     this.startTime = new Date().getTime();
     this.lbIsShowing = false;
@@ -582,11 +566,6 @@ export default class istit {
   }
 
   randomPiece() {
-    if (this.bffrPiece) {
-      const bffr = this.bffrPiece;
-      this.bffrPiece = false;
-      return bffr;
-    }
     let wSum = 0;
     for (let key in this.pieces) {
       wSum += this.pieces[key].weight;
@@ -634,13 +613,11 @@ export default class istit {
       this.addNextPiece();
       const cWeight = this.getCompoundedWeight();
       if (cWeight >= this.safetyThreshold && this.runTime > this.nextSafetyAt) {
-        this.safetyTimes++;
         this.nextSafetyAt = this.runTime + this.safetyInterval;
         this.nextPieces[this.nextPiece.length - 1] = this.safetyPiece;
       } else if (this.gridWeightHistory.length > 0) {
         const wDif = cWeight - this.gridWeightHistory[0].weight;
         if (wDif > this.safetyShift && this.runTime > this.nextSafetyAt) {
-          this.safetyTimes++;
           this.nextSafetyAt = this.runTime + this.safetyInterval;
           this.nextPieces[this.nextPiece.length - 1] = this.safetyPiece;
         }
@@ -886,9 +863,6 @@ export default class istit {
       this.mp.sendLines(numLines);
     }
     this.handleGridChange();
-    if (typeof this.callbacks.clearLines == 'function') {
-      this.callbacks.clearLines(lines.length);
-    }
   }
 
   clearLines(lines) {
@@ -1011,9 +985,6 @@ export default class istit {
       }
     }
     this.lastScoreTime = now;
-    if (typeof this.callbacks.adjustScore == 'function') {
-      this.callbacks.adjustScore(p, this.pState.score);
-    }
   }
 
   getGhostBlocks() {

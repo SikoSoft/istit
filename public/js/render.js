@@ -890,15 +890,6 @@ export default class render {
           y = this.lbY + 22 * i;
           rank = pad.substr(0, pad.length - r.rank.toString().length) + r.rank;
           score = r.score.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          if (r.id == this.g.selfLBRowID) {
-            this.ctx.fillStyle = this.g.theme.lbHighlight;
-            this.ctx.fillRect(
-              x + this.lbRankX - this.g.halfTile * 0.5,
-              y,
-              this.g.tile * 9 + this.g.halfTile,
-              22
-            );
-          }
           this.ctx.fillStyle = this.g.theme.lbRank;
           this.ctx.shadowColor = this.g.theme.lbRankShadow;
           this.ctx.shadowBlur = 3;
