@@ -1,11 +1,12 @@
 {
   "name": "istit",
   "version": "1.0.0",
-  "description": "I Swear This Isn't Tetris",
+  "description": "I Swear This Isn't Tetr*s",
   "main": "serve.js",
   "dependencies": {
     "express": "^4.17.1",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "websocket": "^1.0.30"
   },
   "devDependencies": {
     "eslint": "^6.6.0",

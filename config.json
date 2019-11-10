@@ -1,4 +1,9 @@
 {
+  "server": {
+    "webPort": 75,
+    "webSocketPort": 76,
+    "activeTime": 5000
+  },
   "lbAdd": "http://api.sikosoft.net/json/istit/addToLeaderBoard",
   "lbGet": "http://api.sikosoft.net/json/istit/getLeaderBoard",
   "maxFallTime": 17500,
