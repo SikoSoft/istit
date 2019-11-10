@@ -29,7 +29,7 @@ export default class render {
       this.g.config.theme.font.scoreNormal.replace(/\b([0-9]+)(px|pt).*/, '$1')
     );
     this.scoreLarge = parseInt(
-      this.g.config.theme.font.scoreNormal.replace(/\b([0-9]+)(px|pt).*/, '$1')
+      this.g.config.theme.font.scoreLarge.replace(/\b([0-9]+)(px|pt).*/, '$1')
     );
     this.scoreDif = this.scoreLarge - this.scoreNormal;
     this.levelX = this.pEndX + this.g.config.tile * 2;
