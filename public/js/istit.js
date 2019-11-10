@@ -320,7 +320,7 @@ export default class istit {
 
   loadCFG() {
     return new Promise((resolve, reject) => {
-      fetch('core.json')
+      fetch('config.json')
         .then(response => response.json())
         .then(data => {
           this.cfg = data;
