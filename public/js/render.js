@@ -408,15 +408,18 @@ export default class render {
     this.ctx.strokeRect(rX, rY, rW, rH);
     this.g.ctx.font = fontSize + 'px Roboto Condensed';
     this.g.ctx.fillStyle = this.g.config.theme.score;
-    this.g.ctx.textBaseline = 'middle';
+    this.g.ctx.textBaseline = 'top';
     this.ctx.shadowColor = this.g.config.theme.scoreShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
+    const textDim = this.g.ctx.measureText(this.g.pState.score);
+    const textHeight =
+      textDim.actualBoundingBoxAscent + textDim.actualBoundingBoxDescent;
     this.g.ctx.fillText(
       this.g.pState.score,
-      this.scoreX - this.g.ctx.measureText(this.g.pState.score).width / 2,
-      rY + 22
+      this.scoreX - textDim.width / 2,
+      rY + (rH - textHeight) / 2
     );
     this.g.ctx.restore();
   }
@@ -439,10 +442,13 @@ export default class render {
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
+    const textDim = this.g.ctx.measureText(str);
+    const textHeight =
+      textDim.actualBoundingBoxAscent + textDim.actualBoundingBoxDescent;
     this.g.ctx.fillText(
       str,
-      this.scoreX - this.g.ctx.measureText(str).width / 2,
-      rY
+      this.scoreX - textDim.width / 2,
+      rY + (rH - textHeight) / 2
     );
     this.g.ctx.restore();
   }
