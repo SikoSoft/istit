@@ -141,7 +141,7 @@ export default class istit {
         false
       );
       setInterval(() => {
-        this.live();
+        this.update();
       }, 0);
       setInterval(() => {
         this.renderer.draw();
@@ -364,7 +364,7 @@ export default class istit {
     return false;
   }
 
-  live() {
+  update() {
     if (this.mp.countingDown) {
       const remaining = Math.ceil(
         (this.mp.countUntil - new Date().getTime()) / 1000
