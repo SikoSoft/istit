@@ -1,21 +1,24 @@
 {
   "name": "istit",
-  "version": "1.0.0",
-  "description": "I Swear This Isn't Tetris",
+  "version": "1.1.0",
+  "description": "I Swear This Isn't Tetr*s",
   "main": "serve.js",
   "dependencies": {
     "express": "^4.17.1",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "websocket": "^1.0.30"
   },
   "devDependencies": {
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
     "eslint-loader": "^3.0.2",
     "eslint-plugin-prettier": "^3.1.1",
+    "nodemon": "^1.19.4",
     "prettier": "^1.18.2"
   },
   "scripts": {
-    "start": "node ./serve.js"
+    "start": "node ./serve.js",
+    "dev": "nodemon ./serve.js"
   },
   "repository": {
     "type": "git",
