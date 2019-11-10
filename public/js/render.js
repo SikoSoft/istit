@@ -610,8 +610,6 @@ export default class render {
 
   drawLoader() {
     const percent = (new Date().getTime() % 1000) / 1000;
-    const counter = percent * (Math.PI / 100);
-    const v = Math.sin(counter) * Math.PI;
     const x = 450,
       y = 110,
       r = 50;
@@ -729,7 +727,6 @@ export default class render {
     this.ctx.save();
     const percent = (((this.g.runTime / 1000) % 2) / 2) * 100;
     const counter = percent * (Math.PI / 100);
-    const counter2 = percent * 0.123 * (Math.PI / 100);
     const v = (Math.sin(counter) * (this.g.config.tile * 0.75)) | 0;
     const defXOffset = 0;
     const defYOffset = 0;
