@@ -457,13 +457,6 @@ export default class istit {
     this.input.process();
   }
 
-  setVolume(v) {
-    this.volume = v;
-    for (let snd in this.sounds) {
-      this.sounds[snd].volume = v;
-    }
-  }
-
   rowIsCleared(r) {
     for (let i = 0; i < this.linesToClear.length; i++) {
       if (this.linesToClear[i] == r) {
@@ -712,35 +705,6 @@ export default class istit {
       blocks[b] = { r: r, c: c };
     }
     return [blocks[0], blocks[1], blocks[2], blocks[3]];
-  }
-
-  getPositionOffset(b, p, x, y) {
-    if (p == 2) {
-      if (b[1] == 1) {
-        x = x + 2 - b[0];
-        y = y - b[1] + b[0];
-      } else {
-        x = x + 1 - b[0];
-        y = y - b[1] + b[0];
-      }
-    } else if (p == 3) {
-      if (b[1] == 1) {
-        x = x - b[0] - x + 9;
-        y = y + 1;
-      } else {
-        x = x - b[0] + 4 - b[0] + 1;
-        y = y - 1;
-      }
-    } else if (p == 4) {
-      if (b[1] == 1) {
-        x = x - b[0] + b[0] + b[0] - 3;
-        y = y - b[1] + b[0] + 1;
-      } else {
-        x = x - b[0] + 2;
-        y = y - b[1] + b[0] + 1;
-      }
-    }
-    return [x, y];
   }
 
   handleGridChange() {
@@ -1023,8 +987,6 @@ export default class istit {
     this.pFallingPiece.offset = offset;
   }
 
-  getLargestDrop() {}
-
   getPieceOffset(x, y) {
     const xOffset = x * this.tile;
     const yOffset = y * this.tile;
@@ -1148,14 +1110,14 @@ export default class istit {
   addToLeaderBoard() {}
 
   useLeaderBoard() {
-    if (this.lbGet != '' && this.lbAdd != '') {
+    if (this.lbGet !== '' && this.lbAdd !== '') {
       return true;
     }
     return false;
   }
 
   queueLeaderBoard(add) {
-    if (typeof add == 'undefined') {
+    if (typeof add === 'undefined') {
       add = false;
     }
     this.showingNamePrompt = true;
@@ -1164,7 +1126,7 @@ export default class istit {
         'Enter a name to be recorded to the Leader Board:',
         this.playerName
       );
-      if (name && name.replace(/\s/g, '') != '') {
+      if (name && name.replace(/\s/g, '') !== '') {
         this.playerName = name;
       }
     } else {

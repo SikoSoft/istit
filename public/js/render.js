@@ -921,31 +921,4 @@ export default class render {
       this.ctx.restore();
     }
   }
-
-  drawWave() {
-    const wavePower = 40;
-    const force = 0;
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-    this.ctx.fillRect(0, 0, Waves.width, Waves.height);
-    this.ctx.fillStyle = 'rgba(' + $colour + ', ' + this.alpha + ')';
-    this.ctx.beginPath();
-    this.ctx.moveTo(0, this.y);
-    this.ctx.quadraticCurveTo(
-      Waves.width / 4,
-      this.y + wavePower * force,
-      Waves.width / 2,
-      this.y
-    );
-    this.ctx.quadraticCurveTo(
-      Waves.width * 0.75,
-      this.y - wavePower * force,
-      Waves.width,
-      this.y
-    );
-    this.ctx.lineTo(Waves.width, Waves.height);
-    this.ctx.lineTo(0, Waves.height);
-    this.ctx.lineTo(0, this.y);
-    this.ctx.closePath();
-    this.ctx.fill();
-  }
 }

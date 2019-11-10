@@ -79,10 +79,6 @@ export default class mp {
     this.sessionEnded = true;
   }
 
-  sendPulse() {
-    this.ws.send('{"event": "pulse"}');
-  }
-
   sendEnd() {
     this.ws.send('{"event": "end"}');
   }
