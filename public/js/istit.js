@@ -1052,7 +1052,29 @@ export default class istit {
 
   getLeaderBoard() {}
 
-  addToLeaderBoard() {}
+  addToLeaderBoard() {
+    return new Promise((resolve, reject) => {
+      fetch(this.config.lbAdd, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: this.playerName,
+          score: this.pState.score,
+          duration: this.runTime
+        })
+      })
+        .then(data => data.json())
+        .then(json => {
+          this.leaderBoard = json;
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
 
   useLeaderBoard() {
     if (this.config.lbGet !== '' && this.config.lbAdd !== '') {
@@ -1074,12 +1096,16 @@ export default class istit {
       if (name && name.replace(/\s/g, '') !== '') {
         this.playerName = name;
       }
+      this.addToLeaderBoard().then(() => {
+        this.launchLeaderBoard();
+      });
     } else {
       this.launchLeaderBoard();
     }
   }
 
   launchLeaderBoard() {
+    console.log('launch leaderboard');
     this.lbIsShowing = true;
     this.showingNamePrompt = false;
     this.animateTo.sysUp =
