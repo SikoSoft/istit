@@ -1056,10 +1056,6 @@ export default class istit {
     return new Promise((resolve, reject) => {
       fetch(this.config.lbAdd, {
         method: 'POST',
-        mode: 'cors',
-        headers: {
-          'content-type': 'application/json'
-        },
         body: JSON.stringify({
           name: this.playerName,
           score: this.pState.score,
@@ -1068,7 +1064,8 @@ export default class istit {
       })
         .then(data => data.json())
         .then(json => {
-          this.leaderBoard = json;
+          this.leaderBoard = json.records;
+          resolve(json);
         })
         .catch(err => {
           reject(err);

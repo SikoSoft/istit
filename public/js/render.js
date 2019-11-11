@@ -923,7 +923,7 @@ export default class render {
           this.ctx.shadowOffsetX = 2;
           this.ctx.shadowOffsetY = 2;
           this.ctx.fillText(
-            r.player,
+            r.name,
             x + this.lbRankX + this.textWidth(rank) + 8,
             y
           );
