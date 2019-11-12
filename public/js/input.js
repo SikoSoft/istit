@@ -3,27 +3,25 @@ export default class input {
     this.g = g;
     this.keyState = {};
     this.floodTimers = {};
+    this.useGamePad = false;
+    this.keyMap = {
+      pause: 80,
+      drop: 32,
+      left: 37,
+      rotate: 38,
+      right: 39,
+      down: 40,
+      hold: 72
+    };
   }
 
   init() {
-    this.floodWait = {
-      80: this.g.config.coolDown.pause,
-      32: this.g.config.coolDown.drop,
-      37: this.g.config.coolDown.left,
-      38: this.g.config.coolDown.rotate,
-      39: this.g.config.coolDown.right,
-      40: this.g.config.coolDown.down,
-      72: this.g.config.coolDown.hold
-    };
-    this.lastFloodWait = {
-      80: 0,
-      32: 0,
-      37: 0,
-      38: 0,
-      39: 0,
-      40: 0,
-      72: 0
-    };
+    this.floodWait = {};
+    this.lastFloodWait = {};
+    Object.keys(this.keyMap).forEach(key => {
+      this.floodWait[this.keyMap[key]] = this.g.config.coolDown[key];
+      this.lastFloodWait[this.keyMap[key]] = 0;
+    });
     window.addEventListener(
       'keydown',
       e => {
@@ -50,36 +48,43 @@ export default class input {
   }
 
   process() {
-    if (!this.g.ended && this.keyState[80] && this.floodSafe(80)) {
+    if (
+      !this.g.ended &&
+      this.keyState[this.keyMap.pause] &&
+      this.floodSafe(this.keyMap.pause)
+    ) {
       this.g.pause();
-      this.setFloodTimer(80);
+      this.setFloodTimer(pause);
     }
     if (this.g.inputIsLocked() || this.g.ended) {
       return false;
     }
-    if (this.keyState[37] && this.floodSafe(37)) {
+    if (this.keyState[this.keyMap.left] && this.floodSafe(this.keyMap.left)) {
       this.g.movePiece(-1);
-      this.setFloodTimer(37);
+      this.setFloodTimer(this.keyMap.left);
     }
-    if (this.keyState[39] && this.floodSafe(39)) {
+    if (this.keyState[this.keyMap.right] && this.floodSafe(this.keyMap.right)) {
       this.g.movePiece(1);
-      this.setFloodTimer(39);
+      this.setFloodTimer(this.keyMap.right);
     }
-    if (this.keyState[40] && this.floodSafe(40)) {
+    if (this.keyState[this.keyMap.down] && this.floodSafe(this.keyMap.down)) {
       this.g.adjustFallingHeightOffset();
-      this.setFloodTimer(40);
+      this.setFloodTimer(this.keyMap.down);
     }
-    if (this.keyState[38] && this.floodSafe(38)) {
+    if (
+      this.keyState[this.keyMap.rotate] &&
+      this.floodSafe(this.keyMap.rotate)
+    ) {
       this.g.rotatePiece();
-      this.setFloodTimer(38);
+      this.setFloodTimer(this.keyMap.rotate);
     }
-    if (this.keyState[32] && this.floodSafe(32)) {
+    if (this.keyState[this.keyMap.drop] && this.floodSafe(this.keyMap.drop)) {
       this.g.placeFallingPieceAtBottom();
-      this.setFloodTimer(32);
+      this.setFloodTimer(this.keyMap.drop);
     }
-    if (this.keyState[72] && this.floodSafe(72)) {
+    if (this.keyState[this.keyMap.hold] && this.floodSafe(hold)) {
       this.g.toggleHold();
-      this.setFloodTimer(72);
+      this.setFloodTimer(this.keyMap.hold);
     }
   }
 
