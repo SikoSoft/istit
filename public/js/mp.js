@@ -41,9 +41,9 @@ export default class mp {
     } else if (json.event == 'linesGet') {
       this.g.getLines(json.num);
     } else if (json.event == 'statePull') {
-      this.g.oState = json.state;
+      this.g.opponent = json.state;
     } else if (json.event == 'fpPull') {
-      this.g.oFallingPiece = json.fallingPiece;
+      this.g.opponent.fallingPiece = json.fallingPiece;
     } else if (json.event == 'sync') {
       if (!this.wait) {
         const now = new Date().getTime();
@@ -88,12 +88,15 @@ export default class mp {
   }
 
   sendState() {
-    this.ws.send(JSON.stringify({ event: 'statePush', state: this.g.pState }));
+    this.ws.send(JSON.stringify({ event: 'statePush', state: this.g.player }));
   }
 
   sendFPState() {
     this.ws.send(
-      JSON.stringify({ event: 'fpPush', fallingPiece: this.g.pFallingPiece })
+      JSON.stringify({
+        event: 'fpPush',
+        fallingPiece: this.g.player.fallingPiece
+      })
     );
   }
 }

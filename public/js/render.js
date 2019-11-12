@@ -80,7 +80,7 @@ export default class render {
       this.drawGrid(true);
     }
     if (!this.g.mp.wait) {
-      if (!this.g.pFallingPiece.placed) {
+      if (!this.g.player.fallingPiece.placed) {
         this.drawFallingPiece();
       }
       this.drawGhost();
@@ -209,8 +209,8 @@ export default class render {
     this.g.ctx.save();
     this.g.ctx.globalAlpha = 0.6;
     let img = false;
-    if (typeof this.g.images.bg[this.g.pState.level] != 'undefined') {
-      img = this.g.images.bg[this.g.pState.level];
+    if (typeof this.g.images.bg[this.g.player.level] != 'undefined') {
+      img = this.g.images.bg[this.g.player.level];
     } else if (typeof this.g.images.bg['default'] != 'undefined') {
       img = this.g.images.bg['default'];
     }
@@ -224,8 +224,8 @@ export default class render {
       );
     }
     if (drawOpponent) {
-      if (typeof this.g.images.bg[this.g.oState.level] != 'undefined') {
-        img = this.g.images.bg[this.g.oState.level];
+      if (typeof this.g.images.bg[this.g.opponent.level] != 'undefined') {
+        img = this.g.images.bg[this.g.opponent.level];
       } else {
         img = this.g.images.bg['default'];
       }
@@ -413,11 +413,11 @@ export default class render {
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
-    const textDim = this.g.ctx.measureText(this.g.pState.score);
+    const textDim = this.g.ctx.measureText(this.g.player.score);
     const textHeight =
       textDim.actualBoundingBoxAscent + textDim.actualBoundingBoxDescent;
     this.g.ctx.fillText(
-      this.g.pState.score,
+      this.g.player.score,
       this.scoreX - textDim.width / 2,
       rY + (rH - textHeight) / 2
     );
@@ -437,7 +437,7 @@ export default class render {
     this.g.ctx.font = this.g.config.theme.font.level;
     this.g.ctx.fillStyle = this.g.config.theme.level;
     this.g.ctx.textBaseline = 'top';
-    const str = 'LEVEL ' + this.g.pState.level;
+    const str = 'LEVEL ' + this.g.player.level;
     this.ctx.shadowColor = this.g.config.theme.levelShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
@@ -503,11 +503,11 @@ export default class render {
   }
 
   drawFallingPiece(opponent) {
-    let fp = this.g.pFallingPiece;
+    let fp = this.g.player.fallingPiece;
     let sX = this.pStartX;
     let sY = this.pStartY;
     if (opponent) {
-      fp = this.g.oFallingPiece;
+      fp = this.g.opponent.fallingPiece;
       sX = this.oStartX;
       sY = this.oStartY;
     }
@@ -538,11 +538,11 @@ export default class render {
   drawFixedBlocks(opponent) {
     let sX = this.pStartX;
     let sY = this.pStartY;
-    let grid = this.g.pState.grid;
+    let grid = this.g.player.grid;
     if (opponent) {
       sX = this.oStartX;
       sY = this.oStartY;
-      grid = this.g.oState.grid;
+      grid = this.g.opponent.grid;
     }
     let x = 0,
       y = 0;
@@ -595,7 +595,7 @@ export default class render {
           }
           let bType = grid[h][v];
           if (
-            typeof this.g.pState.special[v + ':' + h] != 'undefined' &&
+            typeof this.g.player.special[v + ':' + h] != 'undefined' &&
             !opponent
           ) {
             bType = 9;
@@ -746,7 +746,7 @@ export default class render {
     this.ctx.fillStyle = 'rgba(240, 210, 0, ' + fillAlpha + ')';
     let x = 0,
       y = 0;
-    for (let key in this.g.pState.special) {
+    for (let key in this.g.player.special) {
       let pair = key.split(':');
       let r = parseInt(pair[0]);
       let c = parseInt(pair[1]);
@@ -813,7 +813,7 @@ export default class render {
       for (let i = 0; i < ghost.length; i++) {
         let o = this.g.getPieceOffset(ghost[i].c, ghost[i].r);
         this.drawBlock(
-          this.g.pFallingPiece.type,
+          this.g.player.fallingPiece.type,
           o[0] + this.pStartX,
           o[1] + this.pStartY,
           alpha

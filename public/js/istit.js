@@ -1,4 +1,5 @@
 import config from './config.js';
+import player from './player.js';
 import input from './input.js';
 import mp from './mp.js';
 import render from './render.js';
@@ -7,7 +8,7 @@ export default class istit {
   constructor(cfg) {
     this.version = '1.0.0';
     this.config = new config(cfg);
-    // variables used to store dynamic values (these will change during runtime)
+
     this.animateTo = {
       score: 0,
       lineBreak: 0,
@@ -40,7 +41,6 @@ export default class istit {
     this.nextSpecialJitterTime = 0;
     this.leaderBoard = [];
     this.lbIsShowing = false;
-    this.playerName = 'Player';
     this.showingNamePrompt = false;
   }
 
@@ -52,6 +52,8 @@ export default class istit {
     if (this.c.getContext) {
       this.ctx = this.c.getContext('2d');
     }
+    this.player = new player(this);
+    this.opponent = new player(this);
     this.input = new input(this);
     this.mp = new mp(this);
     this.renderer = new render(this);
@@ -131,48 +133,8 @@ export default class istit {
     this.lastTick = new Date().getTime();
     this.startTime = new Date().getTime();
     this.lbIsShowing = false;
-    this.pState = {
-      score: 0,
-      level: 0,
-      lines: 0,
-      grid: [],
-      special: {}
-    };
-    this.pFallingPiece = {
-      startStamp: 0,
-      start: 0,
-      x: 0,
-      y: 0,
-      type: -1,
-      position: 1,
-      elapsed: 0,
-      placed: false
-    };
-    this.oState = {
-      score: 0,
-      level: 0,
-      lines: 0,
-      grid: [],
-      special: {}
-    };
-    this.oFallingPiece = {
-      startStamp: 0,
-      start: 0,
-      x: 0,
-      y: 0,
-      type: -1,
-      position: 1,
-      elapsed: 0,
-      placed: false
-    };
-    for (let h = 0; h < this.config.hTiles; h++) {
-      this.pState.grid[h] = [];
-      this.oState.grid[h] = [];
-      for (let v = 0; v < this.config.vTiles; v++) {
-        this.pState.grid[h][v] = 0;
-        this.oState.grid[h][v] = 0;
-      }
-    }
+    this.player.reset();
+    this.opponent.reset();
     this.setLevel(1);
     this.nextPieces = [
       this.randomPiece(),
@@ -322,7 +284,7 @@ export default class istit {
       this.adjustFallingHeight();
       if (
         this.runTime > this.dropAt &&
-        this.pFallingPiece.start < this.dropAt
+        this.player.fallingPiece.start < this.dropAt
       ) {
         this.dropPiece();
       }
@@ -336,9 +298,9 @@ export default class istit {
         this.spawnSpecial();
         this.nextSpecialTime = this.runTime + this.config.specialInterval;
       }
-      for (let i in this.pState.special) {
-        if (this.runTime > this.pState.special[i]) {
-          delete this.pState.special[i];
+      for (let i in this.player.special) {
+        if (this.runTime > this.player.special[i]) {
+          delete this.player.special[i];
         }
       }
       if (this.runTime > this.nextSpecialJitterTime) {
@@ -399,19 +361,19 @@ export default class istit {
     let adjust = true;
     let place = false;
     let h = 0;
-    const dif = this.runTime - this.pFallingPiece.start;
+    const dif = this.runTime - this.player.fallingPiece.start;
     if (dif >= this.fallTime) {
       h = this.config.vTiles;
     } else {
       const percent = dif / this.fallTime;
       h = Math.floor(percent * this.config.vTiles);
     }
-    h += this.pFallingPiece.offset;
+    h += this.player.fallingPiece.offset;
     if (h >= this.config.vTiles) {
       h = this.config.vTiles;
     }
-    if (this.pFallingPiece.lastY != h) {
-      yAdjust = h - this.pFallingPiece.lastY;
+    if (this.player.fallingPiece.lastY != h) {
+      yAdjust = h - this.player.fallingPiece.lastY;
       adjust = false;
       if (this.collides(0, 1, 0) == false) {
         validYAdjust = true;
@@ -425,11 +387,11 @@ export default class istit {
     }
     if (adjust) {
       let sendState = false;
-      if (h - yAdjustDifFromExp != this.pFallingPiece.lastY) {
+      if (h - yAdjustDifFromExp != this.player.fallingPiece.lastY) {
         sendState = true;
       }
-      this.pFallingPiece.y = h - yAdjustDifFromExp;
-      this.pFallingPiece.lastY = this.pFallingPiece.y;
+      this.player.fallingPiece.y = h - yAdjustDifFromExp;
+      this.player.fallingPiece.lastY = this.player.fallingPiece.y;
       if (sendState && this.mp.session > -1) {
         this.mp.sendFPState();
       }
@@ -437,11 +399,11 @@ export default class istit {
     if (place) {
       this.placePiece();
     }
-    return this.pFallingPiece.y;
+    return this.player.fallingPiece.y;
   }
 
   adjustFallingHeightOffset() {
-    this.pFallingPiece.offset++;
+    this.player.fallingPiece.offset++;
   }
 
   adjustTime(dif) {
@@ -472,14 +434,14 @@ export default class istit {
     const r = rows[rowIndex];
     const cells = [];
     for (let c = 0; c < this.config.hTiles; c++) {
-      if (this.pState.grid[c][r]) {
+      if (this.player.grid[c][r]) {
         cells.push(c);
       }
     }
     const columnIndex = this.random(1, cells.length) - 1;
     const c = cells[columnIndex];
     if (r && c) {
-      this.pState.special[r + ':' + c] =
+      this.player.special[r + ':' + c] =
         this.runTime + this.config.specialDuration;
     }
   }
@@ -518,22 +480,17 @@ export default class istit {
           this.config.pieces[this.nextPieces[0]].orientations[1][b][1] -
           1;
         blocks[b] = [x, y];
-        if (this.pState.grid[x][y]) {
+        if (this.player.grid[x][y]) {
           this.end();
           return;
         }
       }
-      this.pFallingPiece.startStamp = new Date().getTime();
-      this.pFallingPiece.start = this.runTime;
-      this.pFallingPiece.x = startX;
-      this.pFallingPiece.y = startY;
-      this.pFallingPiece.lastX = this.pFallingPiece.x;
-      this.pFallingPiece.lastY = this.pFallingPiece.y;
-      this.pFallingPiece.offset = 0;
-      this.pFallingPiece.type = this.nextPieces[0] * 1;
-      this.pFallingPiece.position = 1;
-      this.pFallingPiece.placed = false;
-      this.pFallingPiece.elapsed = 0;
+      this.player.dropPiece({
+        start: this.runTime,
+        x: startX,
+        y: startY,
+        type: this.nextPieces[0] * 1
+      });
       this.nextPieces.splice(0, 1);
       this.addNextPiece();
       const cWeight = this.getCompoundedWeight();
@@ -561,7 +518,7 @@ export default class istit {
 
   movePiece(d) {
     if (!this.collides(d, 0, 0)) {
-      this.pFallingPiece.x += d;
+      this.player.fallingPiece.x += d;
       if (this.mp.session > -1) {
         this.mp.sendFPState();
       }
@@ -573,7 +530,7 @@ export default class istit {
       update = true;
     }
     let collides = false;
-    let newPosition = this.pFallingPiece.position + 1;
+    let newPosition = this.player.fallingPiece.position + 1;
     if (newPosition > 4) {
       newPosition = 1;
     }
@@ -581,8 +538,8 @@ export default class istit {
       let xAdjust = c;
       collides = this.collides(xAdjust, 0, newPosition);
       if (update && !collides) {
-        this.pFallingPiece.x += xAdjust;
-        this.pFallingPiece.position = newPosition;
+        this.player.fallingPiece.x += xAdjust;
+        this.player.fallingPiece.position = newPosition;
         if (this.mp.session > -1) {
           this.mp.sendFPState();
         }
@@ -594,7 +551,7 @@ export default class istit {
 
   collides(xAdjust, yAdjust, rAdjust, type) {
     if (typeof rAdjust == 'undefined' || rAdjust == 0) {
-      rAdjust = this.pFallingPiece.position;
+      rAdjust = this.player.fallingPiece.position;
     }
     let collidesWith = false;
     let tmpX = -1;
@@ -615,7 +572,7 @@ export default class istit {
         tmpX < this.config.hTiles &&
         tmpY > -1 &&
         tmpY < this.config.vTiles &&
-        this.pState.grid[tmpX][tmpY] != false
+        this.player.grid[tmpX][tmpY] != false
       ) {
         collidesWith = 'bottom';
       }
@@ -624,9 +581,9 @@ export default class istit {
   }
 
   getFallingBlocks(opponent, p, t) {
-    let fp = this.pFallingPiece;
+    let fp = this.player.fallingPiece;
     if (opponent) {
-      fp = this.oFallingPiece;
+      fp = this.opponent.fallingPiece;
     }
     if (typeof p == 'undefined') {
       p = fp.position;
@@ -677,12 +634,12 @@ export default class istit {
   }
 
   placePiece() {
-    if (!this.pFallingPiece.placed) {
+    if (!this.player.fallingPiece.placed) {
       this.placedBlocks = {};
       const blocks = this.getFallingBlocks();
       for (let b = 0; b < 4; b++) {
-        this.pState.grid[blocks[b].c][blocks[b].r] = parseInt(
-          this.pFallingPiece.type
+        this.player.grid[blocks[b].c][blocks[b].r] = parseInt(
+          this.player.fallingPiece.type
         );
         this.placedBlocks[blocks[b].r + ':' + blocks[b].c] =
           new Date().getTime() + this.config.dropDelay;
@@ -695,7 +652,7 @@ export default class istit {
         this.clearLines(lines);
       }
       this.dropAt = this.runTime + this.config.dropDelay;
-      this.pFallingPiece.placed = true;
+      this.player.fallingPiece.placed = true;
       this.handleGridChange();
     }
   }
@@ -705,7 +662,7 @@ export default class istit {
     for (let v = 0; v < this.config.vTiles; v++) {
       let solid = true;
       for (let h = 0; h < this.config.hTiles; h++) {
-        if (!this.pState.grid[h][v]) {
+        if (!this.player.grid[h][v]) {
           solid = false;
           break;
         }
@@ -725,21 +682,21 @@ export default class istit {
       for (let v = 0; v < this.config.vTiles; v++) {
         if (v == line) {
           for (let h = 0; h < this.config.hTiles; h++) {
-            this.pState.grid[h][v] = 0;
+            this.player.grid[h][v] = 0;
           }
         }
       }
       for (let v = this.config.vTiles - 1; v >= 0; v--) {
         if (v < line) {
           for (let c = 0; c < this.config.hTiles; c++) {
-            let tmpVal = this.pState.grid[c][v];
-            this.pState.grid[c][v] = 0;
-            this.pState.grid[c][v + 1] = tmpVal;
-            if (typeof this.pState.special[v + ':' + c] != 'undefined') {
-              this.pState.special[v + 1 + ':' + c] = this.pState.special[
+            let tmpVal = this.player.grid[c][v];
+            this.player.grid[c][v] = 0;
+            this.player.grid[c][v + 1] = tmpVal;
+            if (typeof this.player.special[v + ':' + c] != 'undefined') {
+              this.player.special[v + 1 + ':' + c] = this.player.special[
                 v + ':' + c
               ];
-              delete this.pState.special[v + ':' + c];
+              delete this.player.special[v + ':' + c];
             }
           }
         }
@@ -748,7 +705,7 @@ export default class istit {
     let isCleared = true;
     for (let v = 0; v < this.config.vTiles; v++) {
       for (let h = 0; h < this.config.hTiles; h++) {
-        if (this.pState.grid[h][v]) {
+        if (this.player.grid[h][v]) {
           isCleared = false;
           break;
         }
@@ -789,10 +746,10 @@ export default class istit {
       });
     }
     for (let i = 0; i < lines.length; i++) {
-      for (let s in this.pState.special) {
+      for (let s in this.player.special) {
         for (let c = 0; c < this.config.hTiles; c++) {
-          if (typeof this.pState.special[lines[i] + ':' + c] != 'undefined') {
-            delete this.pState.special[lines[i] + ':' + c];
+          if (typeof this.player.special[lines[i] + ':' + c] != 'undefined') {
+            delete this.player.special[lines[i] + ':' + c];
             this.adjustScore(
               this.config.specialBonus,
               { text: 'golden block' },
@@ -810,7 +767,7 @@ export default class istit {
       this.sounds['lines' + lines.length].currentTime = 0;
       this.sounds['lines' + lines.length].play();
     }
-    this.pState.lines += lines.length;
+    this.player.lines += lines.length;
     this.linesToClear = lines;
     this.animateTo.lineBreak =
       new Date().getTime() + this.config.animateCycle.lineBreak;
@@ -830,15 +787,15 @@ export default class istit {
     for (let i = 0; i < this.linesToGet; i++) {
       for (let v = 0; v < this.config.vTiles; v++) {
         for (let h = 0; h < this.config.hTiles; h++) {
-          let tmpVal = this.pState.grid[h][v];
-          this.pState.grid[h][v] = false;
-          this.pState.grid[h][v - 1] = tmpVal;
+          let tmpVal = this.player.grid[h][v];
+          this.player.grid[h][v] = false;
+          this.player.grid[h][v - 1] = tmpVal;
         }
       }
       const empty = this.random(1, this.config.hTiles);
       for (let li = 0; li < this.config.hTiles; li++) {
         if (li != empty) {
-          this.pState.grid[li][19] = 8;
+          this.player.grid[li][19] = 8;
         }
       }
     }
@@ -854,7 +811,7 @@ export default class istit {
       new Date().getTime() + this.config.animateCycle.score;
     const now = new Date().getTime();
     const levelBonus = Math.round(
-      (parseInt(this.pState.level) - 1) * this.config.levelBonusMultiplier * p
+      (parseInt(this.player.level) - 1) * this.config.levelBonusMultiplier * p
     );
     let speedBonus = 0;
     if (this.lastScoreTime > 0) {
@@ -870,11 +827,11 @@ export default class istit {
     if (giveSpeedBonus) {
       tp += speedBonus;
     }
-    this.pState.score += tp;
+    this.player.score += tp;
     let lastLevel = 1;
     for (let key in this.levels) {
-      if (this.pState.score < this.levels[key]) {
-        if (lastLevel != this.pState.level) {
+      if (this.player.score < this.levels[key]) {
+        if (lastLevel != this.player.level) {
           this.setLevel(lastLevel);
         }
         break;
@@ -917,7 +874,7 @@ export default class istit {
 
   getClosestToTopInColumn(c) {
     for (let i = 0; i < this.config.vTiles; i++) {
-      if (this.pState.grid[c][i]) {
+      if (this.player.grid[c][i]) {
         return i;
       }
     }
@@ -926,7 +883,7 @@ export default class istit {
 
   placeFallingPieceAtBottom() {
     const offset = this.config.vTiles;
-    this.pFallingPiece.offset = offset;
+    this.player.fallingPiece.offset = offset;
   }
 
   getPieceOffset(x, y) {
@@ -936,7 +893,7 @@ export default class istit {
   }
 
   setLevel(l) {
-    this.pState.level = l;
+    this.player.level = l;
     let fallTime = this.config.maxFallTime;
     for (let i = 1; i < l; i++) {
       fallTime -= fallTime * this.config.lSpeedDecay;
@@ -1007,7 +964,7 @@ export default class istit {
     for (let c = 0; c < this.config.hTiles; c++) {
       for (let r = 0; r < this.config.vTiles; r++) {
         total++;
-        if (this.pState.grid[c][r]) {
+        if (this.player.grid[c][r]) {
           numFilled++;
         }
       }
@@ -1026,21 +983,21 @@ export default class istit {
 
   toggleHold() {
     if (!this.holdPiece) {
-      this.holdPiece = this.pFallingPiece.type;
+      this.holdPiece = this.player.fallingPiece.type;
       this.dropPiece();
     } else {
-      const cFP = this.pFallingPiece.type;
+      const cFP = this.player.fallingPiece.type;
       const cHP = this.holdPiece;
       this.holdPiece = cFP;
       for (let c = 0; c >= -4; c--) {
         let xAdjust = c;
         let collides = this.collides(c, 0, 0, cHP);
         if (!collides) {
-          this.pFallingPiece.x += xAdjust;
+          this.player.fallingPiece.x += xAdjust;
           break;
         }
       }
-      this.pFallingPiece.type = cHP;
+      this.player.fallingPiece.type = cHP;
     }
   }
 
@@ -1057,8 +1014,8 @@ export default class istit {
       fetch(this.config.lbAdd, {
         method: 'POST',
         body: JSON.stringify({
-          name: this.playerName,
-          score: this.pState.score,
+          name: this.player.name,
+          score: this.player.score,
           duration: this.runTime
         })
       })
@@ -1088,10 +1045,10 @@ export default class istit {
     if (add) {
       let name = prompt(
         'Enter a name to be recorded to the Leader Board:',
-        this.playerName
+        this.player.name
       );
       if (name && name.replace(/\s/g, '') !== '') {
-        this.playerName = name;
+        this.player.name = name;
       }
       this.addToLeaderBoard().then(() => {
         this.launchLeaderBoard();
