@@ -1007,7 +1007,19 @@ export default class istit {
     }
   }
 
-  getLeaderBoard() {}
+  getLeaderBoard() {
+    return new Promise((resolve, reject) => {
+      fetch(this.config.lbGet)
+        .then(data => data.json())
+        .then(json => {
+          this.leaderBoard = json.records;
+          resolve(json);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
 
   addToLeaderBoard() {
     return new Promise((resolve, reject) => {
@@ -1042,7 +1054,7 @@ export default class istit {
       add = false;
     }
     this.showingNamePrompt = true;
-    if (add) {
+    if (add && this.player.score > 0) {
       let name = prompt(
         'Enter a name to be recorded to the Leader Board:',
         this.player.name
@@ -1054,12 +1066,13 @@ export default class istit {
         this.launchLeaderBoard();
       });
     } else {
-      this.launchLeaderBoard();
+      this.getLeaderBoard().then(() => {
+        this.launchLeaderBoard();
+      });
     }
   }
 
   launchLeaderBoard() {
-    console.log('launch leaderboard');
     this.lbIsShowing = true;
     this.showingNamePrompt = false;
     this.animateTo.sysUp =
