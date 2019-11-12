@@ -24,6 +24,20 @@ export default class input {
       40: 0,
       72: 0
     };
+    window.addEventListener(
+      'keydown',
+      e => {
+        this.handleKeyDown(e);
+      },
+      false
+    );
+    window.addEventListener(
+      'keyup',
+      e => {
+        this.handleKeyUp(e);
+      },
+      false
+    );
   }
 
   reset() {

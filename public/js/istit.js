@@ -76,20 +76,6 @@ export default class istit {
       this.renderer.init();
       this.getLevelScores(50);
       this.start();
-      window.addEventListener(
-        'keydown',
-        e => {
-          this.input.handleKeyDown(e);
-        },
-        false
-      );
-      window.addEventListener(
-        'keyup',
-        e => {
-          this.input.handleKeyUp(e);
-        },
-        false
-      );
       setInterval(() => {
         this.update();
       }, 0);

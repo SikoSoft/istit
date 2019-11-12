@@ -38,7 +38,6 @@ export default class player {
   }
 
   setFallingPiece(properties) {
-    console.log({ ...this.fallingPiece, ...properties });
     this.fallingPiece = { ...this.fallingPiece, ...properties };
   }
 
