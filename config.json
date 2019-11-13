@@ -15,7 +15,8 @@
     "down": 50,
     "drop": 300,
     "pause": 200,
-    "hold": 300
+    "hold": 300,
+    "inputToggle": 250
   },
   "keyDecay": 0.4,
   "theme": {

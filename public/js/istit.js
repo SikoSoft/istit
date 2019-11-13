@@ -230,14 +230,6 @@ export default class istit {
     return true;
   }
 
-  inputIsLocked() {
-    const now = new Date().getTime();
-    if (now < this.animateTo.lineBreak || now < this.animateTo.lineAdd) {
-      return true;
-    }
-    return false;
-  }
-
   update() {
     if (this.mp.countingDown) {
       const remaining = Math.ceil(
