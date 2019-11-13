@@ -99,26 +99,26 @@ export default class render {
     this.drawLevel();
     this.drawMessages();
     if (this.g.paused) {
-      this.drawSystemMessage('Paused');
+      this.drawSystemMessage(this.g.strings.paused);
     } else if (!this.g.mp.oppIsAlive) {
-      this.drawSystemMessage('Opponent Disconnected');
+      this.drawSystemMessage(this.g.strings.opponentDisconnected);
     } else if (this.g.mp.wait) {
       if (this.g.mp.countingDown) {
-        this.drawSystemMessage('Get Ready!');
+        this.drawSystemMessage(this.g.strings.getReady);
       } else if (this.g.mp.connected) {
-        this.drawSystemMessage('Waiting For Peer');
+        this.drawSystemMessage(this.g.strings.waitingForPeer);
       } else {
-        this.drawSystemMessage('Connecting To Server');
+        this.drawSystemMessage(this.g.strings.connectingToServer);
       }
     } else if (this.g.ended) {
       if (this.g.mp.sessionEnded) {
         if (this.g.mp.isWinner) {
-          this.drawSystemMessage('You Win! :)');
+          this.drawSystemMessage(this.g.strings.youWin);
         } else {
-          this.drawSystemMessage('You Lose. :(');
+          this.drawSystemMessage(this.g.strings.youLose);
         }
       } else {
-        this.drawSystemMessage('Game Over');
+        this.drawSystemMessage(this.g.strings.gameOver);
       }
     }
     if (this.g.mp.wait == true) {
@@ -272,12 +272,12 @@ export default class render {
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
     this.ctx.fillText(
-      'NEXT',
+      this.g.strings.next,
       this.mStartX + this.g.halfTile * 0.5,
       this.pStartY + this.g.halfTile * 0.5
     );
     this.ctx.restore();
-    if (!this.g.mp.wait) {
+    if (!this.g.mp.wait && this.g.nextPieces.length > 0) {
       const pW = this.g.getPieceDimension(this.g.nextPieces[0], 1, 0);
       const pH = this.g.getPieceDimension(this.g.nextPieces[0], 1, 1);
       let npStartX = this.mStartX + (this.mW - pW * this.g.config.tile) / 2;
@@ -362,7 +362,7 @@ export default class render {
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
     this.ctx.fillText(
-      'HOLD',
+      this.g.strings.hold,
       this.mStartX + this.g.halfTile * 0.5,
       this.hStartY + this.g.halfTile * 0.5
     );
@@ -437,7 +437,7 @@ export default class render {
     this.g.ctx.font = this.g.config.theme.font.level;
     this.g.ctx.fillStyle = this.g.config.theme.level;
     this.g.ctx.textBaseline = 'top';
-    const str = 'LEVEL ' + this.g.player.level;
+    const str = this.g.strings.level.replace('{level}', this.g.player.level);
     this.ctx.shadowColor = this.g.config.theme.levelShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
@@ -524,7 +524,7 @@ export default class render {
       this.g.config.pieces[fp.type].color.blue +
       ', 1)';
     const blocks = this.g.getFallingBlocks(opponent);
-    for (let b = 0; b < 4; b++) {
+    for (let b = 0; b < blocks.length; b++) {
       let block = blocks[b];
       this.drawBlock(
         fp.type,
@@ -629,9 +629,9 @@ export default class render {
   drawCountDown(now) {
     const remaining = Math.ceil((this.g.mp.countUntil - now) / 1000);
     if (remaining != this.g.lastCountDown) {
-      if (typeof this.g.sounds['countDown'] != 'undefined') {
-        this.g.sounds['countDown'].currentTime = 0;
-        this.g.sounds['countDown'].play();
+      if (typeof this.g.sounds.countDown != 'undefined') {
+        this.g.sounds.countDown.currentTime = 0;
+        this.g.sounds.countDown.play();
       }
     }
     this.ctx.save();
@@ -809,7 +809,7 @@ export default class render {
     const v = (Math.sin(counter) * (tmpAlpha * 1)) | 0;
     tmpAlpha = tmpAlpha * 0.5 + v * 0.5;
     const alpha = tmpAlpha / 100;
-    if (fBlocks[0].r < ghost[0].r) {
+    if (fBlocks.length > 0 && fBlocks[0].r < ghost[0].r) {
       for (let i = 0; i < ghost.length; i++) {
         let o = this.g.getPieceOffset(ghost[i].c, ghost[i].r);
         this.drawBlock(

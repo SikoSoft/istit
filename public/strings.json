@@ -1,0 +1,13 @@
+{
+  "next": "NEXT",
+  "hold": "HOLD",
+  "level": "LEVEL {level}",
+  "paused": "Paused",
+  "opponentDisconnected": "Opponent Disconnected",
+  "getReady": "Get Ready!",
+  "waitingForPeer": "Waiting For Peer",
+  "connectingToServer": "Connecting To Server",
+  "youWin": "You Win! :)",
+  "youLose": "You Lose! :(",
+  "gameOver": "Game Over"
+}

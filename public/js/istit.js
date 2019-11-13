@@ -8,7 +8,7 @@ export default class istit {
   constructor(cfg) {
     this.version = '1.0.0';
     this.config = new config(cfg);
-
+    this.strings = {};
     this.animateTo = {
       score: 0,
       lineBreak: 0,
@@ -147,6 +147,9 @@ export default class istit {
       this.config
         .load()
         .then(() => {
+          return this.loadStrings();
+        })
+        .then(() => {
           return this.loadImages();
         })
         .then(() => {
@@ -157,6 +160,20 @@ export default class istit {
         })
         .catch(error => {
           console.log('Encountered an error while loading!', error);
+        });
+    });
+  }
+
+  loadStrings() {
+    return new Promise((resolve, reject) => {
+      fetch('strings.json')
+        .then(data => data.json())
+        .then(json => {
+          this.strings = json;
+          resolve(json);
+        })
+        .catch(err => {
+          reject(err);
         });
     });
   }
