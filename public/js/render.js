@@ -120,6 +120,8 @@ export default class render {
       } else {
         this.drawSystemMessage(this.g.strings.gameOver);
       }
+    } else if (this.g.wait) {
+      this.drawSystemMessage(this.g.strings.pressSpaceToBegin);
     }
     if (this.g.mp.wait == true) {
       this.drawLoader(now);

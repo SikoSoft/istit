@@ -3,9 +3,9 @@ import player from './player.js';
 import input from './input.js';
 import mp from './mp.js';
 import render from './render.js';
-
 export default class istit {
   constructor(cfg) {
+    window.istit = this;
     this.version = '1.0.0';
     this.config = new config(cfg);
     this.strings = {};
@@ -19,6 +19,7 @@ export default class istit {
     this.startTime = 0;
     this.paused = false;
     this.ended = false;
+    this.wait = false;
     this.time = 0;
     this.fallTime = 0;
     this.lastScoreTime = 0;
@@ -75,7 +76,9 @@ export default class istit {
       this.input.init();
       this.renderer.init();
       this.getLevelScores(50);
-      this.start();
+      this.lastTick = new Date().getTime();
+      this.startTime = new Date().getTime();
+      this.wait = true;
       setInterval(() => {
         this.update();
       }, 0);
@@ -114,6 +117,7 @@ export default class istit {
   reset() {
     this.input.reset();
     this.renderer.init();
+    this.wait = false;
     this.ended = false;
     this.runTime = 0;
     this.lastTick = new Date().getTime();
@@ -241,7 +245,7 @@ export default class istit {
   }
 
   inPlay() {
-    if (this.ended || this.paused || this.mp.wait) {
+    if (this.ended || this.paused || this.mp.wait || this.wait) {
       return false;
     }
     return true;
@@ -580,10 +584,13 @@ export default class istit {
     if (opponent) {
       fp = this.opponent.fallingPiece;
     }
-    if (typeof p == 'undefined') {
+    if (fp.type === -1) {
+      return [];
+    }
+    if (typeof p === 'undefined') {
       p = fp.position;
     }
-    if (typeof t == 'undefined') {
+    if (typeof t === 'undefined') {
       t = fp.type;
     }
     let r = 0;

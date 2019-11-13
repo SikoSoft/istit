@@ -73,7 +73,6 @@ export default class input {
       false
     );
     window.addEventListener('gamepadconnected', e => {
-      console.log('gamepad connected', e.gamepad);
       this.gamePadDetected = true;
       this.lastButtonState = {};
       Object.keys(this.buttonMap).forEach(button => {
@@ -100,6 +99,9 @@ export default class input {
   }
 
   process() {
+    if (this.g.wait && this.keyState[this.keyMap.drop]) {
+      this.g.start();
+    }
     if (this.isLocked() || this.g.ended) {
       return false;
     }

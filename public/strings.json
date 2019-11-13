@@ -9,5 +9,6 @@
   "connectingToServer": "Connecting To Server",
   "youWin": "You Win! :)",
   "youLose": "You Lose! :(",
-  "gameOver": "Game Over"
+  "gameOver": "Game Over",
+  "pressSpaceToBegin": "Press [SPACE] to begin"
 }
