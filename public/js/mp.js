@@ -88,7 +88,7 @@ export default class mp {
   }
 
   sendState() {
-    this.ws.send(JSON.stringify({ event: 'statePush', state: this.g.player }));
+    this.ws.send(JSON.stringify({ event: 'statePush', state: this.g.player.state() }));
   }
 
   sendFPState() {

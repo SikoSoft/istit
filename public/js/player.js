@@ -15,6 +15,16 @@ export default class player {
     this.resetFallingPiece();
   }
 
+  state(){
+    let copy = {};
+    Object.keys(this).forEach(key => {
+      if (key !== 'g' && typeof this[key] !== 'function') {
+        copy[key] = this[key];
+      }
+    });
+    return copy;
+  }
+
   resetGrid() {
     for (let h = 0; h < this.g.config.hTiles; h++) {
       this.grid[h] = [];
