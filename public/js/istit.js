@@ -45,36 +45,22 @@ export default class istit {
     this.showingNamePrompt = false;
   }
 
-  init(canvasID) {
+  init(canvasId) {
+    this.canvasId = canvasId;
     this.halfPI = Math.PI / 2;
     this.halfTile = this.config.tile / 2;
-    this.syncDefDimension();
-    this.c = document.getElementById(canvasID);
-    if (this.c.getContext) {
-      this.ctx = this.c.getContext('2d');
-    }
     this.player = new player(this);
     this.opponent = new player(this);
     this.input = new input(this);
     this.mp = new mp(this);
-    this.renderer = new render(this);
+    this.render = new render(this);
     this.run();
-  }
-
-  syncDefDimension() {
-    this.defWidth =
-      this.config.hTiles * this.config.tile +
-      this.config.tile * 6 +
-      (this.config.tile / 2) * 3;
-    this.defHeight = this.config.vTiles * this.config.tile + this.config.tile;
   }
 
   run() {
     this.load().then(() => {
-      this.syncDefDimension();
-      this.resizeForSP();
       this.input.init();
-      this.renderer.init();
+      this.render.init();
       this.getLevelScores(50);
       this.lastTick = new Date().getTime();
       this.startTime = new Date().getTime();
@@ -83,7 +69,7 @@ export default class istit {
         this.update();
       }, 0);
       setInterval(() => {
-        this.renderer.draw();
+        this.render.draw();
       }, 0);
     });
   }
@@ -109,14 +95,14 @@ export default class istit {
     if (this.mp.sessionEnded || this.mp.wait) {
       this.mp.endSession();
     }
-    this.resizeForSP();
+    this.render.resizeForSP();
     this.paused = false;
     this.start();
   }
 
   reset() {
     this.input.reset();
-    this.renderer.init();
+    this.render.init();
     this.wait = false;
     this.ended = false;
     this.runTime = 0;
@@ -325,13 +311,12 @@ export default class istit {
           lbPer = 1;
         }
       }
-      this.renderer.sysY =
-        this.renderer.sysYDef - sysPer * this.renderer.sysYDif;
-      this.renderer.lbLeftX =
-        this.renderer.lbLeftXDef + lbPer * this.renderer.lbLeftXDif;
-      this.renderer.lbRightX =
-        this.renderer.lbRightXDef + lbPer * this.renderer.lbRightXDif;
-      this.renderer.lbPer = lbPer;
+      this.render.sysY = this.render.sysYDef - sysPer * this.render.sysYDif;
+      this.render.lbLeftX =
+        this.render.lbLeftXDef + lbPer * this.render.lbLeftXDif;
+      this.render.lbRightX =
+        this.render.lbRightXDef + lbPer * this.render.lbRightXDif;
+      this.render.lbPer = lbPer;
     } else if (
       !this.showingNamePrompt &&
       this.ended &&
@@ -941,23 +926,6 @@ export default class istit {
       }
     }
     return max - min + 1;
-  }
-
-  resizeForSP() {
-    this.width = this.defWidth;
-    this.height = this.defHeight;
-    this.c.width = this.width;
-    this.c.height = this.height;
-  }
-
-  resizeForMP() {
-    this.width =
-      this.defWidth +
-      this.config.hTiles * this.config.tile +
-      this.config.tile / 2;
-    this.height = this.defHeight;
-    this.c.width = this.width;
-    this.c.height = this.height;
   }
 
   getCompoundedWeight() {

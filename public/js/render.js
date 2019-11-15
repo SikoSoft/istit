@@ -1,30 +1,36 @@
 export default class render {
   constructor(g) {
     this.g = g;
-    this.ctx = this.g.ctx;
+    this.canvas = document.getElementById(this.g.canvasId);
+    if (this.canvas.getContext) {
+      this.ctx = this.canvas.getContext('2d');
+    }
+    this.mpMode = false;
   }
 
   init() {
+    this.syncDefDimension();
+    this.resizeForSP();
     this.pWidth = this.g.config.hTiles * this.g.config.tile;
     this.pHeight = this.g.config.vTiles * this.g.config.tile;
     this.pStartX = this.g.config.tile / 2;
     this.pStartY = this.g.config.tile / 2;
     this.pEndX = this.pStartX + this.pWidth;
     this.pEndY = this.pStaryY + this.pHeight;
-    this.oStartX = this.g.defWidth;
+    this.oStartX = this.defWidth;
     this.oStartY = this.pStartY;
-    this.mW = this.g.defWidth - this.pEndX;
+    this.mW = this.defWidth - this.pEndX;
     this.mW = this.g.config.tile * 6;
     this.mStartX = this.pEndX + this.g.config.tile / 2;
     this.mStartY = this.g.config.tile / 2;
-    this.mEndX = this.g.defWidth - this.g.config.tile / 2;
+    this.mEndX = this.defWidth - this.g.config.tile / 2;
     this.npStartX = this.pEndX + this.g.config.tile + this.g.config.tile / 2;
     this.npStartY = this.pStartY + this.g.config.tile / 2;
     this.npH = this.mW + this.g.config.tile * 2;
     this.hStartY = this.npStartY + this.mW + this.g.config.tile * 2;
     this.scoreX =
       this.pEndX + this.g.config.tile * 0.5 + this.g.config.tile * 3;
-    this.scoreY = this.g.defHeight - this.g.config.tile * 0.5;
+    this.scoreY = this.defHeight - this.g.config.tile * 0.5;
     this.scoreNormal = parseInt(
       this.g.config.theme.font.scoreNormal.replace(/\b([0-9]+)(px|pt).*/, '$1')
     );
@@ -33,10 +39,10 @@ export default class render {
     );
     this.scoreDif = this.scoreLarge - this.scoreNormal;
     this.levelX = this.pEndX + this.g.config.tile * 2;
-    this.levelY = this.g.defHeight - 100;
+    this.levelY = this.defHeight - 100;
     this.timeX =
       this.scoreX - this.textWidth('00:00', this.g.config.theme.font.time) / 2;
-    this.timeY = this.g.defHeight - 5 * this.g.config.tile;
+    this.timeY = this.defHeight - 5 * this.g.config.tile;
     this.msgX = this.scoreX;
     this.msgH =
       parseInt(
@@ -53,7 +59,7 @@ export default class render {
     this.sysYTop = this.pStartY + this.g.config.tile;
     this.sysY = this.sysYDef;
     this.sysYDif = this.sysYDef - this.sysYTop;
-    this.lbYDef = this.g.height;
+    this.lbYDef = this.canvas.height;
     this.lbYTop = this.pStartY + this.g.config.tile * 2.5;
     this.lbYDif = this.lbYDef - this.lbYTop;
     this.lbY = this.lbYTop;
@@ -70,13 +76,36 @@ export default class render {
     this.noEdgeTile = this.g.config.tile - this.g.config.edgeThickness;
   }
 
+  syncDefDimension() {
+    this.defWidth =
+      this.g.config.hTiles * this.g.config.tile +
+      this.g.config.tile * 6 +
+      (this.g.config.tile / 2) * 3;
+    this.defHeight =
+      this.g.config.vTiles * this.g.config.tile + this.g.config.tile;
+  }
+
+  resizeForSP() {
+    this.canvas.width = this.defWidth;
+    this.canvas.height = this.defHeight;
+    this.mpMode = false;
+  }
+
+  resizeForMP() {
+    this.canvas.width =
+      this.defWidth +
+      this.g.config.hTiles * this.g.config.tile +
+      this.g.config.tile / 2;
+    this.canvas.height = this.defHeight;
+    this.mpMode = true;
+  }
+
   draw() {
     const now = new Date().getTime();
-    const drawOpponent = this.g.width > this.g.defWidth;
-    this.g.ctx.clearRect(0, 0, this.g.c.width, this.g.c.height);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawLayout();
     this.drawGrid();
-    if (drawOpponent) {
+    if (this.mpMode) {
       this.drawGrid(true);
     }
     if (!this.g.mp.wait) {
@@ -85,7 +114,7 @@ export default class render {
       }
       this.drawGhost();
       this.drawFixedBlocks();
-      if (drawOpponent) {
+      if (this.mpMode) {
         this.drawFallingPiece(true);
         this.drawFixedBlocks(true);
       }
@@ -139,22 +168,17 @@ export default class render {
         ((this.g.animateTo.lineBreak - now) /
           (this.g.config.animateCycle.lineBreak * this.g.linesToClear.length)) *
         1;
-      this.g.ctx.save();
-      this.g.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-      this.g.ctx.globalAlpha = alpha;
-      this.g.ctx.fillRect(
-        this.pStartX,
-        this.pStartY,
-        this.pWidth,
-        this.pHeight
-      );
-      this.g.ctx.restore();
+      this.ctx.save();
+      this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      this.ctx.globalAlpha = alpha;
+      this.ctx.fillRect(this.pStartX, this.pStartY, this.pWidth, this.pHeight);
+      this.ctx.restore();
     }
   }
 
   drawSystemMessage(msg) {
-    this.g.ctx.save();
-    const grad = this.g.ctx.createLinearGradient(
+    this.ctx.save();
+    const grad = this.ctx.createLinearGradient(
       this.pStartX,
       this.pStartY,
       this.pStartX,
@@ -162,32 +186,35 @@ export default class render {
     );
     grad.addColorStop(0, 'rgba(0, 0, 60, 0.6)');
     grad.addColorStop(1, 'rgba(0, 0, 0, 0.6)');
-    this.g.ctx.fillStyle = grad;
-    this.g.ctx.fillRect(0, 0, this.g.width, this.g.height);
-    this.g.ctx.restore();
-    this.g.ctx.save();
-    this.g.ctx.font = this.g.config.theme.font.systemMessage;
-    this.g.ctx.fillStyle = this.g.config.theme.systemMessage;
+    this.ctx.fillStyle = grad;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.restore();
+    this.ctx.save();
+    this.ctx.font = this.g.config.theme.font.systemMessage;
+    this.ctx.fillStyle = this.g.config.theme.systemMessage;
     this.ctx.shadowColor = this.g.config.theme.systemMessageShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
-    this.g.ctx.textBaseline = 'top';
+    this.ctx.textBaseline = 'top';
     const pauseX =
-      this.pWidth / 2 - this.g.ctx.measureText(msg).width / 2 + this.g.halfTile;
-    this.g.ctx.fillText(msg, pauseX, this.sysY);
-    this.g.ctx.restore();
+      this.pWidth / 2 - this.ctx.measureText(msg).width / 2 + this.g.halfTile;
+    this.ctx.fillText(msg, pauseX, this.sysY);
+    this.ctx.restore();
   }
 
   drawLayout() {
-    const drawOpponent = this.g.width > this.g.defWidth;
-    this.g.ctx.save();
-    this.g.ctx.fillStyle = this.g.config.theme.frame;
-    this.g.ctx.fillRect(0, 0, this.g.width, this.g.height);
-    this.g.ctx.restore();
+    this.ctx.save();
+    this.ctx.fillStyle = this.g.config.theme.frame;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.restore();
     if (this.g.images.frameTexture) {
-      const numH = Math.ceil(this.g.width / this.g.images.frameTexture.width);
-      const numV = Math.ceil(this.g.height / this.g.images.frameTexture.height);
+      const numH = Math.ceil(
+        this.canvas.width / this.g.images.frameTexture.width
+      );
+      const numV = Math.ceil(
+        this.canvas.height / this.g.images.frameTexture.height
+      );
       for (let v = 0; v < numV; v++) {
         for (let h = 0; h < numH; h++) {
           let x = h * this.g.images.frameTexture.width;
@@ -196,20 +223,15 @@ export default class render {
         }
       }
     }
-    this.g.ctx.save();
-    this.g.ctx.fillStyle = this.g.config.theme.grid;
-    this.g.ctx.fillRect(this.pStartX, this.pStartY, this.pWidth, this.pHeight);
-    if (drawOpponent) {
-      this.g.ctx.fillRect(
-        this.oStartX,
-        this.oStartY,
-        this.pWidth,
-        this.pHeight
-      );
+    this.ctx.save();
+    this.ctx.fillStyle = this.g.config.theme.grid;
+    this.ctx.fillRect(this.pStartX, this.pStartY, this.pWidth, this.pHeight);
+    if (this.mpMode) {
+      this.ctx.fillRect(this.oStartX, this.oStartY, this.pWidth, this.pHeight);
     }
-    this.g.ctx.restore();
-    this.g.ctx.save();
-    this.g.ctx.globalAlpha = 0.6;
+    this.ctx.restore();
+    this.ctx.save();
+    this.ctx.globalAlpha = 0.6;
     let img = false;
     if (typeof this.g.images.bg[this.g.player.level] != 'undefined') {
       img = this.g.images.bg[this.g.player.level];
@@ -217,7 +239,7 @@ export default class render {
       img = this.g.images.bg['default'];
     }
     if (img) {
-      this.g.ctx.drawImage(
+      this.ctx.drawImage(
         img,
         this.pStartX,
         this.pStartY,
@@ -225,13 +247,13 @@ export default class render {
         this.pHeight
       );
     }
-    if (drawOpponent) {
+    if (this.mpMode) {
       if (typeof this.g.images.bg[this.g.opponent.level] != 'undefined') {
         img = this.g.images.bg[this.g.opponent.level];
       } else {
         img = this.g.images.bg['default'];
       }
-      this.g.ctx.drawImage(
+      this.ctx.drawImage(
         img,
         this.oStartX,
         this.oStartY,
@@ -239,25 +261,25 @@ export default class render {
         this.pHeight
       );
     }
-    this.g.ctx.restore();
-    this.g.ctx.save();
+    this.ctx.restore();
+    this.ctx.save();
     this.ctx.lineWidth = 1;
-    this.g.ctx.strokeStyle = this.g.config.theme.gridOutline;
-    this.g.ctx.strokeRect(
+    this.ctx.strokeStyle = this.g.config.theme.gridOutline;
+    this.ctx.strokeRect(
       this.pStartX - 1,
       this.pStartY - 1,
       this.pWidth,
       this.pHeight
     );
-    if (drawOpponent) {
-      this.g.ctx.strokeRect(
+    if (this.mpMode) {
+      this.ctx.strokeRect(
         this.oStartX - 1,
         this.oStartY - 1,
         this.pWidth,
         this.pHeight
       );
     }
-    this.g.ctx.restore();
+    this.ctx.restore();
   }
 
   drawNextPieces() {
@@ -399,60 +421,60 @@ export default class render {
       const v = (Math.sin(counter) * this.scoreDif) | 0;
       fontSize = this.scoreNormal + v;
     }
-    this.g.ctx.save();
+    this.ctx.save();
     const rX = this.mStartX;
     const rW = this.mW;
-    const rY = this.g.height - 96;
+    const rY = this.canvas.height - 96;
     const rH = 48;
     this.ctx.fillStyle = this.g.config.theme.scoreFrame;
     this.ctx.strokeStyle = this.g.config.theme.scoreOutline;
     this.ctx.fillRect(rX, rY, rW, rH);
     this.ctx.strokeRect(rX, rY, rW, rH);
-    this.g.ctx.font = fontSize + 'px Roboto Condensed';
-    this.g.ctx.fillStyle = this.g.config.theme.score;
-    this.g.ctx.textBaseline = 'top';
+    this.ctx.font = fontSize + 'px Roboto Condensed';
+    this.ctx.fillStyle = this.g.config.theme.score;
+    this.ctx.textBaseline = 'top';
     this.ctx.shadowColor = this.g.config.theme.scoreShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
-    const textDim = this.g.ctx.measureText(this.g.player.score);
+    const textDim = this.ctx.measureText(this.g.player.score);
     const textHeight =
       textDim.actualBoundingBoxAscent + textDim.actualBoundingBoxDescent;
-    this.g.ctx.fillText(
+    this.ctx.fillText(
       this.g.player.score,
       this.scoreX - textDim.width / 2,
       rY + (rH - textHeight) / 2
     );
-    this.g.ctx.restore();
+    this.ctx.restore();
   }
 
   drawLevel() {
-    this.g.ctx.save();
+    this.ctx.save();
     const rX = this.mStartX;
     const rW = this.mW;
-    const rY = this.g.height - 48;
+    const rY = this.canvas.height - 48;
     const rH = 32;
     this.ctx.fillStyle = this.g.config.theme.levelFrame;
     this.ctx.strokeStyle = this.g.config.theme.levelOutline;
     this.ctx.fillRect(rX, rY, rW, rH);
     this.ctx.strokeRect(rX, rY, rW, rH);
-    this.g.ctx.font = this.g.config.theme.font.level;
-    this.g.ctx.fillStyle = this.g.config.theme.level;
-    this.g.ctx.textBaseline = 'top';
+    this.ctx.font = this.g.config.theme.font.level;
+    this.ctx.fillStyle = this.g.config.theme.level;
+    this.ctx.textBaseline = 'top';
     const str = this.g.strings.level.replace('{level}', this.g.player.level);
     this.ctx.shadowColor = this.g.config.theme.levelShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
-    const textDim = this.g.ctx.measureText(str);
+    const textDim = this.ctx.measureText(str);
     const textHeight =
       textDim.actualBoundingBoxAscent + textDim.actualBoundingBoxDescent;
-    this.g.ctx.fillText(
+    this.ctx.fillText(
       str,
       this.scoreX - textDim.width / 2,
       rY + (rH - textHeight) / 2
     );
-    this.g.ctx.restore();
+    this.ctx.restore();
   }
 
   drawTime() {
@@ -466,16 +488,16 @@ export default class render {
       seconds = '0' + seconds;
     }
     const time = minutes + ':' + seconds;
-    this.g.ctx.save();
-    this.g.ctx.font = this.g.config.theme.font.time;
-    this.g.ctx.fillStyle = this.g.config.theme.time;
-    this.g.ctx.textBaseline = 'top';
+    this.ctx.save();
+    this.ctx.font = this.g.config.theme.font.time;
+    this.ctx.fillStyle = this.g.config.theme.time;
+    this.ctx.textBaseline = 'top';
     this.ctx.shadowColor = this.g.config.theme.timeShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 3;
     this.ctx.shadowOffsetY = 3;
-    this.g.ctx.fillText(time, this.timeX, this.timeY);
-    this.g.ctx.restore();
+    this.ctx.fillText(time, this.timeX, this.timeY);
+    this.ctx.restore();
   }
 
   drawGrid(opponent) {
@@ -641,7 +663,7 @@ export default class render {
     this.ctx.fillStyle = this.g.config.theme.countDown;
     this.ctx.textBaseline = 'middle';
     const num = remaining.toString();
-    this.ctx.fillText(num, 450 - this.g.ctx.measureText(num).width / 2, 110);
+    this.ctx.fillText(num, 450 - this.ctx.measureText(num).width / 2, 110);
     this.ctx.restore();
   }
 
@@ -850,7 +872,7 @@ export default class render {
       let points = msg.text.replace(/(\+[0-9]+)\b.*/, '$1');
       let label = msg.text.replace(/(\+[0-9]+)\b(.*)/, '$2');
       this.ctx.font = this.g.config.theme.font.scoreMsgPoints;
-      let sW = this.g.ctx.measureText(points).width;
+      let sW = this.ctx.measureText(points).width;
       this.ctx.font = this.g.config.theme.font.scoreMsgLabel;
       this.ctx.font = this.g.config.theme.scoreMsgPoints;
       this.ctx.fillStyle = this.g.config.theme.scoreMsgPoints;
@@ -874,7 +896,7 @@ export default class render {
       x = p[0] + this.pStartX;
       y = p[1] + this.pStartY;
     } else {
-      y = this.g.height - this.g.config.tile * 1;
+      y = this.canvas.height - this.g.config.tile * 1;
       x = this.pStartX + this.g.config.tile * 3;
     }
     return { x: x, y: y };

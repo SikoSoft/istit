@@ -29,7 +29,7 @@ export default class mp {
     this.ws.onmessage = msg => {
       this.handleMessage(msg);
     };
-    this.g.resizeForMP();
+    this.g.renderer.resizeForMP();
   }
 
   handleMessage(msg) {
