@@ -4,10 +4,10 @@ import input from './input.js';
 import mp from './mp.js';
 import render from './render.js';
 export default class istit {
-  constructor(cfg) {
+  constructor() {
     window.istit = this;
     this.version = '1.0.0';
-    this.config = new config(cfg);
+    this.config = new config(this);
     this.strings = {};
     this.animateTo = {
       score: 0,

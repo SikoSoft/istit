@@ -1,7 +1,8 @@
 import piecesMatrix from './piecesMatrix.js';
 
 export default class config {
-  constructor(override) {
+  constructor(g) {
+    this.g = g;
     this.hTiles = 10;
     this.vTiles = 20;
     this.maxFallTime = 15000;
@@ -52,14 +53,15 @@ export default class config {
       sysUp: 300,
       lbShow: 500
     };
-    if (typeof override !== 'undefined') {
-      this.process(override);
-    }
   }
 
   process(override) {
     for (let key in override) {
       this[key] = override[key];
+      if (key === 'hTiles' || key === 'vTiles') {
+        this.g.player.resetGrid();
+        this.g.opponent.resetGrid();
+      }
     }
   }
 
