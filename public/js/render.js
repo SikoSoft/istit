@@ -46,14 +46,19 @@ export default class render {
           .replace(/^\s/, ''),
         family: this.g.config.theme.font[font]
           .replace(/^(italic|bold)? ?[0-9]+(px|pt) ?(.*)/g, '$3')
-          .replace(/^\s/, '')
+          .replace(/^\s/, ''),
+        string() {
+          return `${this.style ? this.style + ' ' : ''}${this.size}px ${
+            this.family
+          }`;
+        }
       };
     });
     this.scoreDif = this.font.scoreLarge.size - this.font.scoreNormal.size;
     this.levelX = this.pEndX + this.g.config.tile * 2;
     this.levelY = this.defHeight - 100;
     this.timeX =
-      this.scoreX - this.textWidth('00:00', this.g.config.theme.font.time) / 2;
+      this.scoreX - this.textWidth('00:00', this.font.time.string()) / 2;
     this.timeY = this.defHeight - 5 * this.g.config.tile;
     this.msgX = this.scoreX;
     this.msgH =
@@ -219,7 +224,7 @@ export default class render {
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.restore();
     this.ctx.save();
-    this.ctx.font = this.g.config.theme.font.systemMessage;
+    this.ctx.font = this.font.systemMessage.string();
     this.ctx.fillStyle = this.g.config.theme.systemMessage;
     this.ctx.shadowColor = this.g.config.theme.systemMessageShadow;
     this.ctx.shadowBlur = 0;
@@ -317,7 +322,7 @@ export default class render {
     this.ctx.fillRect(this.mStartX, this.pStartY, this.mW, this.npH);
     this.ctx.strokeStyle = this.g.config.theme.nextOutline;
     this.ctx.strokeRect(this.mStartX, this.pStartY, this.mW, this.npH);
-    this.ctx.font = this.g.config.theme.font.next;
+    this.ctx.font = this.font.next.string();
     this.ctx.textBaseline = 'top';
     this.ctx.fillStyle = this.g.config.theme.nextLabel;
     this.ctx.shadowColor = this.g.config.theme.nextLabelShadow;
@@ -407,7 +412,7 @@ export default class render {
     this.ctx.fillRect(this.mStartX, this.hStartY, this.mW, this.mW);
     this.ctx.strokeStyle = this.g.config.theme.holdOutline;
     this.ctx.strokeRect(this.mStartX, this.hStartY, this.mW, this.mW);
-    this.ctx.font = this.g.config.theme.font.hold;
+    this.ctx.font = this.font.hold.string();
     this.ctx.textBaseline = 'top';
     this.ctx.fillStyle = this.g.config.theme.holdLabel;
     this.ctx.shadowColor = this.g.config.theme.holdLabelShadow;
@@ -487,7 +492,7 @@ export default class render {
     this.ctx.strokeStyle = this.g.config.theme.levelOutline;
     this.ctx.fillRect(rX, rY, rW, rH);
     this.ctx.strokeRect(rX, rY, rW, rH);
-    this.ctx.font = this.g.config.theme.font.level;
+    this.ctx.font = this.font.level.string();
     this.ctx.fillStyle = this.g.config.theme.level;
     this.ctx.textBaseline = 'top';
     const str = this.g.strings.level.replace('{level}', this.g.player.level);
@@ -519,7 +524,6 @@ export default class render {
     const time = minutes + ':' + seconds;
     this.ctx.save();
     this.ctx.font = this.font.time.size + 'px ' + this.font.time.family;
-    console.log(this.font.time.size + 'px ' + this.font.time.family);
     this.ctx.fillStyle = this.g.config.theme.time;
     this.ctx.textBaseline = 'top';
     this.ctx.shadowColor = this.g.config.theme.timeShadow;
@@ -895,13 +899,12 @@ export default class render {
       this.ctx.shadowOffsetY = 0;
       let points = msg.text.replace(/(\+[0-9]+)\b.*/, '$1');
       let label = msg.text.replace(/(\+[0-9]+)\b(.*)/, '$2');
-      this.ctx.font = this.g.config.theme.font.scoreMsgPoints;
+      this.ctx.font = this.font.scoreMsgPoints.string();
       let sW = this.ctx.measureText(points).width;
-      this.ctx.font = this.g.config.theme.font.scoreMsgLabel;
-      this.ctx.font = this.g.config.theme.scoreMsgPoints;
+      this.ctx.font = this.font.scoreMsgPoints.string();
       this.ctx.fillStyle = this.g.config.theme.scoreMsgPoints;
       this.ctx.fillText(points, p.x, p.y - offset);
-      this.ctx.font = this.g.config.theme.font.scoreMsgLabel;
+      this.ctx.font = this.font.scoreMsgLabel.string();
       this.ctx.fillStyle = this.g.config.theme.scoreMsgLabel;
       this.ctx.fillText(label, p.x + sW, p.y - offset);
     }
