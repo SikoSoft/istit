@@ -3,6 +3,8 @@ import player from './player.js';
 import input from './input.js';
 import mp from './mp.js';
 import render from './render.js';
+import viewport from './viewport.js';
+
 export default class istit {
   constructor() {
     window.istit = this;
@@ -54,6 +56,7 @@ export default class istit {
     this.input = new input(this);
     this.mp = new mp(this);
     this.render = new render(this);
+    this.viewport = new viewport(this);
     this.run();
   }
 
@@ -61,6 +64,7 @@ export default class istit {
     this.load().then(() => {
       this.input.init();
       this.render.init();
+      this.viewport.init();
       this.getLevelScores(50);
       this.lastTick = new Date().getTime();
       this.startTime = new Date().getTime();

@@ -7,7 +7,7 @@ export default class config {
     this.vTiles = 20;
     this.maxFallTime = 15000;
     this.tile = 32;
-    this.edgeThickness = 10;
+    this.tileEdgeRatio = 0.25;
     this.lSpeedDecay = 0.075;
     this.levelBonusMultiplier = 0.07;
     this.levelIncreaseThreshold = 1000;

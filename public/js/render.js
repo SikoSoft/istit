@@ -9,8 +9,7 @@ export default class render {
   }
 
   init() {
-    this.syncDefDimension();
-    this.resizeForSP();
+    this.resize();
     this.pWidth = this.g.config.hTiles * this.g.config.tile;
     this.pHeight = this.g.config.vTiles * this.g.config.tile;
     this.pStartX = this.g.config.tile / 2;
@@ -73,7 +72,10 @@ export default class render {
     this.lbRightXEnd = this.pStartX + this.g.config.tile * 0.5;
     this.lbRightXDif = this.lbRightXEnd - this.lbRightXDef;
     this.lbRightX = this.lbRightDef;
-    this.noEdgeTile = this.g.config.tile - this.g.config.edgeThickness;
+    this.edgeThickness = Math.floor(
+      this.g.config.tile * this.g.config.tileEdgeRatio
+    );
+    this.noEdgeTile = this.g.config.tile - this.edgeThickness;
   }
 
   syncDefDimension() {
@@ -85,13 +87,23 @@ export default class render {
       this.g.config.vTiles * this.g.config.tile + this.g.config.tile;
   }
 
+  resize() {
+    if (this.mpMode) {
+      this.resizeForMP();
+    } else {
+      this.resizeForSP();
+    }
+  }
+
   resizeForSP() {
+    this.syncDefDimension();
     this.canvas.width = this.defWidth;
     this.canvas.height = this.defHeight;
     this.mpMode = false;
   }
 
   resizeForMP() {
+    this.syncDefDimension();
     this.canvas.width =
       this.defWidth +
       this.g.config.hTiles * this.g.config.tile +
@@ -424,8 +436,8 @@ export default class render {
     this.ctx.save();
     const rX = this.mStartX;
     const rW = this.mW;
-    const rY = this.canvas.height - 96;
-    const rH = 48;
+    const rY = this.canvas.height - this.g.config.tile * 3;
+    const rH = this.g.config.tile * 1.5;
     this.ctx.fillStyle = this.g.config.theme.scoreFrame;
     this.ctx.strokeStyle = this.g.config.theme.scoreOutline;
     this.ctx.fillRect(rX, rY, rW, rH);
@@ -452,8 +464,8 @@ export default class render {
     this.ctx.save();
     const rX = this.mStartX;
     const rW = this.mW;
-    const rY = this.canvas.height - 48;
-    const rH = 32;
+    const rY = this.canvas.height - this.g.config.tile * 1.5;
+    const rH = this.g.config.tile;
     this.ctx.fillStyle = this.g.config.theme.levelFrame;
     this.ctx.strokeStyle = this.g.config.theme.levelOutline;
     this.ctx.fillRect(rX, rY, rW, rH);
@@ -702,11 +714,8 @@ export default class render {
     this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
-    this.ctx.lineTo(
-      x + this.g.config.edgeThickness,
-      y + this.g.config.edgeThickness
-    );
-    this.ctx.lineTo(x + this.noEdgeTile, y + this.g.config.edgeThickness);
+    this.ctx.lineTo(x + this.edgeThickness, y + this.edgeThickness);
+    this.ctx.lineTo(x + this.noEdgeTile, y + this.edgeThickness);
     this.ctx.lineTo(x + this.g.config.tile, y);
     this.ctx.lineTo(x, y);
     this.ctx.fill();
@@ -715,11 +724,8 @@ export default class render {
     this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
-    this.ctx.lineTo(
-      x + this.g.config.edgeThickness,
-      y + this.g.config.edgeThickness
-    );
-    this.ctx.lineTo(x + this.g.config.edgeThickness, y + this.noEdgeTile);
+    this.ctx.lineTo(x + this.edgeThickness, y + this.edgeThickness);
+    this.ctx.lineTo(x + this.edgeThickness, y + this.noEdgeTile);
     this.ctx.lineTo(x + this.g.config.tile, y);
     this.ctx.lineTo(x, y + this.g.config.tile);
     this.ctx.fill();
@@ -728,7 +734,7 @@ export default class render {
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
     this.ctx.beginPath();
     this.ctx.moveTo(x + this.g.config.tile, y);
-    this.ctx.lineTo(x + this.noEdgeTile, y + this.g.config.edgeThickness);
+    this.ctx.lineTo(x + this.noEdgeTile, y + this.edgeThickness);
     this.ctx.lineTo(x + this.noEdgeTile, y + this.noEdgeTile);
     this.ctx.lineTo(x + this.g.config.tile, y + this.g.config.tile);
     this.ctx.lineTo(x + this.g.config.tile, y);
@@ -738,7 +744,7 @@ export default class render {
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
     this.ctx.beginPath();
     this.ctx.moveTo(x, y + this.g.config.tile);
-    this.ctx.lineTo(x + this.g.config.edgeThickness, y + this.noEdgeTile);
+    this.ctx.lineTo(x + this.edgeThickness, y + this.noEdgeTile);
     this.ctx.lineTo(x + this.noEdgeTile, y + this.noEdgeTile);
     this.ctx.lineTo(x + this.g.config.tile, y + this.g.config.tile);
     this.ctx.lineTo(x, y + this.g.config.tile);
