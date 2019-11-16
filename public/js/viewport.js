@@ -21,9 +21,12 @@ export default class viewport {
             this.height / (this.g.config.vTiles + 1)
           );
           console.log('idealTileHeight', this.fullScreen, idealTileHeight);
+          const ratio = idealTileHeight / this.g.config.tile;
           this.g.config.process({ tile: idealTileHeight });
+          this.g.render.setScaleRatio(ratio);
         } else {
           this.g.config.process({ tile: this.defTile });
+          this.g.render.setScaleRatio(1);
         }
         this.g.render.init();
       });

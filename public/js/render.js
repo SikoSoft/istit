@@ -6,6 +6,8 @@ export default class render {
       this.ctx = this.canvas.getContext('2d');
     }
     this.mpMode = false;
+    this.font = {};
+    this.scaleRatio = 1;
   }
 
   init() {
@@ -30,13 +32,24 @@ export default class render {
     this.scoreX =
       this.pEndX + this.g.config.tile * 0.5 + this.g.config.tile * 3;
     this.scoreY = this.defHeight - this.g.config.tile * 0.5;
-    this.scoreNormal = parseInt(
-      this.g.config.theme.font.scoreNormal.replace(/\b([0-9]+)(px|pt).*/, '$1')
-    );
-    this.scoreLarge = parseInt(
-      this.g.config.theme.font.scoreLarge.replace(/\b([0-9]+)(px|pt).*/, '$1')
-    );
-    this.scoreDif = this.scoreLarge - this.scoreNormal;
+    Object.keys(this.g.config.theme.font).forEach(font => {
+      this.font[font] = {
+        size:
+          parseInt(
+            this.g.config.theme.font[font].replace(
+              /^(italic|bold)? ([0-9]+)(px|pt).*/,
+              '$2'
+            )
+          ) * this.scaleRatio,
+        style: this.g.config.theme.font[font]
+          .replace(/^(italic|bold)?.*/, '$1')
+          .replace(/^\s/, ''),
+        family: this.g.config.theme.font[font]
+          .replace(/^(italic|bold)? ?[0-9]+(px|pt) ?(.*)/g, '$3')
+          .replace(/^\s/, '')
+      };
+    });
+    this.scoreDif = this.font.scoreLarge.size - this.font.scoreNormal.size;
     this.levelX = this.pEndX + this.g.config.tile * 2;
     this.levelY = this.defHeight - 100;
     this.timeX =
@@ -110,6 +123,10 @@ export default class render {
       this.g.config.tile / 2;
     this.canvas.height = this.defHeight;
     this.mpMode = true;
+  }
+
+  setScaleRatio(ratio) {
+    this.scaleRatio = ratio;
   }
 
   draw() {
@@ -423,7 +440,7 @@ export default class render {
   }
 
   drawScore(now) {
-    let fontSize = this.scoreNormal;
+    let fontSize = this.font.scoreNormal.size;
     if (this.g.animateTo.score > now) {
       const dif = this.g.animateTo.score - now;
       const percent = Math.round(
@@ -431,7 +448,7 @@ export default class render {
       );
       const counter = percent * (Math.PI / 100);
       const v = (Math.sin(counter) * this.scoreDif) | 0;
-      fontSize = this.scoreNormal + v;
+      fontSize = this.font.scoreNormal.size + v;
     }
     this.ctx.save();
     const rX = this.mStartX;
@@ -442,7 +459,7 @@ export default class render {
     this.ctx.strokeStyle = this.g.config.theme.scoreOutline;
     this.ctx.fillRect(rX, rY, rW, rH);
     this.ctx.strokeRect(rX, rY, rW, rH);
-    this.ctx.font = fontSize + 'px Roboto Condensed';
+    this.ctx.font = fontSize + 'px ' + this.font.scoreNormal.family;
     this.ctx.fillStyle = this.g.config.theme.score;
     this.ctx.textBaseline = 'top';
     this.ctx.shadowColor = this.g.config.theme.scoreShadow;
@@ -501,7 +518,8 @@ export default class render {
     }
     const time = minutes + ':' + seconds;
     this.ctx.save();
-    this.ctx.font = this.g.config.theme.font.time;
+    this.ctx.font = this.font.time.size + 'px ' + this.font.time.family;
+    console.log(this.font.time.size + 'px ' + this.font.time.family);
     this.ctx.fillStyle = this.g.config.theme.time;
     this.ctx.textBaseline = 'top';
     this.ctx.shadowColor = this.g.config.theme.timeShadow;
