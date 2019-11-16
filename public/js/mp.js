@@ -29,7 +29,7 @@ export default class mp {
     this.ws.onmessage = msg => {
       this.handleMessage(msg);
     };
-    this.g.renderer.resizeForMP();
+    this.g.render.resizeForMP();
   }
 
   handleMessage(msg) {
@@ -88,7 +88,9 @@ export default class mp {
   }
 
   sendState() {
-    this.ws.send(JSON.stringify({ event: 'statePush', state: this.g.player.state() }));
+    this.ws.send(
+      JSON.stringify({ event: 'statePush', state: this.g.player.state() })
+    );
   }
 
   sendFPState() {
