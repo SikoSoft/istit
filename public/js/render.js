@@ -60,14 +60,7 @@ export default class render {
     this.timeX =
       this.scoreX - this.textWidth('00:00', this.font.time.string()) / 2;
     this.timeY = this.defHeight - 5 * this.g.config.tile;
-    this.msgX = this.scoreX;
-    this.msgH =
-      parseInt(
-        this.g.config.theme.font.scoreMsgPoints.replace(
-          /bold +([0-9]+)(px|pt).*/,
-          '$1'
-        )
-      ) * 1.25;
+    this.msgH = this.font.scoreMsgPoints.size * 1.25;
     this.hScoresX = this.pStartX + this.pWidth * 0.1;
     this.hScoresY = this.pStartY + this.pHeight * 0.5;
     this.hScoresW = this.pWidth * 0.8;
@@ -944,7 +937,7 @@ export default class render {
     if (this.g.lbIsShowing) {
       this.ctx.save();
       this.ctx.textBaseline = 'top';
-      this.ctx.font = this.g.config.theme.font.leaderBoard;
+      this.ctx.font = this.font.leaderBoard.string();
       this.ctx.globalAlpha = this.lbPer;
       let x = 0,
         y = 0;
@@ -959,7 +952,10 @@ export default class render {
           } else {
             x = this.lbRightX;
           }
-          y = this.lbY + 22 * i;
+          y =
+            this.lbY +
+            (this.font.leaderBoard.size + this.font.leaderBoard.size * 0.375) *
+              i;
           rank = pad.substr(0, pad.length - r.rank.toString().length) + r.rank;
           score = r.score.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
           this.ctx.fillStyle = this.g.config.theme.lbRank;
