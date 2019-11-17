@@ -3,6 +3,7 @@ export default class player {
     this.g = g;
     this.reset();
     this.name = 'Player';
+    this.lastRank = -1;
   }
 
   reset() {
@@ -15,7 +16,7 @@ export default class player {
     this.resetFallingPiece();
   }
 
-  state(){
+  state() {
     let copy = {};
     Object.keys(this).forEach(key => {
       if (key !== 'g' && typeof this[key] !== 'function') {

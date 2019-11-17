@@ -29,7 +29,6 @@ export default class istit {
     this.images = {};
     this.linesToClear = [];
     this.linesToGet = 0;
-    this.lastCounDown = 0;
     this.volume = this.config.defVolume;
     this.gridWeightHistory = [];
     this.messages = [];
@@ -987,6 +986,7 @@ export default class istit {
         .then(data => data.json())
         .then(json => {
           this.leaderBoard = json.records;
+          this.player.lastRank = -1;
           resolve(json);
         })
         .catch(err => {
@@ -1008,6 +1008,7 @@ export default class istit {
         .then(data => data.json())
         .then(json => {
           this.leaderBoard = json.records;
+          this.player.lastRank = json.rank;
           resolve(json);
         })
         .catch(err => {

@@ -78,11 +78,12 @@ export default class render {
     this.lbLeftXDef = this.pStartX + this.g.config.tile * 0.5 - this.pWidth;
     this.lbLeftXEnd = this.pStartX + this.g.config.tile * 0.5;
     this.lbLeftXDif = this.lbLeftXEnd - this.lbLeftXDef;
-    this.lbLeftX = this.lbLeftDef;
+    this.lbLeftX = this.lbLeftXDef;
     this.lbRightXDef = this.pStartX - this.g.config.tile * 0.5 + this.pWidth;
     this.lbRightXEnd = this.pStartX + this.g.config.tile * 0.5;
     this.lbRightXDif = this.lbRightXEnd - this.lbRightXDef;
-    this.lbRightX = this.lbRightDef;
+    this.lbRightX = this.lbRightXDef;
+    this.lbWidth = this.lbRightXDef - this.lbLeftXEnd;
     this.edgeThickness = Math.floor(
       this.g.config.tile * this.g.config.tileEdgeRatio
     );
@@ -939,6 +940,9 @@ export default class render {
       this.ctx.textBaseline = 'top';
       this.ctx.font = this.font.leaderBoard.string();
       this.ctx.globalAlpha = this.lbPer;
+      const rowHeight =
+        this.font.leaderBoard.size + this.font.leaderBoard.size * 0.375;
+      const rowHighlightOffset = this.font.leaderBoard.size * 0.1875;
       let x = 0,
         y = 0;
       let rank = '',
@@ -952,12 +956,18 @@ export default class render {
           } else {
             x = this.lbRightX;
           }
-          y =
-            this.lbY +
-            (this.font.leaderBoard.size + this.font.leaderBoard.size * 0.375) *
-              i;
+          y = this.lbY + rowHeight * i;
           rank = pad.substr(0, pad.length - r.rank.toString().length) + r.rank;
           score = r.score.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          if (this.g.player.lastRank > 0 && this.g.player.lastRank === r.rank) {
+            this.ctx.fillStyle = this.g.config.theme.lbHighlight;
+            this.ctx.fillRect(
+              x,
+              y - rowHighlightOffset,
+              this.lbWidth,
+              rowHeight
+            );
+          }
           this.ctx.fillStyle = this.g.config.theme.lbRank;
           this.ctx.shadowColor = this.g.config.theme.lbRankShadow;
           this.ctx.shadowBlur = 3;
