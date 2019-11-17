@@ -3,27 +3,103 @@ export default class input {
     this.g = g;
     this.keyState = {};
     this.floodTimers = {};
+    this.gamePadDetected = false;
+    this.useGamePad = false;
+    this.keyMap = {
+      pause: 80,
+      drop: 32,
+      left: 37,
+      rotate: 38,
+      right: 39,
+      down: 40,
+      hold: 72,
+      alt: 18,
+      inputToggle: 90,
+      f5: 116,
+      f12: 123
+    };
+    this.buttonMap = {
+      pause: 9,
+      drop: 3,
+      left: 14,
+      rotate: 0,
+      right: 15,
+      down: 13,
+      hold: 5
+    };
+    this.stateActions = {
+      waiting: {
+        _all: () => {
+          this.g.start();
+        }
+      },
+      paused: {
+        pause: () => {
+          this.g.pause();
+        }
+      },
+      gameplay: {
+        pause: () => {
+          this.g.pause();
+        },
+        drop: () => {
+          this.g.placeFallingPieceAtBottom();
+        },
+        left: () => {
+          this.g.movePiece(-1);
+        },
+        rotate: () => {
+          this.g.rotatePiece();
+        },
+        right: () => {
+          this.g.movePiece(1);
+        },
+        down: () => {
+          this.g.adjustFallingHeightOffset();
+        },
+        hold: () => {
+          this.g.toggleHold();
+        }
+      },
+      gameplayLocked: {},
+      ended: {
+        _all: () => {
+          this.g.restart();
+        }
+      }
+    };
+    this.lastButtonState = {};
   }
 
   init() {
-    this.floodWait = {
-      80: this.g.config.coolDown.pause,
-      32: this.g.config.coolDown.drop,
-      37: this.g.config.coolDown.left,
-      38: this.g.config.coolDown.rotate,
-      39: this.g.config.coolDown.right,
-      40: this.g.config.coolDown.down,
-      72: this.g.config.coolDown.hold
-    };
-    this.lastFloodWait = {
-      80: 0,
-      32: 0,
-      37: 0,
-      38: 0,
-      39: 0,
-      40: 0,
-      72: 0
-    };
+    this.floodWait = {};
+    this.lastFloodWait = {};
+    Object.keys(this.keyMap).forEach(key => {
+      this.floodWait[key] = this.g.config.coolDown[key];
+      this.lastFloodWait[key] = 0;
+    });
+    window.addEventListener(
+      'keydown',
+      e => {
+        this.handleKeyDown(e);
+      },
+      false
+    );
+    window.addEventListener(
+      'keyup',
+      e => {
+        this.handleKeyUp(e);
+      },
+      false
+    );
+    window.addEventListener('gamepadconnected', e => {
+      this.gamePadDetected = true;
+      this.lastButtonState = {};
+      console.log(e);
+      Object.keys(this.buttonMap).forEach(button => {
+        this.lastButtonState[button] = false;
+      });
+    });
   }
 
   reset() {
@@ -35,37 +111,63 @@ export default class input {
     }
   }
 
+  isLocked() {
+    const now = new Date().getTime();
+    if (now < this.g.animateTo.lineBreak || now < this.g.animateTo.lineAdd) {
+      return true;
+    }
+    return false;
+  }
+
   process() {
-    if (!this.g.ended && this.keyState[80] && this.floodSafe(80)) {
-      this.g.pause();
-      this.setFloodTimer(80);
+    if (this.keyState[this.keyMap.alt]) {
+      if (
+        this.keyState[this.keyMap.inputToggle] &&
+        this.floodSafe('inputToggle')
+      ) {
+        this.useGamePad = !this.useGamePad;
+        this.setFloodTimer('inputToggle');
+      }
+      return;
     }
-    if (this.g.inputIsLocked() || this.g.ended) {
-      return false;
+    let state = 'gameplayLocked';
+    if (this.g.wait) {
+      state = 'waiting';
+    } else if (this.g.ended) {
+      state = 'ended';
+    } else if (this.g.paused) {
+      state = 'paused';
+    } else {
+      state = 'gameplay';
     }
-    if (this.keyState[37] && this.floodSafe(37)) {
-      this.g.movePiece(-1);
-      this.setFloodTimer(37);
-    }
-    if (this.keyState[39] && this.floodSafe(39)) {
-      this.g.movePiece(1);
-      this.setFloodTimer(39);
-    }
-    if (this.keyState[40] && this.floodSafe(40)) {
-      this.g.adjustFallingHeightOffset();
-      this.setFloodTimer(40);
-    }
-    if (this.keyState[38] && this.floodSafe(38)) {
-      this.g.rotatePiece();
-      this.setFloodTimer(38);
-    }
-    if (this.keyState[32] && this.floodSafe(32)) {
-      this.g.placeFallingPieceAtBottom();
-      this.setFloodTimer(32);
-    }
-    if (this.keyState[72] && this.floodSafe(72)) {
-      this.g.toggleHold();
-      this.setFloodTimer(72);
+    if (this.gamePadDetected && this.useGamePad) {
+      const gamePad = navigator.getGamepads()[0];
+      const buttonState = {};
+      Object.keys(this.buttonMap).forEach(button => {
+        const isPressed = gamePad.buttons[this.buttonMap[button]].pressed;
+        buttonState[button] = isPressed;
+        if (this.lastButtonState[button] && !isPressed) {
+          this.lastFloodWait[button] = 0;
+        }
+        if (isPressed && this.floodSafe(button)) {
+          typeof this.stateActions[state][button] === 'function' &&
+            this.stateActions[state][button]();
+          typeof this.stateActions[state]._all === 'function' &&
+            this.stateActions[state]._all();
+          this.setFloodTimer(button);
+        }
+      });
+      this.lastButtonState = buttonState;
+    } else {
+      Object.keys(this.keyMap).forEach(key => {
+        if (this.keyState[this.keyMap[key]] && this.floodSafe(key)) {
+          typeof this.stateActions[state][key] === 'function' &&
+            this.stateActions[state][key]();
+          typeof this.stateActions[state]._all === 'function' &&
+            this.stateActions[state]._all();
+          this.setFloodTimer(key);
+        }
+      });
     }
   }
 
@@ -93,15 +195,12 @@ export default class input {
 
   handleKeyDown(e) {
     if (!this.keyState[e.keyCode]) {
-      if (this.g.paused && e.keyCode != 80 && !this.g.ended) {
-        return;
-      }
       this.keyState[e.keyCode] = new Date().getTime();
     }
     if (
-      e.keyCode != 116 &&
-      e.keyCode != 123 &&
-      typeof e.preventDefault != 'undefined'
+      e.keyCode !== this.keyMap.f5 &&
+      e.keyCode !== this.keyMap.f12 &&
+      typeof e.preventDefault !== 'undefined'
     ) {
       e.preventDefault();
       return false;
@@ -111,7 +210,15 @@ export default class input {
 
   handleKeyUp(e) {
     this.keyState[e.keyCode] = false;
-    this.lastFloodWait[e.keyCode] = 0;
+    let commandName = '';
+    Object.keys(this.keyMap).forEach(key => {
+      if (this.keyMap[key] == e.keyCode) {
+        commandName = key;
+      }
+    });
+    if (commandName) {
+      this.lastFloodWait[commandName] = 0;
+    }
     for (let mi = 37; mi <= 40; mi++) {
       if (this.keyState[mi]) {
         e.preventDefault();

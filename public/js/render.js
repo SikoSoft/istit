@@ -1,50 +1,66 @@
 export default class render {
   constructor(g) {
     this.g = g;
-    this.ctx = this.g.ctx;
+    this.canvas = document.getElementById(this.g.canvasId);
+    if (this.canvas.getContext) {
+      this.ctx = this.canvas.getContext('2d');
+    }
+    this.mpMode = false;
+    this.font = {};
+    this.scaleRatio = 1;
   }
 
   init() {
+    this.resize();
     this.pWidth = this.g.config.hTiles * this.g.config.tile;
     this.pHeight = this.g.config.vTiles * this.g.config.tile;
     this.pStartX = this.g.config.tile / 2;
     this.pStartY = this.g.config.tile / 2;
     this.pEndX = this.pStartX + this.pWidth;
     this.pEndY = this.pStaryY + this.pHeight;
-    this.oStartX = this.g.defWidth;
+    this.oStartX = this.defWidth;
     this.oStartY = this.pStartY;
-    this.mW = this.g.defWidth - this.pEndX;
+    this.mW = this.defWidth - this.pEndX;
     this.mW = this.g.config.tile * 6;
     this.mStartX = this.pEndX + this.g.config.tile / 2;
     this.mStartY = this.g.config.tile / 2;
-    this.mEndX = this.g.defWidth - this.g.config.tile / 2;
+    this.mEndX = this.defWidth - this.g.config.tile / 2;
     this.npStartX = this.pEndX + this.g.config.tile + this.g.config.tile / 2;
     this.npStartY = this.pStartY + this.g.config.tile / 2;
     this.npH = this.mW + this.g.config.tile * 2;
     this.hStartY = this.npStartY + this.mW + this.g.config.tile * 2;
     this.scoreX =
       this.pEndX + this.g.config.tile * 0.5 + this.g.config.tile * 3;
-    this.scoreY = this.g.defHeight - this.g.config.tile * 0.5;
-    this.scoreNormal = parseInt(
-      this.g.config.theme.font.scoreNormal.replace(/\b([0-9]+)(px|pt).*/, '$1')
-    );
-    this.scoreLarge = parseInt(
-      this.g.config.theme.font.scoreLarge.replace(/\b([0-9]+)(px|pt).*/, '$1')
-    );
-    this.scoreDif = this.scoreLarge - this.scoreNormal;
+    this.scoreY = this.defHeight - this.g.config.tile * 0.5;
+    Object.keys(this.g.config.theme.font).forEach(font => {
+      this.font[font] = {
+        size:
+          parseInt(
+            this.g.config.theme.font[font].replace(
+              /^(italic|bold)? ([0-9]+)(px|pt).*/,
+              '$2'
+            )
+          ) * this.scaleRatio,
+        style: this.g.config.theme.font[font]
+          .replace(/^(italic|bold)?.*/, '$1')
+          .replace(/^\s/, ''),
+        family: this.g.config.theme.font[font]
+          .replace(/^(italic|bold)? ?[0-9]+(px|pt) ?(.*)/g, '$3')
+          .replace(/^\s/, ''),
+        string() {
+          return `${this.style ? this.style + ' ' : ''}${this.size}px ${
+            this.family
+          }`;
+        }
+      };
+    });
+    this.scoreDif = this.font.scoreLarge.size - this.font.scoreNormal.size;
     this.levelX = this.pEndX + this.g.config.tile * 2;
-    this.levelY = this.g.defHeight - 100;
+    this.levelY = this.defHeight - 100;
     this.timeX =
-      this.scoreX - this.textWidth('00:00', this.g.config.theme.font.time) / 2;
-    this.timeY = this.g.defHeight - 5 * this.g.config.tile;
-    this.msgX = this.scoreX;
-    this.msgH =
-      parseInt(
-        this.g.config.theme.font.scoreMsgPoints.replace(
-          /bold +([0-9]+)(px|pt).*/,
-          '$1'
-        )
-      ) * 1.25;
+      this.scoreX - this.textWidth('00:00', this.font.time.string()) / 2;
+    this.timeY = this.defHeight - 5 * this.g.config.tile;
+    this.msgH = this.font.scoreMsgPoints.size * 1.25;
     this.hScoresX = this.pStartX + this.pWidth * 0.1;
     this.hScoresY = this.pStartY + this.pHeight * 0.5;
     this.hScoresW = this.pWidth * 0.8;
@@ -53,7 +69,7 @@ export default class render {
     this.sysYTop = this.pStartY + this.g.config.tile;
     this.sysY = this.sysYDef;
     this.sysYDif = this.sysYDef - this.sysYTop;
-    this.lbYDef = this.g.height;
+    this.lbYDef = this.canvas.height;
     this.lbYTop = this.pStartY + this.g.config.tile * 2.5;
     this.lbYDif = this.lbYDef - this.lbYTop;
     this.lbY = this.lbYTop;
@@ -62,30 +78,71 @@ export default class render {
     this.lbLeftXDef = this.pStartX + this.g.config.tile * 0.5 - this.pWidth;
     this.lbLeftXEnd = this.pStartX + this.g.config.tile * 0.5;
     this.lbLeftXDif = this.lbLeftXEnd - this.lbLeftXDef;
-    this.lbLeftX = this.lbLeftDef;
+    this.lbLeftX = this.lbLeftXDef;
     this.lbRightXDef = this.pStartX - this.g.config.tile * 0.5 + this.pWidth;
     this.lbRightXEnd = this.pStartX + this.g.config.tile * 0.5;
     this.lbRightXDif = this.lbRightXEnd - this.lbRightXDef;
-    this.lbRightX = this.lbRightDef;
-    this.noEdgeTile = this.g.config.tile - this.g.config.edgeThickness;
+    this.lbRightX = this.lbRightXDef;
+    this.lbWidth = this.lbRightXDef - this.lbLeftXEnd;
+    this.edgeThickness = Math.floor(
+      this.g.config.tile * this.g.config.tileEdgeRatio
+    );
+    this.noEdgeTile = this.g.config.tile - this.edgeThickness;
+  }
+
+  syncDefDimension() {
+    this.defWidth =
+      this.g.config.hTiles * this.g.config.tile +
+      this.g.config.tile * 6 +
+      (this.g.config.tile / 2) * 3;
+    this.defHeight =
+      this.g.config.vTiles * this.g.config.tile + this.g.config.tile;
+  }
+
+  resize() {
+    if (this.mpMode) {
+      this.resizeForMP();
+    } else {
+      this.resizeForSP();
+    }
+  }
+
+  resizeForSP() {
+    this.syncDefDimension();
+    this.canvas.width = this.defWidth;
+    this.canvas.height = this.defHeight;
+    this.mpMode = false;
+  }
+
+  resizeForMP() {
+    this.syncDefDimension();
+    this.canvas.width =
+      this.defWidth +
+      this.g.config.hTiles * this.g.config.tile +
+      this.g.config.tile / 2;
+    this.canvas.height = this.defHeight;
+    this.mpMode = true;
+  }
+
+  setScaleRatio(ratio) {
+    this.scaleRatio = ratio;
   }
 
   draw() {
     const now = new Date().getTime();
-    const drawOpponent = this.g.width > this.g.defWidth;
-    this.g.ctx.clearRect(0, 0, this.g.c.width, this.g.c.height);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawLayout();
     this.drawGrid();
-    if (drawOpponent) {
+    if (this.mpMode) {
       this.drawGrid(true);
     }
     if (!this.g.mp.wait) {
-      if (!this.g.pFallingPiece.placed) {
+      if (!this.g.player.fallingPiece.placed) {
         this.drawFallingPiece();
       }
       this.drawGhost();
       this.drawFixedBlocks();
-      if (drawOpponent) {
+      if (this.mpMode) {
         this.drawFallingPiece(true);
         this.drawFixedBlocks(true);
       }
@@ -99,27 +156,29 @@ export default class render {
     this.drawLevel();
     this.drawMessages();
     if (this.g.paused) {
-      this.drawSystemMessage('Paused');
+      this.drawSystemMessage(this.g.strings.paused);
     } else if (!this.g.mp.oppIsAlive) {
-      this.drawSystemMessage('Opponent Disconnected');
+      this.drawSystemMessage(this.g.strings.opponentDisconnected);
     } else if (this.g.mp.wait) {
       if (this.g.mp.countingDown) {
-        this.drawSystemMessage('Get Ready!');
+        this.drawSystemMessage(this.g.strings.getReady);
       } else if (this.g.mp.connected) {
-        this.drawSystemMessage('Waiting For Peer');
+        this.drawSystemMessage(this.g.strings.waitingForPeer);
       } else {
-        this.drawSystemMessage('Connecting To Server');
+        this.drawSystemMessage(this.g.strings.connectingToServer);
       }
     } else if (this.g.ended) {
       if (this.g.mp.sessionEnded) {
         if (this.g.mp.isWinner) {
-          this.drawSystemMessage('You Win! :)');
+          this.drawSystemMessage(this.g.strings.youWin);
         } else {
-          this.drawSystemMessage('You Lose. :(');
+          this.drawSystemMessage(this.g.strings.youLose);
         }
       } else {
-        this.drawSystemMessage('Game Over');
+        this.drawSystemMessage(this.g.strings.gameOver);
       }
+    } else if (this.g.wait) {
+      this.drawSystemMessage(this.g.strings.pressSpaceToBegin);
     }
     if (this.g.mp.wait == true) {
       this.drawLoader(now);
@@ -137,22 +196,17 @@ export default class render {
         ((this.g.animateTo.lineBreak - now) /
           (this.g.config.animateCycle.lineBreak * this.g.linesToClear.length)) *
         1;
-      this.g.ctx.save();
-      this.g.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-      this.g.ctx.globalAlpha = alpha;
-      this.g.ctx.fillRect(
-        this.pStartX,
-        this.pStartY,
-        this.pWidth,
-        this.pHeight
-      );
-      this.g.ctx.restore();
+      this.ctx.save();
+      this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      this.ctx.globalAlpha = alpha;
+      this.ctx.fillRect(this.pStartX, this.pStartY, this.pWidth, this.pHeight);
+      this.ctx.restore();
     }
   }
 
   drawSystemMessage(msg) {
-    this.g.ctx.save();
-    const grad = this.g.ctx.createLinearGradient(
+    this.ctx.save();
+    const grad = this.ctx.createLinearGradient(
       this.pStartX,
       this.pStartY,
       this.pStartX,
@@ -160,32 +214,35 @@ export default class render {
     );
     grad.addColorStop(0, 'rgba(0, 0, 60, 0.6)');
     grad.addColorStop(1, 'rgba(0, 0, 0, 0.6)');
-    this.g.ctx.fillStyle = grad;
-    this.g.ctx.fillRect(0, 0, this.g.width, this.g.height);
-    this.g.ctx.restore();
-    this.g.ctx.save();
-    this.g.ctx.font = this.g.config.theme.font.systemMessage;
-    this.g.ctx.fillStyle = this.g.config.theme.systemMessage;
+    this.ctx.fillStyle = grad;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.restore();
+    this.ctx.save();
+    this.ctx.font = this.font.systemMessage.string();
+    this.ctx.fillStyle = this.g.config.theme.systemMessage;
     this.ctx.shadowColor = this.g.config.theme.systemMessageShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
-    this.g.ctx.textBaseline = 'top';
+    this.ctx.textBaseline = 'top';
     const pauseX =
-      this.pWidth / 2 - this.g.ctx.measureText(msg).width / 2 + this.g.halfTile;
-    this.g.ctx.fillText(msg, pauseX, this.sysY);
-    this.g.ctx.restore();
+      this.pWidth / 2 - this.ctx.measureText(msg).width / 2 + this.g.halfTile;
+    this.ctx.fillText(msg, pauseX, this.sysY);
+    this.ctx.restore();
   }
 
   drawLayout() {
-    const drawOpponent = this.g.width > this.g.defWidth;
-    this.g.ctx.save();
-    this.g.ctx.fillStyle = this.g.config.theme.frame;
-    this.g.ctx.fillRect(0, 0, this.g.width, this.g.height);
-    this.g.ctx.restore();
+    this.ctx.save();
+    this.ctx.fillStyle = this.g.config.theme.frame;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.restore();
     if (this.g.images.frameTexture) {
-      const numH = Math.ceil(this.g.width / this.g.images.frameTexture.width);
-      const numV = Math.ceil(this.g.height / this.g.images.frameTexture.height);
+      const numH = Math.ceil(
+        this.canvas.width / this.g.images.frameTexture.width
+      );
+      const numV = Math.ceil(
+        this.canvas.height / this.g.images.frameTexture.height
+      );
       for (let v = 0; v < numV; v++) {
         for (let h = 0; h < numH; h++) {
           let x = h * this.g.images.frameTexture.width;
@@ -194,28 +251,23 @@ export default class render {
         }
       }
     }
-    this.g.ctx.save();
-    this.g.ctx.fillStyle = this.g.config.theme.grid;
-    this.g.ctx.fillRect(this.pStartX, this.pStartY, this.pWidth, this.pHeight);
-    if (drawOpponent) {
-      this.g.ctx.fillRect(
-        this.oStartX,
-        this.oStartY,
-        this.pWidth,
-        this.pHeight
-      );
+    this.ctx.save();
+    this.ctx.fillStyle = this.g.config.theme.grid;
+    this.ctx.fillRect(this.pStartX, this.pStartY, this.pWidth, this.pHeight);
+    if (this.mpMode) {
+      this.ctx.fillRect(this.oStartX, this.oStartY, this.pWidth, this.pHeight);
     }
-    this.g.ctx.restore();
-    this.g.ctx.save();
-    this.g.ctx.globalAlpha = 0.6;
+    this.ctx.restore();
+    this.ctx.save();
+    this.ctx.globalAlpha = 0.6;
     let img = false;
-    if (typeof this.g.images.bg[this.g.pState.level] != 'undefined') {
-      img = this.g.images.bg[this.g.pState.level];
+    if (typeof this.g.images.bg[this.g.player.level] != 'undefined') {
+      img = this.g.images.bg[this.g.player.level];
     } else if (typeof this.g.images.bg['default'] != 'undefined') {
       img = this.g.images.bg['default'];
     }
     if (img) {
-      this.g.ctx.drawImage(
+      this.ctx.drawImage(
         img,
         this.pStartX,
         this.pStartY,
@@ -223,13 +275,13 @@ export default class render {
         this.pHeight
       );
     }
-    if (drawOpponent) {
-      if (typeof this.g.images.bg[this.g.oState.level] != 'undefined') {
-        img = this.g.images.bg[this.g.oState.level];
+    if (this.mpMode) {
+      if (typeof this.g.images.bg[this.g.opponent.level] != 'undefined') {
+        img = this.g.images.bg[this.g.opponent.level];
       } else {
         img = this.g.images.bg['default'];
       }
-      this.g.ctx.drawImage(
+      this.ctx.drawImage(
         img,
         this.oStartX,
         this.oStartY,
@@ -237,25 +289,25 @@ export default class render {
         this.pHeight
       );
     }
-    this.g.ctx.restore();
-    this.g.ctx.save();
+    this.ctx.restore();
+    this.ctx.save();
     this.ctx.lineWidth = 1;
-    this.g.ctx.strokeStyle = this.g.config.theme.gridOutline;
-    this.g.ctx.strokeRect(
+    this.ctx.strokeStyle = this.g.config.theme.gridOutline;
+    this.ctx.strokeRect(
       this.pStartX - 1,
       this.pStartY - 1,
       this.pWidth,
       this.pHeight
     );
-    if (drawOpponent) {
-      this.g.ctx.strokeRect(
+    if (this.mpMode) {
+      this.ctx.strokeRect(
         this.oStartX - 1,
         this.oStartY - 1,
         this.pWidth,
         this.pHeight
       );
     }
-    this.g.ctx.restore();
+    this.ctx.restore();
   }
 
   drawNextPieces() {
@@ -264,7 +316,7 @@ export default class render {
     this.ctx.fillRect(this.mStartX, this.pStartY, this.mW, this.npH);
     this.ctx.strokeStyle = this.g.config.theme.nextOutline;
     this.ctx.strokeRect(this.mStartX, this.pStartY, this.mW, this.npH);
-    this.ctx.font = this.g.config.theme.font.next;
+    this.ctx.font = this.font.next.string();
     this.ctx.textBaseline = 'top';
     this.ctx.fillStyle = this.g.config.theme.nextLabel;
     this.ctx.shadowColor = this.g.config.theme.nextLabelShadow;
@@ -272,12 +324,12 @@ export default class render {
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
     this.ctx.fillText(
-      'NEXT',
+      this.g.strings.next,
       this.mStartX + this.g.halfTile * 0.5,
       this.pStartY + this.g.halfTile * 0.5
     );
     this.ctx.restore();
-    if (!this.g.mp.wait) {
+    if (!this.g.mp.wait && this.g.nextPieces.length > 0) {
       const pW = this.g.getPieceDimension(this.g.nextPieces[0], 1, 0);
       const pH = this.g.getPieceDimension(this.g.nextPieces[0], 1, 1);
       let npStartX = this.mStartX + (this.mW - pW * this.g.config.tile) / 2;
@@ -354,7 +406,7 @@ export default class render {
     this.ctx.fillRect(this.mStartX, this.hStartY, this.mW, this.mW);
     this.ctx.strokeStyle = this.g.config.theme.holdOutline;
     this.ctx.strokeRect(this.mStartX, this.hStartY, this.mW, this.mW);
-    this.ctx.font = this.g.config.theme.font.hold;
+    this.ctx.font = this.font.hold.string();
     this.ctx.textBaseline = 'top';
     this.ctx.fillStyle = this.g.config.theme.holdLabel;
     this.ctx.shadowColor = this.g.config.theme.holdLabelShadow;
@@ -362,7 +414,7 @@ export default class render {
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
     this.ctx.fillText(
-      'HOLD',
+      this.g.strings.hold,
       this.mStartX + this.g.halfTile * 0.5,
       this.hStartY + this.g.halfTile * 0.5
     );
@@ -387,7 +439,7 @@ export default class render {
   }
 
   drawScore(now) {
-    let fontSize = this.scoreNormal;
+    let fontSize = this.font.scoreNormal.size;
     if (this.g.animateTo.score > now) {
       const dif = this.g.animateTo.score - now;
       const percent = Math.round(
@@ -395,62 +447,62 @@ export default class render {
       );
       const counter = percent * (Math.PI / 100);
       const v = (Math.sin(counter) * this.scoreDif) | 0;
-      fontSize = this.scoreNormal + v;
+      fontSize = this.font.scoreNormal.size + v;
     }
-    this.g.ctx.save();
+    this.ctx.save();
     const rX = this.mStartX;
     const rW = this.mW;
-    const rY = this.g.height - 96;
-    const rH = 48;
+    const rY = this.canvas.height - this.g.config.tile * 3;
+    const rH = this.g.config.tile * 1.5;
     this.ctx.fillStyle = this.g.config.theme.scoreFrame;
     this.ctx.strokeStyle = this.g.config.theme.scoreOutline;
     this.ctx.fillRect(rX, rY, rW, rH);
     this.ctx.strokeRect(rX, rY, rW, rH);
-    this.g.ctx.font = fontSize + 'px Roboto Condensed';
-    this.g.ctx.fillStyle = this.g.config.theme.score;
-    this.g.ctx.textBaseline = 'top';
+    this.ctx.font = fontSize + 'px ' + this.font.scoreNormal.family;
+    this.ctx.fillStyle = this.g.config.theme.score;
+    this.ctx.textBaseline = 'top';
     this.ctx.shadowColor = this.g.config.theme.scoreShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
-    const textDim = this.g.ctx.measureText(this.g.pState.score);
+    const textDim = this.ctx.measureText(this.g.player.score);
     const textHeight =
       textDim.actualBoundingBoxAscent + textDim.actualBoundingBoxDescent;
-    this.g.ctx.fillText(
-      this.g.pState.score,
+    this.ctx.fillText(
+      this.g.player.score,
       this.scoreX - textDim.width / 2,
       rY + (rH - textHeight) / 2
     );
-    this.g.ctx.restore();
+    this.ctx.restore();
   }
 
   drawLevel() {
-    this.g.ctx.save();
+    this.ctx.save();
     const rX = this.mStartX;
     const rW = this.mW;
-    const rY = this.g.height - 48;
-    const rH = 32;
+    const rY = this.canvas.height - this.g.config.tile * 1.5;
+    const rH = this.g.config.tile;
     this.ctx.fillStyle = this.g.config.theme.levelFrame;
     this.ctx.strokeStyle = this.g.config.theme.levelOutline;
     this.ctx.fillRect(rX, rY, rW, rH);
     this.ctx.strokeRect(rX, rY, rW, rH);
-    this.g.ctx.font = this.g.config.theme.font.level;
-    this.g.ctx.fillStyle = this.g.config.theme.level;
-    this.g.ctx.textBaseline = 'top';
-    const str = 'LEVEL ' + this.g.pState.level;
+    this.ctx.font = this.font.level.string();
+    this.ctx.fillStyle = this.g.config.theme.level;
+    this.ctx.textBaseline = 'top';
+    const str = this.g.strings.level.replace('{level}', this.g.player.level);
     this.ctx.shadowColor = this.g.config.theme.levelShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 2;
     this.ctx.shadowOffsetY = 2;
-    const textDim = this.g.ctx.measureText(str);
+    const textDim = this.ctx.measureText(str);
     const textHeight =
       textDim.actualBoundingBoxAscent + textDim.actualBoundingBoxDescent;
-    this.g.ctx.fillText(
+    this.ctx.fillText(
       str,
       this.scoreX - textDim.width / 2,
       rY + (rH - textHeight) / 2
     );
-    this.g.ctx.restore();
+    this.ctx.restore();
   }
 
   drawTime() {
@@ -464,16 +516,16 @@ export default class render {
       seconds = '0' + seconds;
     }
     const time = minutes + ':' + seconds;
-    this.g.ctx.save();
-    this.g.ctx.font = this.g.config.theme.font.time;
-    this.g.ctx.fillStyle = this.g.config.theme.time;
-    this.g.ctx.textBaseline = 'top';
+    this.ctx.save();
+    this.ctx.font = this.font.time.size + 'px ' + this.font.time.family;
+    this.ctx.fillStyle = this.g.config.theme.time;
+    this.ctx.textBaseline = 'top';
     this.ctx.shadowColor = this.g.config.theme.timeShadow;
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 3;
     this.ctx.shadowOffsetY = 3;
-    this.g.ctx.fillText(time, this.timeX, this.timeY);
-    this.g.ctx.restore();
+    this.ctx.fillText(time, this.timeX, this.timeY);
+    this.ctx.restore();
   }
 
   drawGrid(opponent) {
@@ -503,11 +555,11 @@ export default class render {
   }
 
   drawFallingPiece(opponent) {
-    let fp = this.g.pFallingPiece;
+    let fp = this.g.player.fallingPiece;
     let sX = this.pStartX;
     let sY = this.pStartY;
     if (opponent) {
-      fp = this.g.oFallingPiece;
+      fp = this.g.opponent.fallingPiece;
       sX = this.oStartX;
       sY = this.oStartY;
     }
@@ -524,7 +576,7 @@ export default class render {
       this.g.config.pieces[fp.type].color.blue +
       ', 1)';
     const blocks = this.g.getFallingBlocks(opponent);
-    for (let b = 0; b < 4; b++) {
+    for (let b = 0; b < blocks.length; b++) {
       let block = blocks[b];
       this.drawBlock(
         fp.type,
@@ -538,11 +590,11 @@ export default class render {
   drawFixedBlocks(opponent) {
     let sX = this.pStartX;
     let sY = this.pStartY;
-    let grid = this.g.pState.grid;
+    let grid = this.g.player.grid;
     if (opponent) {
       sX = this.oStartX;
       sY = this.oStartY;
-      grid = this.g.oState.grid;
+      grid = this.g.opponent.grid;
     }
     let x = 0,
       y = 0;
@@ -595,7 +647,7 @@ export default class render {
           }
           let bType = grid[h][v];
           if (
-            typeof this.g.pState.special[v + ':' + h] != 'undefined' &&
+            typeof this.g.player.special[v + ':' + h] != 'undefined' &&
             !opponent
           ) {
             bType = 9;
@@ -629,9 +681,9 @@ export default class render {
   drawCountDown(now) {
     const remaining = Math.ceil((this.g.mp.countUntil - now) / 1000);
     if (remaining != this.g.lastCountDown) {
-      if (typeof this.g.sounds['countDown'] != 'undefined') {
-        this.g.sounds['countDown'].currentTime = 0;
-        this.g.sounds['countDown'].play();
+      if (typeof this.g.sounds.countDown != 'undefined') {
+        this.g.sounds.countDown.currentTime = 0;
+        this.g.sounds.countDown.play();
       }
     }
     this.ctx.save();
@@ -639,7 +691,7 @@ export default class render {
     this.ctx.fillStyle = this.g.config.theme.countDown;
     this.ctx.textBaseline = 'middle';
     const num = remaining.toString();
-    this.ctx.fillText(num, 450 - this.g.ctx.measureText(num).width / 2, 110);
+    this.ctx.fillText(num, 450 - this.ctx.measureText(num).width / 2, 110);
     this.ctx.restore();
   }
 
@@ -678,11 +730,8 @@ export default class render {
     this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
-    this.ctx.lineTo(
-      x + this.g.config.edgeThickness,
-      y + this.g.config.edgeThickness
-    );
-    this.ctx.lineTo(x + this.noEdgeTile, y + this.g.config.edgeThickness);
+    this.ctx.lineTo(x + this.edgeThickness, y + this.edgeThickness);
+    this.ctx.lineTo(x + this.noEdgeTile, y + this.edgeThickness);
     this.ctx.lineTo(x + this.g.config.tile, y);
     this.ctx.lineTo(x, y);
     this.ctx.fill();
@@ -691,11 +740,8 @@ export default class render {
     this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
-    this.ctx.lineTo(
-      x + this.g.config.edgeThickness,
-      y + this.g.config.edgeThickness
-    );
-    this.ctx.lineTo(x + this.g.config.edgeThickness, y + this.noEdgeTile);
+    this.ctx.lineTo(x + this.edgeThickness, y + this.edgeThickness);
+    this.ctx.lineTo(x + this.edgeThickness, y + this.noEdgeTile);
     this.ctx.lineTo(x + this.g.config.tile, y);
     this.ctx.lineTo(x, y + this.g.config.tile);
     this.ctx.fill();
@@ -704,7 +750,7 @@ export default class render {
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
     this.ctx.beginPath();
     this.ctx.moveTo(x + this.g.config.tile, y);
-    this.ctx.lineTo(x + this.noEdgeTile, y + this.g.config.edgeThickness);
+    this.ctx.lineTo(x + this.noEdgeTile, y + this.edgeThickness);
     this.ctx.lineTo(x + this.noEdgeTile, y + this.noEdgeTile);
     this.ctx.lineTo(x + this.g.config.tile, y + this.g.config.tile);
     this.ctx.lineTo(x + this.g.config.tile, y);
@@ -714,7 +760,7 @@ export default class render {
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
     this.ctx.beginPath();
     this.ctx.moveTo(x, y + this.g.config.tile);
-    this.ctx.lineTo(x + this.g.config.edgeThickness, y + this.noEdgeTile);
+    this.ctx.lineTo(x + this.edgeThickness, y + this.noEdgeTile);
     this.ctx.lineTo(x + this.noEdgeTile, y + this.noEdgeTile);
     this.ctx.lineTo(x + this.g.config.tile, y + this.g.config.tile);
     this.ctx.lineTo(x, y + this.g.config.tile);
@@ -746,7 +792,7 @@ export default class render {
     this.ctx.fillStyle = 'rgba(240, 210, 0, ' + fillAlpha + ')';
     let x = 0,
       y = 0;
-    for (let key in this.g.pState.special) {
+    for (let key in this.g.player.special) {
       let pair = key.split(':');
       let r = parseInt(pair[0]);
       let c = parseInt(pair[1]);
@@ -809,11 +855,11 @@ export default class render {
     const v = (Math.sin(counter) * (tmpAlpha * 1)) | 0;
     tmpAlpha = tmpAlpha * 0.5 + v * 0.5;
     const alpha = tmpAlpha / 100;
-    if (fBlocks[0].r < ghost[0].r) {
+    if (fBlocks.length > 0 && fBlocks[0].r < ghost[0].r) {
       for (let i = 0; i < ghost.length; i++) {
         let o = this.g.getPieceOffset(ghost[i].c, ghost[i].r);
         this.drawBlock(
-          this.g.pFallingPiece.type,
+          this.g.player.fallingPiece.type,
           o[0] + this.pStartX,
           o[1] + this.pStartY,
           alpha
@@ -847,13 +893,12 @@ export default class render {
       this.ctx.shadowOffsetY = 0;
       let points = msg.text.replace(/(\+[0-9]+)\b.*/, '$1');
       let label = msg.text.replace(/(\+[0-9]+)\b(.*)/, '$2');
-      this.ctx.font = this.g.config.theme.font.scoreMsgPoints;
-      let sW = this.g.ctx.measureText(points).width;
-      this.ctx.font = this.g.config.theme.font.scoreMsgLabel;
-      this.ctx.font = this.g.config.theme.scoreMsgPoints;
+      this.ctx.font = this.font.scoreMsgPoints.string();
+      let sW = this.ctx.measureText(points).width;
+      this.ctx.font = this.font.scoreMsgPoints.string();
       this.ctx.fillStyle = this.g.config.theme.scoreMsgPoints;
       this.ctx.fillText(points, p.x, p.y - offset);
-      this.ctx.font = this.g.config.theme.font.scoreMsgLabel;
+      this.ctx.font = this.font.scoreMsgLabel.string();
       this.ctx.fillStyle = this.g.config.theme.scoreMsgLabel;
       this.ctx.fillText(label, p.x + sW, p.y - offset);
     }
@@ -872,7 +917,7 @@ export default class render {
       x = p[0] + this.pStartX;
       y = p[1] + this.pStartY;
     } else {
-      y = this.g.height - this.g.config.tile * 1;
+      y = this.canvas.height - this.g.config.tile * 1;
       x = this.pStartX + this.g.config.tile * 3;
     }
     return { x: x, y: y };
@@ -893,8 +938,11 @@ export default class render {
     if (this.g.lbIsShowing) {
       this.ctx.save();
       this.ctx.textBaseline = 'top';
-      this.ctx.font = this.g.config.theme.font.leaderBoard;
+      this.ctx.font = this.font.leaderBoard.string();
       this.ctx.globalAlpha = this.lbPer;
+      const rowHeight =
+        this.font.leaderBoard.size + this.font.leaderBoard.size * 0.375;
+      const rowHighlightOffset = this.font.leaderBoard.size * 0.1875;
       let x = 0,
         y = 0;
       let rank = '',
@@ -908,9 +956,18 @@ export default class render {
           } else {
             x = this.lbRightX;
           }
-          y = this.lbY + 22 * i;
+          y = this.lbY + rowHeight * i;
           rank = pad.substr(0, pad.length - r.rank.toString().length) + r.rank;
           score = r.score.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          if (this.g.player.lastRank > 0 && this.g.player.lastRank === r.rank) {
+            this.ctx.fillStyle = this.g.config.theme.lbHighlight;
+            this.ctx.fillRect(
+              x,
+              y - rowHighlightOffset,
+              this.lbWidth,
+              rowHeight
+            );
+          }
           this.ctx.fillStyle = this.g.config.theme.lbRank;
           this.ctx.shadowColor = this.g.config.theme.lbRankShadow;
           this.ctx.shadowBlur = 3;
@@ -923,7 +980,7 @@ export default class render {
           this.ctx.shadowOffsetX = 2;
           this.ctx.shadowOffsetY = 2;
           this.ctx.fillText(
-            r.player,
+            r.name,
             x + this.lbRankX + this.textWidth(rank) + 8,
             y
           );
