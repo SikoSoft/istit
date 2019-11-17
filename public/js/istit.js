@@ -1037,11 +1037,15 @@ export default class istit {
         this.player.name = name;
       }
       this.addToLeaderBoard().then(() => {
-        this.launchLeaderBoard();
+        if (this.ended) {
+          this.launchLeaderBoard();
+        }
       });
     } else {
       this.getLeaderBoard().then(() => {
-        this.launchLeaderBoard();
+        if (this.ended) {
+          this.launchLeaderBoard();
+        }
       });
     }
   }
