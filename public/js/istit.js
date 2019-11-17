@@ -8,7 +8,7 @@ import viewport from './viewport.js';
 export default class istit {
   constructor() {
     window.istit = this;
-    this.version = '1.0.0';
+    this.version = '1.2.0';
     this.config = new config(this);
     this.strings = {};
     this.animateTo = {
