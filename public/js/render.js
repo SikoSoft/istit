@@ -935,7 +935,7 @@ export default class render {
   }
 
   drawLeaderBoard() {
-    if (this.g.lbIsShowing) {
+    if (this.g.leaderBoard.isShowing) {
       this.ctx.save();
       this.ctx.textBaseline = 'top';
       this.ctx.font = this.font.leaderBoard.string();
@@ -949,7 +949,7 @@ export default class render {
         pad = '000',
         score = '';
       for (let i = 0; i < 25; i++) {
-        let r = this.g.leaderBoard[i];
+        let r = this.g.leaderBoard.records[i];
         if (r) {
           if (i % 2) {
             x = this.lbLeftX;

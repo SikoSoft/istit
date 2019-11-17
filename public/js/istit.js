@@ -4,6 +4,7 @@ import input from './input.js';
 import mp from './mp.js';
 import render from './render.js';
 import viewport from './viewport.js';
+import leaderBoard from './leaderBoard.js';
 
 export default class istit {
   constructor() {
@@ -41,8 +42,6 @@ export default class istit {
     this.holdPiece = false;
     this.nextSpecialTime = 0;
     this.nextSpecialJitterTime = 0;
-    this.leaderBoard = [];
-    this.lbIsShowing = false;
     this.showingNamePrompt = false;
   }
 
@@ -54,6 +53,7 @@ export default class istit {
     this.opponent = new player(this);
     this.input = new input(this);
     this.mp = new mp(this);
+    this.leaderBoard = new leaderBoard(this);
     this.render = new render(this);
     this.viewport = new viewport(this);
     this.run();
@@ -111,7 +111,7 @@ export default class istit {
     this.runTime = 0;
     this.lastTick = new Date().getTime();
     this.startTime = new Date().getTime();
-    this.lbIsShowing = false;
+    this.leaderBoard.isShowing = false;
     this.player.reset();
     this.opponent.reset();
     this.setLevel(1);
@@ -299,7 +299,7 @@ export default class istit {
       }
     }
     const now = new Date().getTime();
-    if (this.lbIsShowing) {
+    if (this.leaderBoard.isShowing) {
       let sysPer =
         (this.config.animateCycle.sysUp - (this.animateTo.sysUp - now)) /
         this.config.animateCycle.sysUp;
@@ -324,9 +324,9 @@ export default class istit {
       !this.showingNamePrompt &&
       this.ended &&
       now > this.ended + 100 &&
-      this.useLeaderBoard()
+      this.leaderBoard.use()
     ) {
-      this.queueLeaderBoard(true);
+      this.leaderBoard.queue(true);
     }
     this.lastTick = new Date().getTime();
     this.input.process();
@@ -978,83 +978,5 @@ export default class istit {
     if (this.nextPieces.length < 3) {
       this.nextPieces.push(this.randomPiece());
     }
-  }
-
-  getLeaderBoard() {
-    return new Promise((resolve, reject) => {
-      fetch(this.config.lbGet)
-        .then(data => data.json())
-        .then(json => {
-          this.leaderBoard = json.records;
-          this.player.lastRank = -1;
-          resolve(json);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
-  }
-
-  addToLeaderBoard() {
-    return new Promise((resolve, reject) => {
-      fetch(this.config.lbAdd, {
-        method: 'POST',
-        body: JSON.stringify({
-          name: this.player.name,
-          score: this.player.score,
-          duration: this.runTime
-        })
-      })
-        .then(data => data.json())
-        .then(json => {
-          this.leaderBoard = json.records;
-          this.player.lastRank = json.rank;
-          resolve(json);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
-  }
-
-  useLeaderBoard() {
-    if (this.config.lbGet !== '' && this.config.lbAdd !== '') {
-      return true;
-    }
-    return false;
-  }
-
-  queueLeaderBoard(add) {
-    if (typeof add === 'undefined') {
-      add = false;
-    }
-    this.showingNamePrompt = true;
-    if (add && this.player.score > 0) {
-      let name = prompt(
-        'Enter a name to be recorded to the Leader Board:',
-        this.player.name
-      );
-      if (name && name.replace(/\s/g, '') !== '') {
-        this.player.name = name;
-      }
-      this.addToLeaderBoard().then(() => {
-        if (this.ended) {
-          this.launchLeaderBoard();
-        }
-      });
-    } else {
-      this.getLeaderBoard().then(() => {
-        if (this.ended) {
-          this.launchLeaderBoard();
-        }
-      });
-    }
-  }
-
-  launchLeaderBoard() {
-    this.lbIsShowing = true;
-    this.showingNamePrompt = false;
-    this.animateTo.sysUp =
-      new Date().getTime() + this.config.animateCycle.sysUp;
   }
 }
