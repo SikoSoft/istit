@@ -349,14 +349,14 @@ export default class player {
   }
 
   clearLines(lines) {
-    const msg = 'lines cleared X' + lines.length;
+    const msg = this.g.strings.linesClearedX.replace('{lines}', lines.length);
     const hotPiece = this.getHotPiece(lines);
     if (lines.length == 4) {
       this.adjustScore(800, { text: msg, r: hotPiece.r, c: hotPiece.c });
       this.chainCount++;
       if (this.chainCount > 1) {
         this.adjustScore(800 * this.chainCount, {
-          text: 'ISTiT chain',
+          text: this.g.strings.istitChain,
           r: hotPiece.r,
           c: hotPiece.c
         });
@@ -376,7 +376,7 @@ export default class player {
             delete this.special[lines[i] + ':' + c];
             this.adjustScore(
               this.g.config.specialBonus,
-              { text: 'golden block' },
+              { text: this.g.strings.goldenBlock },
               false
             );
           }
@@ -474,10 +474,18 @@ export default class player {
     if (msg) {
       this.addScoreMessage('+' + p + ' ' + msg.text, msg.r, msg.c);
       if (levelBonus > 0) {
-        this.addScoreMessage('+' + levelBonus + ' level bonus', msg.r, msg.c);
+        this.addScoreMessage(
+          '+' + this.g.strings.levelBonus.replace('{points}', levelBonus),
+          msg.r,
+          msg.c
+        );
       }
       if (speedBonus > 0 && giveSpeedBonus) {
-        this.addScoreMessage('+' + speedBonus + ' speed bonus', msg.r, msg.c);
+        this.addScoreMessage(
+          '+' + this.g.strings.speedBonus.replace('{points}', speedBonus),
+          msg.r,
+          msg.c
+        );
       }
     }
     this.lastScoreTime = now;

@@ -10,5 +10,10 @@
   "youWin": "You Win! :)",
   "youLose": "You Lose! :(",
   "gameOver": "Game Over",
-  "pressSpaceToBegin": "Press [SPACE] to begin"
+  "pressSpaceToBegin": "Press [SPACE] to begin",
+  "goldenBlock": "Golden block",
+  "istitChain": "ISTiT chain",
+  "linesClearedX": "Lines cleared X {lines}",
+  "levelBonus": "{points} level bonus",
+  "speedBonus": "{points} speed bonus"
 }
