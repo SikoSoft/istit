@@ -191,10 +191,11 @@ export default class render {
 
   drawAnimationOverlay() {
     const now = new Date().getTime();
-    if (this.g.animateTo.lineBreak > now) {
+    if (this.g.player.animateTo.lineBreak > now) {
       const alpha =
-        ((this.g.animateTo.lineBreak - now) /
-          (this.g.config.animateCycle.lineBreak * this.g.linesToClear.length)) *
+        ((this.g.player.animateTo.lineBreak - now) /
+          (this.g.config.animateCycle.lineBreak *
+            this.g.player.linesToClear.length)) *
         1;
       this.ctx.save();
       this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
@@ -329,20 +330,24 @@ export default class render {
       this.pStartY + this.g.halfTile * 0.5
     );
     this.ctx.restore();
-    if (!this.g.mp.wait && this.g.nextPieces.length > 0) {
-      const pW = this.g.getPieceDimension(this.g.nextPieces[0], 1, 0);
-      const pH = this.g.getPieceDimension(this.g.nextPieces[0], 1, 1);
+    if (!this.g.mp.wait && this.g.player.nextPieces.length > 0) {
+      const pW = this.g.getPieceDimension(this.g.player.nextPieces[0], 1, 0);
+      const pH = this.g.getPieceDimension(this.g.player.nextPieces[0], 1, 1);
       let npStartX = this.mStartX + (this.mW - pW * this.g.config.tile) / 2;
       let npStartY = this.mStartY + (this.mW - pH * this.g.config.tile) / 2;
       for (let b = 0; b < 4; b++) {
         this.drawBlock(
-          this.g.nextPieces[0],
+          this.g.player.nextPieces[0],
           npStartX +
-            (this.g.config.pieces[this.g.nextPieces[0]].orientations[1][b][0] -
+            (this.g.config.pieces[this.g.player.nextPieces[0]].orientations[1][
+              b
+            ][0] -
               1) *
               this.g.config.tile,
           npStartY +
-            (this.g.config.pieces[this.g.nextPieces[0]].orientations[1][b][1] -
+            (this.g.config.pieces[this.g.player.nextPieces[0]].orientations[1][
+              b
+            ][1] -
               1) *
               this.g.config.tile
         );
@@ -365,14 +370,18 @@ export default class render {
         this.g.config.tile * 6;
       for (let b = 0; b < 4; b++) {
         this.drawBlock(
-          this.g.nextPieces[1],
+          this.g.player.nextPieces[1],
           npStartX2 +
-            (this.g.config.pieces[this.g.nextPieces[1]].orientations[1][b][0] -
+            (this.g.config.pieces[this.g.player.nextPieces[1]].orientations[1][
+              b
+            ][0] -
               1) *
               this.g.config.tile,
           npStartY +
             120 +
-            (this.g.config.pieces[this.g.nextPieces[1]].orientations[1][b][1] -
+            (this.g.config.pieces[this.g.player.nextPieces[1]].orientations[1][
+              b
+            ][1] -
               1) *
               this.g.config.tile,
           1,
@@ -382,14 +391,18 @@ export default class render {
       }
       for (let b = 0; b < 4; b++) {
         this.drawBlock(
-          this.g.nextPieces[2],
+          this.g.player.nextPieces[2],
           npStartX3 +
-            (this.g.config.pieces[this.g.nextPieces[2]].orientations[1][b][0] -
+            (this.g.config.pieces[this.g.player.nextPieces[2]].orientations[1][
+              b
+            ][0] -
               1) *
               this.g.config.tile,
           npStartY +
             120 +
-            (this.g.config.pieces[this.g.nextPieces[2]].orientations[1][b][1] -
+            (this.g.config.pieces[this.g.player.nextPieces[2]].orientations[1][
+              b
+            ][1] -
               1) *
               this.g.config.tile,
           1,
@@ -419,19 +432,25 @@ export default class render {
       this.hStartY + this.g.halfTile * 0.5
     );
     this.ctx.restore();
-    if (!this.g.mp.wait && this.g.holdPiece) {
-      const pW = this.g.getPieceDimension(this.g.holdPiece, 1, 0);
-      const pH = this.g.getPieceDimension(this.g.holdPiece, 1, 1);
+    if (!this.g.mp.wait && this.g.player.holdPiece) {
+      const pW = this.g.getPieceDimension(this.g.player.holdPiece, 1, 0);
+      const pH = this.g.getPieceDimension(this.g.player.holdPiece, 1, 1);
       const npStartX = this.mStartX + (this.mW - pW * this.g.config.tile) / 2;
       const npStartY = this.hStartY + (this.mW - pH * this.g.config.tile) / 2;
       for (let b = 0; b < 4; b++) {
         this.drawBlock(
-          this.g.holdPiece,
+          this.g.player.holdPiece,
           npStartX +
-            (this.g.config.pieces[this.g.holdPiece].orientations[1][b][0] - 1) *
+            (this.g.config.pieces[this.g.player.holdPiece].orientations[1][
+              b
+            ][0] -
+              1) *
               this.g.config.tile,
           npStartY +
-            (this.g.config.pieces[this.g.holdPiece].orientations[1][b][1] - 1) *
+            (this.g.config.pieces[this.g.player.holdPiece].orientations[1][
+              b
+            ][1] -
+              1) *
               this.g.config.tile
         );
       }
@@ -440,8 +459,8 @@ export default class render {
 
   drawScore(now) {
     let fontSize = this.font.scoreNormal.size;
-    if (this.g.animateTo.score > now) {
-      const dif = this.g.animateTo.score - now;
+    if (this.g.player.animateTo.score > now) {
+      const dif = this.g.player.animateTo.score - now;
       const percent = Math.round(
         (dif / this.g.config.animateCycle.score) * 100
       );
@@ -575,7 +594,7 @@ export default class render {
       ', ' +
       this.g.config.pieces[fp.type].color.blue +
       ', 1)';
-    const blocks = this.g.getFallingBlocks(opponent);
+    const blocks = this.g.player.getFallingBlocks(opponent);
     for (let b = 0; b < blocks.length; b++) {
       let block = blocks[b];
       this.drawBlock(
@@ -600,8 +619,8 @@ export default class render {
       y = 0;
     const now = new Date().getTime();
     let mPer = 0;
-    if (this.g.animateTo.lineBreak > now) {
-      const dif = this.g.animateTo.lineBreak - now;
+    if (this.g.player.animateTo.lineBreak > now) {
+      const dif = this.g.player.animateTo.lineBreak - now;
       const mod = dif % this.g.config.animateCycle.lineBreak;
       const opMod = this.g.config.animateCycle.lineBreak - mod;
       mPer = opMod / this.g.config.animateCycle.lineBreak;
@@ -613,7 +632,7 @@ export default class render {
           let offset = this.g.getPieceOffset(h, v);
           x = offset[0];
           y = offset[1];
-          if (!opponent && this.g.rowIsCleared(v)) {
+          if (!opponent && this.g.player.rowIsCleared(v)) {
             let d2x = this.scoreX - this.g.config.tile - x;
             let d2y = this.scoreY - 30 - y;
             let tPer = mPer + h * 0.01;
@@ -633,8 +652,9 @@ export default class render {
             }
           }
           let p = 0;
-          if (typeof this.g.placedBlocks[v + ':' + h] == 'number') {
-            let dif = this.g.placedBlocks[v + ':' + h] - new Date().getTime();
+          if (typeof this.g.player.placedBlocks[v + ':' + h] == 'number') {
+            let dif =
+              this.g.player.placedBlocks[v + ':' + h] - new Date().getTime();
             let percent = dif / this.g.config.dropDelay;
             p = percent;
             if (p > 0) {
@@ -651,8 +671,8 @@ export default class render {
             !opponent
           ) {
             bType = 9;
-            x += this.g.xSpecialJitter;
-            y += this.g.ySpecialJitter;
+            x += this.g.player.xSpecialJitter;
+            y += this.g.player.ySpecialJitter;
           }
           this.drawBlock(bType, x + sX, y + sY, a, p);
         }
@@ -848,7 +868,7 @@ export default class render {
 
   drawGhost() {
     const ghost = this.g.getGhostBlocks();
-    const fBlocks = this.g.getFallingBlocks();
+    const fBlocks = this.g.player.getFallingBlocks();
     let tmpAlpha = this.g.config.ghostAlpha * 100;
     const percent = ((this.g.runTime % 1000) / 1000) * 100;
     const counter = percent * (Math.PI / 100);
@@ -871,9 +891,9 @@ export default class render {
   drawMessages() {
     this.ctx.save();
     this.ctx.textBaseline = 'bottom';
-    for (let i = 0; i < this.g.messages.length; i++) {
-      let o = this.g.messages.length - i;
-      let msg = this.g.messages[i];
+    for (let i = 0; i < this.g.player.messages.length; i++) {
+      let o = this.g.player.messages.length - i;
+      let msg = this.g.player.messages[i];
       let offset = (o - 1) * this.msgH;
       let p = this.getMsgPos(msg);
       let percent =

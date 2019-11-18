@@ -79,7 +79,7 @@ export default class leaderBoard {
   launch() {
     this.isShowing = true;
     this.g.showingNamePrompt = false;
-    this.g.animateTo.sysUp =
+    this.g.player.animateTo.sysUp =
       new Date().getTime() + this.g.config.animateCycle.sysUp;
   }
 }

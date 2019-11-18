@@ -43,22 +43,22 @@ export default class input {
           this.g.pause();
         },
         drop: () => {
-          this.g.placeFallingPieceAtBottom();
+          this.g.player.placeFallingPieceAtBottom();
         },
         left: () => {
-          this.g.movePiece(-1);
+          this.g.player.movePiece(-1);
         },
         rotate: () => {
-          this.g.rotatePiece();
+          this.g.player.rotatePiece();
         },
         right: () => {
-          this.g.movePiece(1);
+          this.g.player.movePiece(1);
         },
         down: () => {
-          this.g.adjustFallingHeightOffset();
+          this.g.player.adjustFallingHeightOffset();
         },
         hold: () => {
-          this.g.toggleHold();
+          this.g.player.toggleHold();
         }
       },
       gameplayLocked: {},
@@ -69,6 +69,8 @@ export default class input {
       }
     };
     this.lastButtonState = {};
+    this.profilesAvailable = 1;
+    this.profiles = [];
   }
 
   init() {
