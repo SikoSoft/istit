@@ -45,6 +45,43 @@ export default class player {
     this.resetFallingPiece();
   }
 
+  update() {
+    const now = new Date().getTime();
+    if (now > this.animateTo.lineBreak && now > this.animateTo.lineAdd) {
+      if (this.linesToClear.length > 0) {
+        this.destroyLines();
+      }
+      if (this.linesToGet > 0) {
+        this.insertLines();
+      }
+    }
+    this.adjustFallingHeight();
+    if (this.g.runTime > this.dropAt && this.fallingPiece.start < this.dropAt) {
+      this.dropPiece();
+    }
+    for (let i = this.messages.length - 1; i >= 0; i--) {
+      let m = this.messages[i];
+      if (this.g.runTime > m.expiration) {
+        this.messages.splice(i, 1);
+      }
+    }
+    if (this.g.runTime > this.nextSpecialTime) {
+      this.spawnSpecial();
+      this.nextSpecialTime = this.g.runTime + this.g.config.specialInterval;
+    }
+    for (let i in this.special) {
+      if (this.g.runTime > this.special[i]) {
+        delete this.special[i];
+      }
+    }
+    if (this.g.runTime > this.nextSpecialJitterTime) {
+      let joa = [-1, 0, 1];
+      this.xSpecialJitter = joa[this.g.random(1, joa.length) - 1];
+      this.ySpecialJitter = joa[this.g.random(1, joa.length) - 1];
+      this.nextSpecialJitterTime = this.g.runTime + this.g.config.specialJitter;
+    }
+  }
+
   state() {
     let copy = {};
     Object.keys(this).forEach(key => {
@@ -612,5 +649,41 @@ export default class player {
       }
     }
     return false;
+  }
+
+  spawnSpecial() {
+    let num = 0,
+      low = this.g.config.vTiles;
+    for (let c = 0; c < this.g.config.hTiles; c++) {
+      num = this.getClosestToTopInColumn(c);
+      if (num < low) {
+        low = num;
+      }
+    }
+    const perRow = this.g.config.vTiles / (this.g.config.vTiles - low);
+    let chance = 0;
+    const rows = [];
+    for (let r = low; r < this.g.config.vTiles; r++) {
+      chance += perRow;
+      const percent = chance / this.g.config.vTiles;
+      const rand = this.g.random(1, 100);
+      if (rand <= percent * 100) {
+        rows.push(r);
+      }
+    }
+    const rowIndex = this.g.random(1, rows.length) - 1;
+    const r = rows[rowIndex];
+    const cells = [];
+    for (let c = 0; c < this.g.config.hTiles; c++) {
+      if (this.grid[c][r]) {
+        cells.push(c);
+      }
+    }
+    const columnIndex = this.g.random(1, cells.length) - 1;
+    const c = cells[columnIndex];
+    if (r && c) {
+      this.special[r + ':' + c] =
+        this.g.runTime + this.g.config.specialDuration;
+    }
   }
 }

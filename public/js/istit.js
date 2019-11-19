@@ -17,9 +17,9 @@ export default class istit {
     this.paused = false;
     this.ended = false;
     this.wait = false;
-    this.time = 0;
     this.levels = {};
     this.images = {};
+    this.players = [];
     this.volume = this.config.defVolume;
     this.showingNamePrompt = false;
   }
@@ -28,14 +28,20 @@ export default class istit {
     this.canvasId = canvasId;
     this.halfPI = Math.PI / 2;
     this.halfTile = this.config.tile / 2;
-    this.player = new player(this);
     this.opponent = new player(this);
     this.input = new input(this);
     this.mp = new mp(this);
     this.leaderBoard = new leaderBoard(this);
     this.render = new render(this);
     this.viewport = new viewport(this);
+    this.registerPlayer();
+    this.player = this.players[0];
     this.run();
+  }
+
+  registerPlayer() {
+    this.players.push(new player(this));
+    return this.players.length - 1;
   }
 
   run() {
@@ -91,8 +97,9 @@ export default class istit {
     this.lastTick = new Date().getTime();
     this.startTime = new Date().getTime();
     this.leaderBoard.isShowing = false;
-    this.player.reset();
-    this.opponent.reset();
+    this.players.forEach(player => {
+      player.reset();
+    });
   }
 
   end(isWinner) {
@@ -214,64 +221,26 @@ export default class istit {
   }
 
   update() {
+    const now = new Date().getTime();
     if (this.mp.countingDown) {
-      const remaining = Math.ceil(
-        (this.mp.countUntil - new Date().getTime()) / 1000
-      );
+      const remaining = Math.ceil((this.mp.countUntil - now) / 1000);
       if (remaining != this.lastCountDown) {
-        if (typeof this.sounds['countDown'] != 'undefined') {
-          this.sounds['countDown'].currentTime = 0;
-          this.sounds['countDown'].play();
+        if (typeof this.sounds.countDown != 'undefined') {
+          this.sounds.countDown.currentTime = 0;
+          this.sounds.countDown.play();
         }
       }
       this.lastCountDown = remaining;
     }
     if (this.inPlay()) {
-      this.lastDelta = new Date().getTime() - this.lastTick;
-      if (this.mp.session == -1) {
+      this.lastDelta = now - this.lastTick;
+      if (this.mp.session === -1) {
         this.runTime += this.lastDelta;
       }
-      if (
-        new Date().getTime() > this.player.animateTo.lineBreak &&
-        new Date().getTime() > this.player.animateTo.lineAdd
-      ) {
-        if (this.player.linesToClear.length > 0) {
-          this.player.destroyLines();
-        }
-        if (this.player.linesToGet > 0) {
-          this.player.insertLines();
-        }
-      }
-      this.player.adjustFallingHeight();
-      if (
-        this.runTime > this.player.dropAt &&
-        this.player.fallingPiece.start < this.player.dropAt
-      ) {
-        this.player.dropPiece();
-      }
-      for (let i = this.player.messages.length - 1; i >= 0; i--) {
-        let m = this.player.messages[i];
-        if (this.runTime > m.expiration) {
-          this.player.messages.splice(i, 1);
-        }
-      }
-      if (this.runTime > this.nextSpecialTime) {
-        this.spawnSpecial();
-        this.nextSpecialTime = this.runTime + this.config.specialInterval;
-      }
-      for (let i in this.player.special) {
-        if (this.runTime > this.player.special[i]) {
-          delete this.player.special[i];
-        }
-      }
-      if (this.runTime > this.nextSpecialJitterTime) {
-        let joa = [-1, 0, 1];
-        this.xSpecialJitter = joa[this.random(1, joa.length) - 1];
-        this.ySpecialJitter = joa[this.random(1, joa.length) - 1];
-        this.nextSpecialJitterTime = this.runTime + this.config.specialJitter;
-      }
+      this.players.forEach(player => {
+        player.update();
+      });
     }
-    const now = new Date().getTime();
     if (this.leaderBoard.isShowing) {
       let sysPer =
         (this.config.animateCycle.sysUp - (this.player.animateTo.sysUp - now)) /
@@ -305,46 +274,6 @@ export default class istit {
     }
     this.lastTick = new Date().getTime();
     this.input.process();
-  }
-
-  adjustTime(dif) {
-    this.time += dif;
-  }
-
-  spawnSpecial() {
-    let num = 0,
-      low = this.config.vTiles;
-    for (let c = 0; c < this.config.hTiles; c++) {
-      num = this.player.getClosestToTopInColumn(c);
-      if (num < low) {
-        low = num;
-      }
-    }
-    const perRow = this.config.vTiles / (this.config.vTiles - low);
-    let chance = 0;
-    const rows = [];
-    for (let r = low; r < this.config.vTiles; r++) {
-      chance += perRow;
-      const percent = chance / this.config.vTiles;
-      const rand = this.random(1, 100);
-      if (rand <= percent * 100) {
-        rows.push(r);
-      }
-    }
-    const rowIndex = this.random(1, rows.length) - 1;
-    const r = rows[rowIndex];
-    const cells = [];
-    for (let c = 0; c < this.config.hTiles; c++) {
-      if (this.player.grid[c][r]) {
-        cells.push(c);
-      }
-    }
-    const columnIndex = this.random(1, cells.length) - 1;
-    const c = cells[columnIndex];
-    if (r && c) {
-      this.player.special[r + ':' + c] =
-        this.runTime + this.config.specialDuration;
-    }
   }
 
   randomPiece() {

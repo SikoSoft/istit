@@ -115,7 +115,7 @@ export default class input {
 
   isLocked() {
     const now = new Date().getTime();
-    if (now < this.g.animateTo.lineBreak || now < this.g.animateTo.lineAdd) {
+    if (now < this.g.player.animateTo.lineBreak || now < this.g.player.animateTo.lineAdd) {
       return true;
     }
     return false;
