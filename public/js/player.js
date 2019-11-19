@@ -93,10 +93,11 @@ export default class player {
   }
 
   resetGrid() {
-    for (let h = 0; h < this.g.config.hTiles; h++) {
-      this.grid[h] = [];
-      for (let v = 0; v < this.g.config.vTiles; v++) {
-        this.grid[h][v] = 0;
+    this.grid = [];
+    for (let r = 0; r < this.g.config.vTiles; r++) {
+      this.grid[r] = [];
+      for (let c = 0; c < this.g.config.hTiles; c++) {
+        this.grid[r][c] = 0;
       }
     }
   }
@@ -104,9 +105,9 @@ export default class player {
   resetFallingPiece() {
     this.fallingPiece = {
       start: 0,
-      x: 0,
-      y: 0,
-      lastY: 0,
+      r: 0,
+      c: 0,
+      lastR: 0,
       type: -1,
       position: 1,
       elapsed: 0,
@@ -120,32 +121,29 @@ export default class player {
 
   dropPiece() {
     if (!this.g.ended) {
-      const startX = this.g.config.hTiles / 2 - 1,
-        startY = -1;
-      let x = 0;
-      let y = 0;
-      const blocks = [];
+      const startC = this.g.config.hTiles / 2 - 1,
+        startR = 0;
+      let r = 0, c = 0;
       for (let b = 0; b < 4; b++) {
-        x =
-          startX +
+        c =
+          startC +
           this.g.config.pieces[this.nextPieces[0]].orientations[1][b][0] -
           1;
-        y =
-          startY +
+        r =
+          startR +
           this.g.config.pieces[this.nextPieces[0]].orientations[1][b][1] -
           1;
-        blocks[b] = [x, y];
-        if (this.grid[x][y]) {
+        if (this.grid[r][c]) {
           this.g.end();
           return;
         }
       }
       this.setFallingPiece({
         start: this.g.runTime,
-        x: startX,
-        y: startY,
-        type: this.nextPieces[0] * 1,
-        lastY: startY,
+        r: startR,
+        c: startC,
+        type: this.nextPieces[0],
+        lastR: startR,
         offset: 0,
         position: 1,
         placed: false,
@@ -180,7 +178,7 @@ export default class player {
 
   movePiece(d) {
     if (!this.collides(d, 0, 0)) {
-      this.fallingPiece.x += d;
+      this.fallingPiece.c += d;
       if (this.g.mp.session > -1) {
         this.g.mp.sendFPState();
       }
@@ -200,7 +198,7 @@ export default class player {
       let xAdjust = c;
       collides = this.collides(xAdjust, 0, newPosition);
       if (update && !collides) {
-        this.fallingPiece.x += xAdjust;
+        this.fallingPiece.c += xAdjust;
         this.fallingPiece.position = newPosition;
         if (this.g.mp.session > -1) {
           this.g.mp.sendFPState();
@@ -211,30 +209,30 @@ export default class player {
     return newPosition;
   }
 
-  collides(xAdjust, yAdjust, rAdjust, type) {
-    if (typeof rAdjust == 'undefined' || rAdjust == 0) {
-      rAdjust = this.fallingPiece.position;
+  collides(cAdjust, rAdjust, oAdjust, type) {
+    if (typeof oAdjust == 'undefined' || oAdjust == 0) {
+      oAdjust = this.fallingPiece.position;
     }
     let collidesWith = false;
-    let tmpX = -1;
-    let tmpY = -1;
-    const blocks = this.getFallingBlocks(false, rAdjust, type);
+    let tmpC = -1;
+    let tmpR = -1;
+    const blocks = this.getFallingBlocks(false, oAdjust, type);
     for (let b = 0; b < blocks.length; b++) {
-      tmpX = blocks[b].c + xAdjust;
-      tmpY = blocks[b].r + yAdjust;
-      if (tmpX < 0) {
+      tmpC = blocks[b].c + cAdjust;
+      tmpR = blocks[b].r + rAdjust;
+      if (tmpC < 0) {
         collidesWith = 'left';
-      } else if (tmpX > this.g.config.hTiles - 1) {
+      } else if (tmpC > this.g.config.hTiles - 1) {
         collidesWith = 'right';
-      } else if (tmpY > this.g.config.vTiles - 1) {
+      } else if (tmpR > this.g.config.vTiles - 1) {
         collidesWith = 'bottom';
       }
       if (
-        tmpX > -1 &&
-        tmpX < this.g.config.hTiles &&
-        tmpY > -1 &&
-        tmpY < this.g.config.vTiles &&
-        this.grid[tmpX][tmpY] != false
+        tmpC > -1 &&
+        tmpC < this.g.config.hTiles &&
+        tmpR > -1 &&
+        tmpR < this.g.config.vTiles &&
+        this.grid[tmpR][tmpC] != false
       ) {
         collidesWith = 'bottom';
       }
@@ -260,8 +258,8 @@ export default class player {
     let c = 0;
     const blocks = [];
     for (let b = 0; b < 4; b++) {
-      c = fp.x + this.g.config.pieces[t].orientations[p][b][0] - 1;
-      r = fp.y + this.g.config.pieces[t].orientations[p][b][1] - 1;
+      c = fp.c + this.g.config.pieces[t].orientations[p][b][0] - 1;
+      r = fp.r + this.g.config.pieces[t].orientations[p][b][1] - 1;
       blocks[b] = { r: r, c: c };
     }
     return [blocks[0], blocks[1], blocks[2], blocks[3]];
@@ -303,7 +301,7 @@ export default class player {
       this.placedBlocks = {};
       const blocks = this.getFallingBlocks();
       for (let b = 0; b < 4; b++) {
-        this.grid[blocks[b].c][blocks[b].r] = parseInt(this.fallingPiece.type);
+        this.grid[blocks[b].r][blocks[b].c] = parseInt(this.fallingPiece.type);
         this.placedBlocks[blocks[b].r + ':' + blocks[b].c] =
           new Date().getTime() + this.g.config.dropDelay;
       }
@@ -321,20 +319,9 @@ export default class player {
   }
 
   getCompleteLines() {
-    const lines = [];
-    for (let v = 0; v < this.g.config.vTiles; v++) {
-      let solid = true;
-      for (let h = 0; h < this.g.config.hTiles; h++) {
-        if (!this.grid[h][v]) {
-          solid = false;
-          break;
-        }
-      }
-      if (solid) {
-        lines[lines.length] = v;
-      }
-    }
-    return lines;
+    return this.grid.reduce((solidRows, row, v) => {
+      return row.every(cell => cell > 0 ) ? solidRows.concat(v) : solidRows;
+    }, []);
   }
 
   destroyLines() {
@@ -342,31 +329,31 @@ export default class player {
     const numLines = lines.length;
     for (let l = 0; l < numLines; l++) {
       let line = lines[l];
-      for (let v = 0; v < this.g.config.vTiles; v++) {
-        if (v == line) {
-          for (let h = 0; h < this.g.config.hTiles; h++) {
-            this.grid[h][v] = 0;
+      for (let r = 0; r < this.g.config.vTiles; r++) {
+        if (r === line) {
+          for (let c = 0; c < this.g.config.hTiles; c++) {
+            this.grid[r][c] = 0;
           }
         }
       }
-      for (let v = this.g.config.vTiles - 1; v >= 0; v--) {
-        if (v < line) {
+      for (let r = this.g.config.vTiles - 1; r >= 0; r--) {
+        if (r < line) {
           for (let c = 0; c < this.g.config.hTiles; c++) {
-            let tmpVal = this.grid[c][v];
-            this.grid[c][v] = 0;
-            this.grid[c][v + 1] = tmpVal;
-            if (typeof this.special[v + ':' + c] != 'undefined') {
-              this.special[v + 1 + ':' + c] = this.special[v + ':' + c];
-              delete this.special[v + ':' + c];
+            let tmpVal = this.grid[r][c];
+            this.grid[r][c] = 0;
+            this.grid[r + 1][c] = tmpVal;
+            if (typeof this.special[r + ':' + c] != 'undefined') {
+              this.special[r + 1 + ':' + c] = this.special[r + ':' + c];
+              delete this.special[r + ':' + c];
             }
           }
         }
       }
     }
     let isCleared = true;
-    for (let v = 0; v < this.g.config.vTiles; v++) {
-      for (let h = 0; h < this.g.config.hTiles; h++) {
-        if (this.grid[h][v]) {
+    for (let r = 0; r < this.g.config.vTiles; r++) {
+      for (let c = 0; c < this.g.config.hTiles; c++) {
+        if (this.grid[r][c]) {
           isCleared = false;
           break;
         }
@@ -446,17 +433,17 @@ export default class player {
 
   insertLines() {
     for (let i = 0; i < this.linesToGet; i++) {
-      for (let v = 0; v < this.g.config.vTiles; v++) {
-        for (let h = 0; h < this.g.config.hTiles; h++) {
-          let tmpVal = this.grid[h][v];
-          this.grid[h][v] = false;
-          this.grid[h][v - 1] = tmpVal;
+      for (let r = 0; r < this.g.config.vTiles; r++) {
+        for (let c = 0; c < this.g.config.hTiles; c++) {
+          let tmpVal = this.grid[r][c];
+          this.grid[r][c] = false;
+          this.grid[r][c - 1] = tmpVal;
         }
       }
       const empty = this.g.random(1, this.g.config.hTiles);
       for (let li = 0; li < this.g.config.hTiles; li++) {
         if (li != empty) {
-          this.grid[li][19] = 8;
+          this.grid[this.g.config.vTiles-1][li] = 8;
         }
       }
     }
@@ -546,10 +533,10 @@ export default class player {
     if (h >= this.g.config.vTiles) {
       h = this.g.config.vTiles;
     }
-    if (this.fallingPiece.lastY != h) {
-      yAdjust = h - this.fallingPiece.lastY;
+    if (this.fallingPiece.lastR != h) {
+      yAdjust = h - this.fallingPiece.lastR;
       adjust = false;
-      if (this.collides(0, 1, 0) == false) {
+      if (this.collides(0, 1, 0) === false) {
         validYAdjust = true;
         yAdjustDifFromExp = yAdjust - 1;
       }
@@ -561,11 +548,11 @@ export default class player {
     }
     if (adjust) {
       let sendState = false;
-      if (h - yAdjustDifFromExp != this.fallingPiece.lastY) {
+      if (h - yAdjustDifFromExp != this.fallingPiece.lastR) {
         sendState = true;
       }
-      this.fallingPiece.y = h - yAdjustDifFromExp;
-      this.fallingPiece.lastY = this.fallingPiece.y;
+      this.fallingPiece.r = h - yAdjustDifFromExp;
+      this.fallingPiece.lastR = this.fallingPiece.r;
       if (sendState && this.g.mp.session > -1) {
         this.g.mp.sendFPState();
       }
@@ -573,7 +560,7 @@ export default class player {
     if (place) {
       this.placePiece();
     }
-    return this.fallingPiece.y;
+    return this.fallingPiece.r;
   }
 
   adjustFallingHeightOffset() {
@@ -581,9 +568,9 @@ export default class player {
   }
 
   getClosestToTopInColumn(c) {
-    for (let i = 0; i < this.g.config.vTiles; i++) {
-      if (this.grid[c][i]) {
-        return i;
+    for (let r = 0; r < this.g.config.vTiles; r++) {
+      if (this.grid[r][c]) {
+        return r;
       }
     }
     return this.g.config.vTiles;
@@ -605,7 +592,7 @@ export default class player {
         let xAdjust = c;
         let collides = this.collides(c, 0, 0, cHP);
         if (!collides) {
-          this.fallingPiece.x += xAdjust;
+          this.fallingPiece.c += xAdjust;
           break;
         }
       }
@@ -625,7 +612,7 @@ export default class player {
     for (let c = 0; c < this.g.config.hTiles; c++) {
       for (let r = 0; r < this.g.config.vTiles; r++) {
         total++;
-        if (this.grid[c][r]) {
+        if (this.grid[r][c]) {
           numFilled++;
         }
       }
@@ -675,7 +662,7 @@ export default class player {
     const r = rows[rowIndex];
     const cells = [];
     for (let c = 0; c < this.g.config.hTiles; c++) {
-      if (this.grid[c][r]) {
+      if (this.grid[rowIndex][c]) {
         cells.push(c);
       }
     }

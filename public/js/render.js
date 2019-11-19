@@ -625,17 +625,17 @@ export default class render {
       const opMod = this.g.config.animateCycle.lineBreak - mod;
       mPer = opMod / this.g.config.animateCycle.lineBreak;
     }
-    for (let h = 0; h < this.g.config.hTiles; h++) {
-      for (let v = 0; v < this.g.config.vTiles; v++) {
+    for (let c = 0; c < this.g.config.hTiles; c++) {
+      for (let r = 0; r < this.g.config.vTiles; r++) {
         let a = 1;
-        if (grid[h][v] != false) {
-          let offset = this.g.getPieceOffset(h, v);
-          x = offset[0];
-          y = offset[1];
-          if (!opponent && this.g.player.rowIsCleared(v)) {
+        if (grid[r][c] != false) {
+          let offset = this.g.getPieceOffset(r, c);
+          x = offset[1];
+          y = offset[0];
+          if (!opponent && this.g.player.rowIsCleared(r)) {
             let d2x = this.scoreX - this.g.config.tile - x;
             let d2y = this.scoreY - 30 - y;
-            let tPer = mPer + h * 0.01;
+            let tPer = mPer + c * 0.01;
             if (mPer > 0) {
               x = x + d2x * tPer;
               y = y + d2y * tPer;
@@ -652,9 +652,9 @@ export default class render {
             }
           }
           let p = 0;
-          if (typeof this.g.player.placedBlocks[v + ':' + h] == 'number') {
+          if (typeof this.g.player.placedBlocks[r + ':' + c] == 'number') {
             let dif =
-              this.g.player.placedBlocks[v + ':' + h] - new Date().getTime();
+              this.g.player.placedBlocks[r + ':' + c] - new Date().getTime();
             let percent = dif / this.g.config.dropDelay;
             p = percent;
             if (p > 0) {
@@ -665,9 +665,9 @@ export default class render {
               y -= ver;
             }
           }
-          let bType = grid[h][v];
+          let bType = grid[r][c];
           if (
-            typeof this.g.player.special[v + ':' + h] != 'undefined' &&
+            typeof this.g.player.special[r + ':' + c] != 'undefined' &&
             !opponent
           ) {
             bType = 9;
@@ -816,9 +816,9 @@ export default class render {
       let pair = key.split(':');
       let r = parseInt(pair[0]);
       let c = parseInt(pair[1]);
-      let offset = this.g.getPieceOffset(c, r);
-      x = offset[0] + this.g.config.tile;
-      y = offset[1] + this.g.config.tile;
+      let offset = this.g.getPieceOffset(r, c);
+      x = offset[1] + this.g.config.tile;
+      y = offset[0] + this.g.config.tile;
       this.ctx.beginPath();
       this.ctx.arc(
         x + this.g.xSpecialJitter,
@@ -877,11 +877,11 @@ export default class render {
     const alpha = tmpAlpha / 100;
     if (fBlocks.length > 0 && fBlocks[0].r < ghost[0].r) {
       for (let i = 0; i < ghost.length; i++) {
-        let o = this.g.getPieceOffset(ghost[i].c, ghost[i].r);
+        let o = this.g.getPieceOffset(ghost[i].r, ghost[i].c);
         this.drawBlock(
           this.g.player.fallingPiece.type,
-          o[0] + this.pStartX,
-          o[1] + this.pStartY,
+          o[1] + this.pStartX,
+          o[0] + this.pStartY,
           alpha
         );
       }
@@ -933,9 +933,9 @@ export default class render {
       if (c > 6) {
         c = 6;
       }
-      const p = this.g.getPieceOffset(c, r);
-      x = p[0] + this.pStartX;
-      y = p[1] + this.pStartY;
+      const p = this.g.getPieceOffset(r, c);
+      x = p[1] + this.pStartX;
+      y = p[0] + this.pStartY;
     } else {
       y = this.canvas.height - this.g.config.tile * 1;
       x = this.pStartX + this.g.config.tile * 3;
