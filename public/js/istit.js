@@ -5,6 +5,7 @@ import mp from './mp.js';
 import render from './render.js';
 import viewport from './viewport.js';
 import leaderBoard from './leaderBoard.js';
+import MAGIC_NUM from './magicNum.js';
 
 export default class istit {
   constructor() {
@@ -26,8 +27,8 @@ export default class istit {
 
   init(canvasId) {
     this.canvasId = canvasId;
-    this.halfPI = Math.PI / 2;
-    this.halfTile = this.config.tile / 2;
+    this.halfPI = Math.PI * MAGIC_NUM.HALF;
+    this.halfTile = this.config.tile * MAGIC_NUM.HALF;
     this.opponent = new player(this);
     this.input = new input(this);
     this.mp = new mp(this);
@@ -49,7 +50,7 @@ export default class istit {
       this.input.init();
       this.render.init();
       this.viewport.init();
-      this.getLevelScores(50);
+      this.getLevelScores(MAGIC_NUM.MAX_LEVELS);
       this.lastTick = new Date().getTime();
       this.startTime = new Date().getTime();
       this.wait = true;
@@ -63,13 +64,13 @@ export default class istit {
   }
 
   parseMiliSeconds(ms) {
-    let x = ms / 1000;
-    const seconds = Math.floor(x % 60);
-    x /= 60;
-    const minutes = Math.floor(x % 60);
-    x /= 60;
-    const hours = Math.floor(x % 24);
-    x /= 24;
+    let x = ms / MAGIC_NUM.MILISECONDS;
+    const seconds = Math.floor(x % MAGIC_NUM.SECONDS);
+    x /= MAGIC_NUM.SECONDS;
+    const minutes = Math.floor(x % MAGIC_NUM.MINUTES);
+    x /= MAGIC_NUM.MINUTES;
+    const hours = Math.floor(x % MAGIC_NUM.HOURS);
+    x /= MAGIC_NUM.HOURS;
     const days = Math.floor(x);
     return [days, hours, minutes, seconds];
   }
@@ -132,7 +133,7 @@ export default class istit {
           resolve();
         })
         .catch(error => {
-          console.log('Encountered an error while loading!', error);
+          console.log('Encountered an error while loading!', error); //eslint-disable-line
         });
     });
   }
@@ -179,7 +180,7 @@ export default class istit {
           }
         };
       }
-      if (numImages == 0) {
+      if (numImages === 0) {
         resolve();
       }
     });
@@ -206,7 +207,7 @@ export default class istit {
   }
 
   pause() {
-    if (this.mp.session == -1) {
+    if (this.mp.session === -1) {
       if (!this.ended) {
         this.paused = !this.paused;
       }
@@ -223,9 +224,9 @@ export default class istit {
   update() {
     const now = new Date().getTime();
     if (this.mp.countingDown) {
-      const remaining = Math.ceil((this.mp.countUntil - now) / 1000);
-      if (remaining != this.lastCountDown) {
-        if (typeof this.sounds.countDown != 'undefined') {
+      const remaining = Math.ceil((this.mp.countUntil - now) / MAGIC_NUM.MILISECONDS);
+      if (remaining !== this.lastCountDown) {
+        if (typeof this.sounds.countDown !== 'undefined') {
           this.sounds.countDown.currentTime = 0;
           this.sounds.countDown.play();
         }
@@ -267,7 +268,7 @@ export default class istit {
     } else if (
       !this.showingNamePrompt &&
       this.ended &&
-      now > this.ended + 100 &&
+      now > this.ended + MAGIC_NUM.END_LB_DELAY &&
       this.leaderBoard.use()
     ) {
       this.leaderBoard.queue(true);
@@ -310,7 +311,10 @@ export default class istit {
       let c = blocks[i].c;
       let r = blocks[i].r;
       let newR = r + mostDif;
-      ghost.push({ c: c, r: newR });
+      ghost.push({
+        c,
+        r: newR 
+      });
     }
     return ghost;
   }
@@ -326,14 +330,10 @@ export default class istit {
     let lastScore = 0;
     this.levels[1] = 0;
     for (let l = 2; l <= mLevel; l++) {
-      if (l == 2) {
-        score = this.config.levelIncreaseThreshold;
-      } else {
-        score =
-          lastScore +
-          this.config.levelIncreaseThreshold +
-          Math.floor(lastScore * this.config.levelIncreaseMultiplier);
-      }
+      score =
+        lastScore +
+        this.config.levelIncreaseThreshold +
+        Math.floor(lastScore * this.config.levelIncreaseMultiplier);
       this.levels[l] = score;
       lastScore = score;
     }
@@ -348,7 +348,7 @@ export default class istit {
     const blocks = this.config.pieces[t].orientations[o];
     let min = 9,
       max = 0;
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < MAGIC_NUM.BLOCKS; i++) {
       let n = blocks[i][d];
       if (n < min) {
         min = n;

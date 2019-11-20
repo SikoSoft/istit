@@ -31,12 +31,12 @@ export default class input {
       waiting: {
         _all: () => {
           this.g.start();
-        }
+        } 
       },
       paused: {
         pause: () => {
           this.g.pause();
-        }
+        } 
       },
       gameplay: {
         pause: () => {
@@ -65,7 +65,7 @@ export default class input {
       ended: {
         _all: () => {
           this.g.restart();
-        }
+        } 
       }
     };
     this.lastButtonState = {};
@@ -94,10 +94,9 @@ export default class input {
       },
       false
     );
-    window.addEventListener('gamepadconnected', e => {
+    window.addEventListener('gamepadconnected', () => {
       this.gamePadDetected = true;
       this.lastButtonState = {};
-      console.log(e);
       Object.keys(this.buttonMap).forEach(button => {
         this.lastButtonState[button] = false;
       });
@@ -152,10 +151,12 @@ export default class input {
           this.lastFloodWait[button] = 0;
         }
         if (isPressed && this.floodSafe(button)) {
-          typeof this.stateActions[state][button] === 'function' &&
+          if (typeof this.stateActions[state][button] === 'function') {
             this.stateActions[state][button]();
-          typeof this.stateActions[state]._all === 'function' &&
+          }
+          if (typeof this.stateActions[state]._all === 'function') {
             this.stateActions[state]._all();
+          }
           this.setFloodTimer(button);
         }
       });
@@ -163,10 +164,12 @@ export default class input {
     } else {
       Object.keys(this.keyMap).forEach(key => {
         if (this.keyState[this.keyMap[key]] && this.floodSafe(key)) {
-          typeof this.stateActions[state][key] === 'function' &&
+          if (typeof this.stateActions[state][key] === 'function') {
             this.stateActions[state][key]();
-          typeof this.stateActions[state]._all === 'function' &&
+          }
+          if (typeof this.stateActions[state]._all === 'function') {
             this.stateActions[state]._all();
+          }
           this.setFloodTimer(key);
         }
       });
@@ -214,17 +217,19 @@ export default class input {
     this.keyState[e.keyCode] = false;
     let commandName = '';
     Object.keys(this.keyMap).forEach(key => {
-      if (this.keyMap[key] == e.keyCode) {
+      if (this.keyMap[key] === e.keyCode) {
         commandName = key;
       }
     });
     if (commandName) {
       this.lastFloodWait[commandName] = 0;
     }
-    for (let mi = 37; mi <= 40; mi++) {
+    for (let mi = this.keyMap.left; mi <= this.keyMap.down; mi++) {
       if (this.keyState[mi]) {
         e.preventDefault();
-        this.handleKeyDown({ keyCode: mi });
+        this.handleKeyDown({
+          keyCode: mi 
+        });
       }
     }
     if (e.preventDefault) {

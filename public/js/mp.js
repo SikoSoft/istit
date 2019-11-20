@@ -34,17 +34,17 @@ export default class mp {
 
   handleMessage(msg) {
     const json = JSON.parse(msg.data);
-    if (json.event == 'sessionReady') {
+    if (json.event === 'sessionReady') {
       this.startSession(json.session);
-    } else if (json.event == 'end') {
+    } else if (json.event === 'end') {
       this.g.end(true);
-    } else if (json.event == 'linesGet') {
+    } else if (json.event === 'linesGet') {
       this.g.getLines(json.num);
-    } else if (json.event == 'statePull') {
+    } else if (json.event === 'statePull') {
       this.g.opponent = json.state;
-    } else if (json.event == 'fpPull') {
+    } else if (json.event === 'fpPull') {
       this.g.opponent.fallingPiece = json.fallingPiece;
-    } else if (json.event == 'sync') {
+    } else if (json.event === 'sync') {
       if (!this.wait) {
         const now = new Date().getTime();
         this.syncTimes++;
@@ -52,7 +52,7 @@ export default class mp {
         this.lastSync = new Date().getTime();
         this.g.adjustFallingHeight();
       }
-    } else if (json.event == 'oppDisconnect') {
+    } else if (json.event === 'oppDisconnect') {
       this.oppIsAlive = false;
       this.ws.close();
     }
@@ -84,12 +84,18 @@ export default class mp {
   }
 
   sendLines(num) {
-    this.ws.send(JSON.stringify({ event: 'linesPut', num: num }));
+    this.ws.send(JSON.stringify({
+      event: 'linesPut',
+      num
+    }));
   }
 
   sendState() {
     this.ws.send(
-      JSON.stringify({ event: 'statePush', state: this.g.player.state() })
+      JSON.stringify({
+        event: 'statePush',
+        state: this.g.player.state()
+      })
     );
   }
 

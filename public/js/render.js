@@ -262,9 +262,9 @@ export default class render {
     this.ctx.save();
     this.ctx.globalAlpha = 0.6;
     let img = false;
-    if (typeof this.g.images.bg[this.g.player.level] != 'undefined') {
+    if (typeof this.g.images.bg[this.g.player.level] !== 'undefined') {
       img = this.g.images.bg[this.g.player.level];
-    } else if (typeof this.g.images.bg['default'] != 'undefined') {
+    } else if (typeof this.g.images.bg['default'] !== 'undefined') {
       img = this.g.images.bg['default'];
     }
     if (img) {
@@ -277,7 +277,7 @@ export default class render {
       );
     }
     if (this.mpMode) {
-      if (typeof this.g.images.bg[this.g.opponent.level] != 'undefined') {
+      if (typeof this.g.images.bg[this.g.opponent.level] !== 'undefined') {
         img = this.g.images.bg[this.g.opponent.level];
       } else {
         img = this.g.images.bg['default'];
@@ -652,7 +652,7 @@ export default class render {
             }
           }
           let p = 0;
-          if (typeof this.g.player.placedBlocks[r + ':' + c] == 'number') {
+          if (typeof this.g.player.placedBlocks[r + ':' + c] === 'number') {
             let dif =
               this.g.player.placedBlocks[r + ':' + c] - new Date().getTime();
             let percent = dif / this.g.config.dropDelay;
@@ -667,7 +667,7 @@ export default class render {
           }
           let bType = grid[r][c];
           if (
-            typeof this.g.player.special[r + ':' + c] != 'undefined' &&
+            typeof this.g.player.special[r + ':' + c] !== 'undefined' &&
             !opponent
           ) {
             bType = 9;
@@ -701,7 +701,7 @@ export default class render {
   drawCountDown(now) {
     const remaining = Math.ceil((this.g.mp.countUntil - now) / 1000);
     if (remaining != this.g.lastCountDown) {
-      if (typeof this.g.sounds.countDown != 'undefined') {
+      if (typeof this.g.sounds.countDown !== 'undefined') {
         this.g.sounds.countDown.currentTime = 0;
         this.g.sounds.countDown.play();
       }
@@ -716,10 +716,10 @@ export default class render {
   }
 
   drawBlock(t, x, y, a, p, s) {
-    if (typeof a == 'undefined') {
+    if (typeof a === 'undefined') {
       a = 1;
     }
-    if (typeof p == 'undefined') {
+    if (typeof p === 'undefined') {
       p = 0;
     }
     if (y < this.g.pStartX) {
@@ -940,11 +940,14 @@ export default class render {
       y = this.canvas.height - this.g.config.tile * 1;
       x = this.pStartX + this.g.config.tile * 3;
     }
-    return { x: x, y: y };
+    return {
+      x,
+      y 
+    };
   }
 
   textWidth(text, font) {
-    if (typeof font == 'undefined') {
+    if (typeof font === 'undefined') {
       font = this.ctx.font;
     }
     this.ctx.save();

@@ -49,10 +49,7 @@ export default class leaderBoard {
     return false;
   }
 
-  queue(add) {
-    if (typeof add === 'undefined') {
-      add = false;
-    }
+  queue(add = false) {
     this.g.showingNamePrompt = true;
     if (add && this.g.player.score > 0) {
       let name = prompt(

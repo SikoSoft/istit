@@ -1,3 +1,5 @@
+import MAGIC_NUM from './magicNum.js';
+
 export default class player {
   constructor(g) {
     this.g = g;
@@ -116,15 +118,18 @@ export default class player {
   }
 
   setFallingPiece(properties) {
-    this.fallingPiece = { ...this.fallingPiece, ...properties };
+    this.fallingPiece = {
+      ...this.fallingPiece,
+      ...properties 
+    };
   }
 
   dropPiece() {
     if (!this.g.ended) {
-      const startC = this.g.config.hTiles / 2 - 1,
+      const startC = this.g.config.hTiles * MAGIC_NUM.HALF - 1,
         startR = 0;
       let r = 0, c = 0;
-      for (let b = 0; b < 4; b++) {
+      for (let b = 0; b < MAGIC_NUM.BLOCKS; b++) {
         c =
           startC +
           this.g.config.pieces[this.nextPieces[0]].orientations[1][b][0] -
@@ -177,7 +182,7 @@ export default class player {
   }
 
   movePiece(d) {
-    if (!this.collides(d, 0, 0)) {
+    if (!this.collides(d, 0)) {
       this.fallingPiece.c += d;
       if (this.g.mp.session > -1) {
         this.g.mp.sendFPState();
@@ -185,16 +190,13 @@ export default class player {
     }
   }
 
-  rotatePiece(update) {
-    if (typeof update == 'undefined') {
-      update = true;
-    }
+  rotatePiece(update = true) {
     let collides = false;
     let newPosition = this.fallingPiece.position + 1;
-    if (newPosition > 4) {
+    if (newPosition > MAGIC_NUM.ORIENTATIONS) {
       newPosition = 1;
     }
-    for (let c = 0; c >= -4; c--) {
+    for (let c = 0; c >= -MAGIC_NUM.ORIENTATIONS; c--) {
       let xAdjust = c;
       collides = this.collides(xAdjust, 0, newPosition);
       if (update && !collides) {
@@ -209,10 +211,7 @@ export default class player {
     return newPosition;
   }
 
-  collides(cAdjust, rAdjust, oAdjust, type) {
-    if (typeof oAdjust == 'undefined' || oAdjust == 0) {
-      oAdjust = this.fallingPiece.position;
-    }
+  collides(cAdjust, rAdjust, oAdjust = this.fallingPiece.position, type) {
     let collidesWith = false;
     let tmpC = -1;
     let tmpR = -1;
@@ -232,7 +231,7 @@ export default class player {
         tmpC < this.g.config.hTiles &&
         tmpR > -1 &&
         tmpR < this.g.config.vTiles &&
-        this.grid[tmpR][tmpC] != false
+        this.grid[tmpR][tmpC] !== 0
       ) {
         collidesWith = 'bottom';
       }
@@ -257,12 +256,15 @@ export default class player {
     let r = 0;
     let c = 0;
     const blocks = [];
-    for (let b = 0; b < 4; b++) {
+    for (let b = 0; b < MAGIC_NUM.BLOCKS; b++) {
       c = fp.c + this.g.config.pieces[t].orientations[p][b][0] - 1;
       r = fp.r + this.g.config.pieces[t].orientations[p][b][1] - 1;
-      blocks[b] = { r: r, c: c };
+      blocks[b] = { 
+        r,
+        c 
+      };
     }
-    return [blocks[0], blocks[1], blocks[2], blocks[3]];
+    return blocks;
   }
 
   handleGridChange() {
@@ -288,19 +290,25 @@ export default class player {
       const r = parseInt(bPair[0]);
       const c = parseInt(bPair[1]);
       for (let l = 0; l < lines.length; l++) {
-        if (lines[l] == r) {
-          return { r: r, c: c };
+        if (lines[l] === r) {
+          return {
+            r,
+            c 
+          };
         }
       }
     }
-    return { r: -1, c: -1 };
+    return {
+      r: -1,
+      c: -1 
+    };
   }
 
   placePiece() {
     if (!this.fallingPiece.placed) {
       this.placedBlocks = {};
       const blocks = this.getFallingBlocks();
-      for (let b = 0; b < 4; b++) {
+      for (let b = 0; b < MAGIC_NUM.BLOCKS; b++) {
         this.grid[blocks[b].r][blocks[b].c] = parseInt(this.fallingPiece.type);
         this.placedBlocks[blocks[b].r + ':' + blocks[b].c] =
           new Date().getTime() + this.g.config.dropDelay;
@@ -342,7 +350,7 @@ export default class player {
             let tmpVal = this.grid[r][c];
             this.grid[r][c] = 0;
             this.grid[r + 1][c] = tmpVal;
-            if (typeof this.special[r + ':' + c] != 'undefined') {
+            if (typeof this.special[r + ':' + c] !== 'undefined') {
               this.special[r + 1 + ':' + c] = this.special[r + ':' + c];
               delete this.special[r + ':' + c];
             }
@@ -363,7 +371,9 @@ export default class player {
       }
     }
     if (isCleared && this.okForClearBonus) {
-      this.adjustScore(this.g.config.clearBonus, { text: 'all clear' });
+      this.adjustScore(this.g.config.clearBonus, {
+        text: 'all clear' 
+      });
     }
     this.linesToClear = [];
     if (this.g.mp.session > -1) {
@@ -375,11 +385,15 @@ export default class player {
   clearLines(lines) {
     const msg = this.g.strings.linesClearedX.replace('{lines}', lines.length);
     const hotPiece = this.getHotPiece(lines);
-    if (lines.length == 4) {
-      this.adjustScore(800, { text: msg, r: hotPiece.r, c: hotPiece.c });
+    if (lines.length === MAGIC_NUM.BLOCKS) {
+      this.adjustScore(MAGIC_NUM.POINTS_MAX_LINES, {
+        text: msg,
+        r: hotPiece.r,
+        c: hotPiece.c 
+      });
       this.chainCount++;
       if (this.chainCount > 1) {
-        this.adjustScore(800 * this.chainCount, {
+        this.adjustScore(MAGIC_NUM.POINTS_MAX_LINES * this.chainCount, {
           text: this.g.strings.istitChain,
           r: hotPiece.r,
           c: hotPiece.c
@@ -387,7 +401,7 @@ export default class player {
       }
     } else {
       this.chainCount = 0;
-      this.adjustScore(lines.length * 100, {
+      this.adjustScore(lines.length * MAGIC_NUM.POINTS_LINE, {
         text: msg,
         r: hotPiece.r,
         c: hotPiece.c
@@ -396,22 +410,24 @@ export default class player {
     for (let i = 0; i < lines.length; i++) {
       for (let s in this.special) {
         for (let c = 0; c < this.g.config.hTiles; c++) {
-          if (typeof this.special[lines[i] + ':' + c] != 'undefined') {
+          if (typeof this.special[lines[i] + ':' + c] !== 'undefined') {
             delete this.special[lines[i] + ':' + c];
             this.adjustScore(
               this.g.config.specialBonus,
-              { text: this.g.strings.goldenBlock },
+              {
+                text: this.g.strings.goldenBlock 
+              },
               false
             );
           }
         }
       }
     }
-    if (typeof this.g.sounds.clearLine != 'undefined') {
+    if (typeof this.g.sounds.clearLine !== 'undefined') {
       this.g.sounds.clearLine.currentTime = 0;
       this.g.sounds.clearLine.play();
     }
-    if (typeof this.g.sounds['lines' + lines.length] != 'undefined') {
+    if (typeof this.g.sounds['lines' + lines.length] !== 'undefined') {
       this.g.sounds['lines' + lines.length].currentTime = 0;
       this.g.sounds['lines' + lines.length].play();
     }
@@ -423,7 +439,7 @@ export default class player {
 
   getLines(num) {
     this.linesToGet += num;
-    if (typeof this.sounds.newLine != 'undefined') {
+    if (typeof this.sounds.newLine !== 'undefined') {
       this.sounds.newLine.currentTime = 0;
       this.sounds.newLine.play();
     }
@@ -442,7 +458,7 @@ export default class player {
       }
       const empty = this.g.random(1, this.g.config.hTiles);
       for (let li = 0; li < this.g.config.hTiles; li++) {
-        if (li != empty) {
+        if (li !== empty) {
           this.grid[this.g.config.vTiles-1][li] = 8;
         }
       }
@@ -461,10 +477,7 @@ export default class player {
     return this.fallTime;
   }
 
-  adjustScore(p, msg, giveSpeedBonus) {
-    if (typeof giveSpeedBonus == 'undefined') {
-      giveSpeedBonus = true;
-    }
+  adjustScore(p, msg, giveSpeedBonus = true) {
     const now = new Date().getTime();
     this.animateTo.score = now + this.g.config.animateCycle.score;
     const levelBonus = Math.round(
@@ -472,7 +485,7 @@ export default class player {
     );
     let speedBonus = 0;
     if (this.lastScoreTime > 0) {
-      const dif = Math.floor((now - this.lastScoreTime) / 1000);
+      const dif = Math.floor((now - this.lastScoreTime) / MAGIC_NUM.MILISECONDS);
       if (dif <= this.g.config.lastScoreThreshold) {
         const remainder = this.g.config.lastScoreThreshold - dif;
         speedBonus = Math.round(
@@ -488,7 +501,7 @@ export default class player {
     let lastLevel = 1;
     for (let key in this.g.levels) {
       if (this.score < this.g.levels[key]) {
-        if (lastLevel != this.level) {
+        if (lastLevel !== this.level) {
           this.setLevel(lastLevel);
         }
         break;
@@ -533,10 +546,11 @@ export default class player {
     if (h >= this.g.config.vTiles) {
       h = this.g.config.vTiles;
     }
-    if (this.fallingPiece.lastR != h) {
+    if (this.fallingPiece.lastR !== h) {
       yAdjust = h - this.fallingPiece.lastR;
       adjust = false;
-      if (this.collides(0, 1, 0) === false) {
+      const collision = this.collides(0, 1);
+      if (collision === false) {
         validYAdjust = true;
         yAdjustDifFromExp = yAdjust - 1;
       }
@@ -548,7 +562,7 @@ export default class player {
     }
     if (adjust) {
       let sendState = false;
-      if (h - yAdjustDifFromExp != this.fallingPiece.lastR) {
+      if (h - yAdjustDifFromExp !== this.fallingPiece.lastR) {
         sendState = true;
       }
       this.fallingPiece.r = h - yAdjustDifFromExp;
@@ -585,12 +599,11 @@ export default class player {
       this.holdPiece = this.fallingPiece.type;
       this.dropPiece();
     } else {
-      const cFP = this.fallingPiece.type;
       const cHP = this.holdPiece;
-      this.holdPiece = cFP;
-      for (let c = 0; c >= -4; c--) {
+      this.holdPiece = this.fallingPiece.type;
+      for (let c = 0; c >= -MAGIC_NUM.BLOCKS; c--) {
         let xAdjust = c;
-        let collides = this.collides(c, 0, 0, cHP);
+        let collides = this.collides(c, 0, this.fallingPiece.position, this.fallingPiece.type);
         if (!collides) {
           this.fallingPiece.c += xAdjust;
           break;
@@ -601,7 +614,7 @@ export default class player {
   }
 
   addNextPiece() {
-    if (this.nextPieces.length < 3) {
+    if (this.nextPieces.length < MAGIC_NUM.NEXT_PIECES) {
       this.nextPieces.push(this.g.randomPiece());
     }
   }
@@ -622,16 +635,16 @@ export default class player {
 
   addScoreMessage(text, r, c) {
     this.messages.push({
-      text: text,
+      text,
       expiration: this.g.runTime + this.g.config.scoreMsgTime,
-      r: r,
-      c: c
+      r,
+      c
     });
   }
 
   rowIsCleared(r) {
     for (let i = 0; i < this.linesToClear.length; i++) {
-      if (this.linesToClear[i] == r) {
+      if (this.linesToClear[i] === r) {
         return true;
       }
     }
@@ -653,8 +666,8 @@ export default class player {
     for (let r = low; r < this.g.config.vTiles; r++) {
       chance += perRow;
       const percent = chance / this.g.config.vTiles;
-      const rand = this.g.random(1, 100);
-      if (rand <= percent * 100) {
+      const rand = this.g.random(1, MAGIC_NUM.PERCENT);
+      if (rand <= percent * MAGIC_NUM.PERCENT) {
         rows.push(r);
       }
     }
