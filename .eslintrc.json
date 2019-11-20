@@ -10,6 +10,7 @@
     "browser": true
   },
   "rules": {
+    "indent": [2, 2],
     "constructor-super": 2,
     "for-direction": 2,
     "getter-return": 2,
@@ -91,7 +92,12 @@
     "no-unused-expressions": 2,
     "no-use-before-define": 2,
     "no-var": 2,
-    "object-curly-newline": 2,
+    "object-curly-newline": [
+      2,
+      { 
+        "minProperties": 1
+      }
+    ],
     "object-curly-spacing": [
       2,
       "always"
