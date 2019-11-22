@@ -1,3 +1,5 @@
+import MAGIC_NUM from './magicNum.js';
+
 export default class render {
   constructor(g) {
     this.g = g;
@@ -14,24 +16,23 @@ export default class render {
     this.resize();
     this.pWidth = this.g.config.hTiles * this.g.config.tile;
     this.pHeight = this.g.config.vTiles * this.g.config.tile;
-    this.pStartX = this.g.config.tile / 2;
-    this.pStartY = this.g.config.tile / 2;
+    this.pStartX = this.g.config.tile * MAGIC_NUM.HALF;
+    this.pStartY = this.g.config.tile * MAGIC_NUM.HALF;
     this.pEndX = this.pStartX + this.pWidth;
     this.pEndY = this.pStaryY + this.pHeight;
     this.oStartX = this.defWidth;
     this.oStartY = this.pStartY;
-    this.mW = this.defWidth - this.pEndX;
     this.mW = this.g.config.tile * 6;
-    this.mStartX = this.pEndX + this.g.config.tile / 2;
-    this.mStartY = this.g.config.tile / 2;
-    this.mEndX = this.defWidth - this.g.config.tile / 2;
-    this.npStartX = this.pEndX + this.g.config.tile + this.g.config.tile / 2;
-    this.npStartY = this.pStartY + this.g.config.tile / 2;
+    this.mStartX = this.pEndX + this.g.config.tile * MAGIC_NUM.HALF;
+    this.mStartY = this.g.config.tile * MAGIC_NUM.HALF;
+    this.mEndX = this.defWidth - this.g.config.tile * MAGIC_NUM.HALF;
+    this.npStartX = this.pEndX + this.g.config.tile + this.g.config.tile * MAGIC_NUM.HALF;
+    this.npStartY = this.pStartY + this.g.config.tile * MAGIC_NUM.HALF;
     this.npH = this.mW + this.g.config.tile * 2;
     this.hStartY = this.npStartY + this.mW + this.g.config.tile * 2;
     this.scoreX =
-      this.pEndX + this.g.config.tile * 0.5 + this.g.config.tile * 3;
-    this.scoreY = this.defHeight - this.g.config.tile * 0.5;
+      this.pEndX + this.g.config.tile * MAGIC_NUM.HALF + this.g.config.tile * 3;
+    this.scoreY = this.defHeight - this.g.config.tile * MAGIC_NUM.HALF;
     Object.keys(this.g.config.theme.font).forEach(font => {
       this.font[font] = {
         size:
@@ -58,11 +59,11 @@ export default class render {
     this.levelX = this.pEndX + this.g.config.tile * 2;
     this.levelY = this.defHeight - 100;
     this.timeX =
-      this.scoreX - this.textWidth('00:00', this.font.time.string()) / 2;
+      this.scoreX - this.textWidth('00:00', this.font.time.string()) * MAGIC_NUM.HALF;
     this.timeY = this.defHeight - 5 * this.g.config.tile;
     this.msgH = this.font.scoreMsgPoints.size * 1.25;
     this.hScoresX = this.pStartX + this.pWidth * 0.1;
-    this.hScoresY = this.pStartY + this.pHeight * 0.5;
+    this.hScoresY = this.pStartY + this.pHeight * MAGIC_NUM.HALF;
     this.hScoresW = this.pWidth * 0.8;
     this.sysYDef =
       this.pStartY + this.g.config.tile * (this.g.config.vTiles * 0.4);
@@ -75,12 +76,12 @@ export default class render {
     this.lbY = this.lbYTop;
     this.lbRankX = 0;
     this.lbScoreX = this.pWidth - this.g.config.tile;
-    this.lbLeftXDef = this.pStartX + this.g.config.tile * 0.5 - this.pWidth;
-    this.lbLeftXEnd = this.pStartX + this.g.config.tile * 0.5;
+    this.lbLeftXDef = this.pStartX + this.g.config.tile * MAGIC_NUM.HALF - this.pWidth;
+    this.lbLeftXEnd = this.pStartX + this.g.config.tile * MAGIC_NUM.HALF;
     this.lbLeftXDif = this.lbLeftXEnd - this.lbLeftXDef;
     this.lbLeftX = this.lbLeftXDef;
-    this.lbRightXDef = this.pStartX - this.g.config.tile * 0.5 + this.pWidth;
-    this.lbRightXEnd = this.pStartX + this.g.config.tile * 0.5;
+    this.lbRightXDef = this.pStartX - this.g.config.tile * MAGIC_NUM.HALF + this.pWidth;
+    this.lbRightXEnd = this.pStartX + this.g.config.tile * MAGIC_NUM.HALF;
     this.lbRightXDif = this.lbRightXEnd - this.lbRightXDef;
     this.lbRightX = this.lbRightXDef;
     this.lbWidth = this.lbRightXDef - this.lbLeftXEnd;
@@ -94,7 +95,7 @@ export default class render {
     this.defWidth =
       this.g.config.hTiles * this.g.config.tile +
       this.g.config.tile * 6 +
-      (this.g.config.tile / 2) * 3;
+      (this.g.config.tile * MAGIC_NUM.HALF) * 3;
     this.defHeight =
       this.g.config.vTiles * this.g.config.tile + this.g.config.tile;
   }
@@ -119,7 +120,7 @@ export default class render {
     this.canvas.width =
       this.defWidth +
       this.g.config.hTiles * this.g.config.tile +
-      this.g.config.tile / 2;
+      this.g.config.tile * MAGIC_NUM.HALF;
     this.canvas.height = this.defHeight;
     this.mpMode = true;
   }
@@ -180,7 +181,7 @@ export default class render {
     } else if (this.g.wait) {
       this.drawSystemMessage(this.g.strings.pressSpaceToBegin);
     }
-    if (this.g.mp.wait == true) {
+    if (this.g.mp.wait === true) {
       this.drawLoader(now);
       if (this.g.mp.countingDown) {
         this.drawCountDown(now);
@@ -227,7 +228,7 @@ export default class render {
     this.ctx.shadowOffsetY = 2;
     this.ctx.textBaseline = 'top';
     const pauseX =
-      this.pWidth / 2 - this.ctx.measureText(msg).width / 2 + this.g.halfTile;
+      this.pWidth * MAGIC_NUM.HALF - this.ctx.measureText(msg).width * MAGIC_NUM.HALF + this.g.halfTile;
     this.ctx.fillText(msg, pauseX, this.sysY);
     this.ctx.restore();
   }
@@ -326,16 +327,16 @@ export default class render {
     this.ctx.shadowOffsetY = 2;
     this.ctx.fillText(
       this.g.strings.next,
-      this.mStartX + this.g.halfTile * 0.5,
-      this.pStartY + this.g.halfTile * 0.5
+      this.mStartX + this.g.halfTile * MAGIC_NUM.HALF,
+      this.pStartY + this.g.halfTile * MAGIC_NUM.HALF
     );
     this.ctx.restore();
     if (!this.g.mp.wait && this.g.player.nextPieces.length > 0) {
       const pW = this.g.getPieceDimension(this.g.player.nextPieces[0], 1, 0);
       const pH = this.g.getPieceDimension(this.g.player.nextPieces[0], 1, 1);
-      let npStartX = this.mStartX + (this.mW - pW * this.g.config.tile) / 2;
-      let npStartY = this.mStartY + (this.mW - pH * this.g.config.tile) / 2;
-      for (let b = 0; b < 4; b++) {
+      let npStartX = this.mStartX + (this.mW - pW * this.g.config.tile) * MAGIC_NUM.HALF;
+      let npStartY = this.mStartY + (this.mW - pH * this.g.config.tile) * MAGIC_NUM.HALF;
+      for (let b = 0; b < MAGIC_NUM.BLOCKS; b++) {
         this.drawBlock(
           this.g.player.nextPieces[0],
           npStartX +
@@ -357,18 +358,18 @@ export default class render {
       const npStartX2 =
         this.g.config.tile * (this.g.config.hTiles + 2) +
         this.mStartX +
-        (this.mW - pW * this.g.config.tile) / 2 -
-        this.g.config.tile * 0.5;
+        (this.mW - pW * this.g.config.tile) * MAGIC_NUM.HALF -
+        this.g.config.tile * MAGIC_NUM.HALF;
       const npStartX3 =
         this.g.config.tile * (this.g.config.hTiles + 2) +
         this.mStartX +
-        (this.mW - pW * this.g.config.tile) / 2 +
+        (this.mW - pW * this.g.config.tile) * MAGIC_NUM.HALF +
         this.g.config.tile * 4;
       npStartY =
         this.mStartY +
-        (this.mW - pH * this.g.config.tile) / 2 +
+        (this.mW - pH * this.g.config.tile) * MAGIC_NUM.HALF +
         this.g.config.tile * 6;
-      for (let b = 0; b < 4; b++) {
+      for (let b = 0; b < MAGIC_NUM.BLOCKS; b++) {
         this.drawBlock(
           this.g.player.nextPieces[1],
           npStartX2 +
@@ -389,7 +390,7 @@ export default class render {
           true
         );
       }
-      for (let b = 0; b < 4; b++) {
+      for (let b = 0; b < MAGIC_NUM.BLOCKS; b++) {
         this.drawBlock(
           this.g.player.nextPieces[2],
           npStartX3 +
@@ -428,16 +429,16 @@ export default class render {
     this.ctx.shadowOffsetY = 2;
     this.ctx.fillText(
       this.g.strings.hold,
-      this.mStartX + this.g.halfTile * 0.5,
-      this.hStartY + this.g.halfTile * 0.5
+      this.mStartX + this.g.halfTile * MAGIC_NUM.HALF,
+      this.hStartY + this.g.halfTile * MAGIC_NUM.HALF
     );
     this.ctx.restore();
     if (!this.g.mp.wait && this.g.player.holdPiece) {
       const pW = this.g.getPieceDimension(this.g.player.holdPiece, 1, 0);
       const pH = this.g.getPieceDimension(this.g.player.holdPiece, 1, 1);
-      const npStartX = this.mStartX + (this.mW - pW * this.g.config.tile) / 2;
-      const npStartY = this.hStartY + (this.mW - pH * this.g.config.tile) / 2;
-      for (let b = 0; b < 4; b++) {
+      const npStartX = this.mStartX + (this.mW - pW * this.g.config.tile) * MAGIC_NUM.HALF;
+      const npStartY = this.hStartY + (this.mW - pH * this.g.config.tile) * MAGIC_NUM.HALF;
+      for (let b = 0; b < MAGIC_NUM.BLOCKS; b++) {
         this.drawBlock(
           this.g.player.holdPiece,
           npStartX +
@@ -462,9 +463,9 @@ export default class render {
     if (this.g.player.animateTo.score > now) {
       const dif = this.g.player.animateTo.score - now;
       const percent = Math.round(
-        (dif / this.g.config.animateCycle.score) * 100
+        (dif / this.g.config.animateCycle.score) * MAGIC_NUM.PERCENT
       );
-      const counter = percent * (Math.PI / 100);
+      const counter = percent * (Math.PI / MAGIC_NUM.PERCENT);
       const v = (Math.sin(counter) * this.scoreDif) | 0;
       fontSize = this.font.scoreNormal.size + v;
     }
@@ -489,8 +490,8 @@ export default class render {
       textDim.actualBoundingBoxAscent + textDim.actualBoundingBoxDescent;
     this.ctx.fillText(
       this.g.player.score,
-      this.scoreX - textDim.width / 2,
-      rY + (rH - textHeight) / 2
+      this.scoreX - textDim.width * MAGIC_NUM.HALF,
+      rY + (rH - textHeight) * MAGIC_NUM.HALF
     );
     this.ctx.restore();
   }
@@ -518,8 +519,8 @@ export default class render {
       textDim.actualBoundingBoxAscent + textDim.actualBoundingBoxDescent;
     this.ctx.fillText(
       str,
-      this.scoreX - textDim.width / 2,
-      rY + (rH - textHeight) / 2
+      this.scoreX - textDim.width * MAGIC_NUM.HALF,
+      rY + (rH - textHeight) * MAGIC_NUM.HALF
     );
     this.ctx.restore();
   }
@@ -528,10 +529,10 @@ export default class render {
     const fTime = this.g.parseMiliSeconds(this.g.runTime);
     let minutes = fTime[2];
     let seconds = fTime[3];
-    if (String(minutes).length == 1) {
+    if (String(minutes).length === 1) {
       minutes = '0' + minutes;
     }
-    if (String(seconds).length == 1) {
+    if (String(seconds).length === 1) {
       seconds = '0' + seconds;
     }
     const time = minutes + ':' + seconds;
@@ -560,13 +561,13 @@ export default class render {
     this.ctx.lineWidth = 1;
     for (let v = 1; v <= this.g.config.vTiles - 1; v++) {
       let y = this.g.config.tile * v + sy;
-      this.ctx.moveTo(sx, y - 0.5);
-      this.ctx.lineTo(sx + this.pWidth, y - 0.5);
+      this.ctx.moveTo(sx, y - MAGIC_NUM.HALF);
+      this.ctx.lineTo(sx + this.pWidth, y - MAGIC_NUM.HALF);
     }
     for (let h = 1; h <= this.g.config.hTiles - 1; h++) {
       let x = this.g.config.tile * h + sx;
-      this.ctx.moveTo(x - 0.5, sy);
-      this.ctx.lineTo(x - 0.5, sy + this.pHeight);
+      this.ctx.moveTo(x - MAGIC_NUM.HALF, sy);
+      this.ctx.lineTo(x - MAGIC_NUM.HALF, sy + this.pHeight);
     }
     this.ctx.stroke();
     this.ctx.closePath();
@@ -582,7 +583,7 @@ export default class render {
       sX = this.oStartX;
       sY = this.oStartY;
     }
-    if (fp.type == -1) {
+    if (fp.type === -1) {
       return;
     }
     this.ctx.save();
@@ -628,7 +629,7 @@ export default class render {
     for (let c = 0; c < this.g.config.hTiles; c++) {
       for (let r = 0; r < this.g.config.vTiles; r++) {
         let a = 1;
-        if (grid[r][c] != false) {
+        if (grid[r][c] !== 0) {
           let offset = this.g.getPieceOffset(r, c);
           x = offset[1];
           y = offset[0];
@@ -658,8 +659,8 @@ export default class render {
             let percent = dif / this.g.config.dropDelay;
             p = percent;
             if (p > 0) {
-              percent = ((new Date().getTime() % 1000) / 1000) * 100;
-              let counter = percent * (Math.PI / 100);
+              percent = ((new Date().getTime() % MAGIC_NUM.MILISECONDS) / MAGIC_NUM.MILISECONDS) * MAGIC_NUM.PERCENT;
+              let counter = percent * (Math.PI / MAGIC_NUM.PERCENT);
               let ver = (Math.sin(counter) * 4) | 0;
               x -= ver;
               y -= ver;
@@ -681,11 +682,11 @@ export default class render {
   }
 
   drawLoader() {
-    const percent = (new Date().getTime() % 1000) / 1000;
+    const percent = (new Date().getTime() % MAGIC_NUM.MILISECONDS) / MAGIC_NUM.MILISECONDS;
     const x = 450,
       y = 110,
       r = 50;
-    const start = percent * 360 * (Math.PI / 180);
+    const start = percent * MAGIC_NUM.CIRCLE * (Math.PI / (MAGIC_NUM.CIRCLE*MAGIC_NUM.HALF));
     const end = start - Math.PI * 1.5;
     this.ctx.save();
     this.ctx.beginPath();
@@ -699,8 +700,8 @@ export default class render {
   }
 
   drawCountDown(now) {
-    const remaining = Math.ceil((this.g.mp.countUntil - now) / 1000);
-    if (remaining != this.g.lastCountDown) {
+    const remaining = Math.ceil((this.g.mp.countUntil - now) / MAGIC_NUM.MILISECONDS);
+    if (remaining !== this.g.lastCountDown) {
       if (typeof this.g.sounds.countDown !== 'undefined') {
         this.g.sounds.countDown.currentTime = 0;
         this.g.sounds.countDown.play();
@@ -715,20 +716,14 @@ export default class render {
     this.ctx.restore();
   }
 
-  drawBlock(t, x, y, a, p, s) {
-    if (typeof a === 'undefined') {
-      a = 1;
-    }
-    if (typeof p === 'undefined') {
-      p = 0;
-    }
+  drawBlock(t, x, y, a = 1, p = 0, s) {
     if (y < this.g.pStartX) {
       return;
     }
     const color = this.g.config.pieces[t].color;
     this.ctx.save();
     if (s) {
-      this.ctx.scale(0.5, 0.5);
+      this.ctx.scale(MAGIC_NUM.HALF, MAGIC_NUM.HALF);
     }
     this.ctx.globalAlpha = a;
     this.ctx.fillStyle =
@@ -791,8 +786,8 @@ export default class render {
 
   drawSpecialEffects() {
     this.ctx.save();
-    const percent = (((this.g.runTime / 1000) % 2) / 2) * 100;
-    const counter = percent * (Math.PI / 100);
+    const percent = (((this.g.runTime / MAGIC_NUM.MILISECONDS) % 2) * MAGIC_NUM.HALF) * MAGIC_NUM.PERCENT;
+    const counter = percent * (Math.PI / MAGIC_NUM.PERCENT);
     const v = (Math.sin(counter) * (this.g.config.tile * 0.75)) | 0;
     const defXOffset = 0;
     const defYOffset = 0;
@@ -833,16 +828,16 @@ export default class render {
         yOffset = defYOffset;
       for (let i = 0; i < 10; i++) {
         this.ctx.beginPath();
-        let xFac = Math.round((Math.PI * i * 1000) % 100);
-        let xCounter = xFac * (Math.PI / 100);
+        let xFac = Math.round((Math.PI * i * MAGIC_NUM.MILISECONDS) % MAGIC_NUM.PERCENT);
+        let xCounter = xFac * (Math.PI / MAGIC_NUM.PERCENT);
         xOffset = defXOffset + ((Math.sin(xCounter) * this.g.halfTile) | 0);
-        let yFac = Math.round((Math.PI * i * 1000000) % 100);
-        let yCounter = yFac * (Math.PI / 100);
+        let yFac = Math.round((Math.PI * i * 1000000) % MAGIC_NUM.PERCENT);
+        let yCounter = yFac * (Math.PI / MAGIC_NUM.PERCENT);
         yOffset = defYOffset + ((Math.sin(yCounter) * this.g.halfTile) | 0);
         this.ctx.globalCompositeOperation = 'xor';
         this.ctx.arc(
-          x + this.g.xSpecialJitter + (this.g.halfTile / 2 - xOffset),
-          y + this.g.ySpecialJitter + (this.g.halfTile / 2 - yOffset),
+          x + this.g.xSpecialJitter + (this.g.halfTile * MAGIC_NUM.HALF - xOffset),
+          y + this.g.ySpecialJitter + (this.g.halfTile * MAGIC_NUM.HALF - yOffset),
           0.2 + v * 0.7,
           0,
           2 * Math.PI
@@ -869,12 +864,12 @@ export default class render {
   drawGhost() {
     const ghost = this.g.getGhostBlocks();
     const fBlocks = this.g.player.getFallingBlocks();
-    let tmpAlpha = this.g.config.ghostAlpha * 100;
-    const percent = ((this.g.runTime % 1000) / 1000) * 100;
-    const counter = percent * (Math.PI / 100);
+    let tmpAlpha = this.g.config.ghostAlpha * MAGIC_NUM.PERCENT;
+    const percent = ((this.g.runTime % MAGIC_NUM.MILISECONDS) / MAGIC_NUM.MILISECONDS) * MAGIC_NUM.PERCENT;
+    const counter = percent * (Math.PI / MAGIC_NUM.PERCENT);
     const v = (Math.sin(counter) * (tmpAlpha * 1)) | 0;
-    tmpAlpha = tmpAlpha * 0.5 + v * 0.5;
-    const alpha = tmpAlpha / 100;
+    tmpAlpha = tmpAlpha * MAGIC_NUM.HALF + v * MAGIC_NUM.HALF;
+    const alpha = tmpAlpha / MAGIC_NUM.PERCENT;
     if (fBlocks.length > 0 && fBlocks[0].r < ghost[0].r) {
       for (let i = 0; i < ghost.length; i++) {
         let o = this.g.getPieceOffset(ghost[i].r, ghost[i].c);
@@ -900,7 +895,7 @@ export default class render {
         (this.g.config.scoreMsgTime - (msg.expiration - this.g.runTime)) /
         this.g.config.scoreMsgTime;
       offset += percent * this.g.config.scoreMsgDrift;
-      let a = Math.sin((1 - percent) * 100 * (Math.PI / 100)) * 2;
+      let a = Math.sin((1 - percent) * MAGIC_NUM.PERCENT * (Math.PI / MAGIC_NUM.PERCENT)) * 2;
       if (a > 1) {
         a = 1;
       } else if (a < 0) {
@@ -946,10 +941,7 @@ export default class render {
     };
   }
 
-  textWidth(text, font) {
-    if (typeof font === 'undefined') {
-      font = this.ctx.font;
-    }
+  textWidth(text, font = this.ctx.font) {
     this.ctx.save();
     this.ctx.font = font;
     const width = this.ctx.measureText(text).width;
@@ -971,7 +963,7 @@ export default class render {
       let rank = '',
         pad = '000',
         score = '';
-      for (let i = 0; i < 25; i++) {
+      for (let i = 0; i < MAGIC_NUM.LEADERBOARD; i++) {
         let r = this.g.leaderBoard.records[i];
         if (r) {
           if (i % 2) {
