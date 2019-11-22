@@ -37,6 +37,7 @@ export default class player {
     this.nextSpecialTime = 0;
     this.nextSpecialJitterTime = 0;
     this.lastRank = -1;
+    this.input = -1;
     this.nextPieces = [
       this.g.randomPiece(),
       this.g.randomPiece(),
@@ -102,6 +103,11 @@ export default class player {
         this.grid[r][c] = 0;
       }
     }
+  }
+
+  registerInput(input) {
+    this.input = input;
+    this.g.input.register(input, this);
   }
 
   resetFallingPiece() {

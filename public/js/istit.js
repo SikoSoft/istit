@@ -35,13 +35,15 @@ export default class istit {
     this.leaderBoard = new leaderBoard(this);
     this.render = new render(this);
     this.viewport = new viewport(this);
-    this.registerPlayer();
+    this.registerPlayer(0);
     this.player = this.players[0];
     this.run();
   }
 
-  registerPlayer() {
-    this.players.push(new player(this));
+  registerPlayer(inputDevice = 0) {
+    const p = new player(this);
+    p.registerInput(inputDevice);
+    this.players.push(p);
     return this.players.length - 1;
   }
 

@@ -1,3 +1,5 @@
+import MAGIC_NUM from './magicNum.js';
+
 export default class input {
   constructor(g) {
     this.g = g;
@@ -42,23 +44,23 @@ export default class input {
         pause: () => {
           this.g.pause();
         },
-        drop: () => {
-          this.g.player.placeFallingPieceAtBottom();
+        drop: (player) => {
+          player.placeFallingPieceAtBottom();
         },
-        left: () => {
-          this.g.player.movePiece(-1);
+        left: (player) => {
+          player.movePiece(-1);
         },
-        rotate: () => {
-          this.g.player.rotatePiece();
+        rotate: (player) => {
+          player.rotatePiece();
         },
-        right: () => {
-          this.g.player.movePiece(1);
+        right: (player) => {
+          player.movePiece(1);
         },
-        down: () => {
-          this.g.player.adjustFallingHeightOffset();
+        down: (player) => {
+          player.adjustFallingHeightOffset();
         },
-        hold: () => {
-          this.g.player.toggleHold();
+        hold: (player) => {
+          player.toggleHold();
         }
       },
       gameplayLocked: {},
@@ -69,8 +71,8 @@ export default class input {
       }
     };
     this.lastButtonState = {};
-    this.profilesAvailable = 1;
-    this.profiles = [];
+    this.devices = [];
+    this.setupDevice(MAGIC_NUM.DEVICE_TYPE_KEYBOARD);
   }
 
   init() {
@@ -112,6 +114,20 @@ export default class input {
     }
   }
 
+  setupDevice(type) {
+    this.devices.push({
+      type,
+      player: false
+    });
+    return this.devices.length - 1;
+  }
+
+  register(device, player) {
+    if (this.devices[device] && this.devices[device].player === false) {
+      this.devices[device].player = player;
+    }
+  }
+
   isLocked() {
     const now = new Date().getTime();
     if (now < this.g.player.animateTo.lineBreak || now < this.g.player.animateTo.lineAdd) {
@@ -141,39 +157,41 @@ export default class input {
     } else {
       state = 'gameplay';
     }
-    if (this.gamePadDetected && this.useGamePad) {
-      const gamePad = navigator.getGamepads()[0];
-      const buttonState = {};
-      Object.keys(this.buttonMap).forEach(button => {
-        const isPressed = gamePad.buttons[this.buttonMap[button]].pressed;
-        buttonState[button] = isPressed;
-        if (this.lastButtonState[button] && !isPressed) {
-          this.lastFloodWait[button] = 0;
-        }
-        if (isPressed && this.floodSafe(button)) {
-          if (typeof this.stateActions[state][button] === 'function') {
-            this.stateActions[state][button]();
+    this.devices.forEach(device => {
+      if (device.type === MAGIC_NUM.DEVICE_TYPE_XBOX360 && this.gamePadDetected && this.useGamePad) {
+        const gamePad = navigator.getGamepads()[0];
+        const buttonState = {};
+        Object.keys(this.buttonMap).forEach(button => {
+          const isPressed = gamePad.buttons[this.buttonMap[button]].pressed;
+          buttonState[button] = isPressed;
+          if (this.lastButtonState[button] && !isPressed) {
+            this.lastFloodWait[button] = 0;
           }
-          if (typeof this.stateActions[state]._all === 'function') {
-            this.stateActions[state]._all();
+          if (isPressed && this.floodSafe(button)) {
+            if (typeof this.stateActions[state][button] === 'function') {
+              this.stateActions[state][button](device.player);
+            }
+            if (typeof this.stateActions[state]._all === 'function') {
+              this.stateActions[state]._all(device.player);
+            }
+            this.setFloodTimer(button);
           }
-          this.setFloodTimer(button);
-        }
-      });
-      this.lastButtonState = buttonState;
-    } else {
-      Object.keys(this.keyMap).forEach(key => {
-        if (this.keyState[this.keyMap[key]] && this.floodSafe(key)) {
-          if (typeof this.stateActions[state][key] === 'function') {
-            this.stateActions[state][key]();
+        });
+        this.lastButtonState = buttonState;
+      } else {
+        Object.keys(this.keyMap).forEach(key => {
+          if (this.keyState[this.keyMap[key]] && this.floodSafe(key)) {
+            if (typeof this.stateActions[state][key] === 'function') {
+              this.stateActions[state][key](device.player);
+            }
+            if (typeof this.stateActions[state]._all === 'function') {
+              this.stateActions[state]._all(device.player);
+            }
+            this.setFloodTimer(key);
           }
-          if (typeof this.stateActions[state]._all === 'function') {
-            this.stateActions[state]._all();
-          }
-          this.setFloodTimer(key);
-        }
-      });
-    }
+        });
+      }
+    });
   }
 
   floodSafe(key) {
