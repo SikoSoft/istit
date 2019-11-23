@@ -10,6 +10,8 @@ export default class render {
     this.mpMode = false;
     this.font = {};
     this.scaleRatio = 1;
+    this.doublePi = Math.PI * MAGIC_NUM.DOUBLE;
+    this.percentPi = Math.PI / MAGIC_NUM.PERCENT;
   }
 
   init() {
@@ -58,7 +60,7 @@ export default class render {
     });
     this.scoreDif = this.font.scoreLarge.size - this.font.scoreNormal.size;
     this.levelX = this.pEndX + this.g.config.tile * MAGIC_NUM.DOUBLE;
-    this.levelY = this.defHeight - 100;
+    this.levelY = this.defHeight - 200;
     this.timeX =
       this.scoreX - this.textWidth('00:00', this.font.time.string()) * MAGIC_NUM.HALF;
     this.timeY = this.defHeight - 5 * this.g.config.tile;
@@ -157,31 +159,7 @@ export default class render {
     this.drawTime();
     this.drawLevel();
     this.drawMessages();
-    if (this.g.paused) {
-      this.drawSystemMessage(this.g.strings.paused);
-    } else if (!this.g.mp.oppIsAlive) {
-      this.drawSystemMessage(this.g.strings.opponentDisconnected);
-    } else if (this.g.mp.wait) {
-      if (this.g.mp.countingDown) {
-        this.drawSystemMessage(this.g.strings.getReady);
-      } else if (this.g.mp.connected) {
-        this.drawSystemMessage(this.g.strings.waitingForPeer);
-      } else {
-        this.drawSystemMessage(this.g.strings.connectingToServer);
-      }
-    } else if (this.g.ended) {
-      if (this.g.mp.sessionEnded) {
-        if (this.g.mp.isWinner) {
-          this.drawSystemMessage(this.g.strings.youWin);
-        } else {
-          this.drawSystemMessage(this.g.strings.youLose);
-        }
-      } else {
-        this.drawSystemMessage(this.g.strings.gameOver);
-      }
-    } else if (this.g.wait) {
-      this.drawSystemMessage(this.g.strings.pressSpaceToBegin);
-    }
+    this.drawSystemMessages();
     if (this.g.mp.wait === true) {
       this.drawLoader(now);
       if (this.g.mp.countingDown) {
@@ -207,6 +185,34 @@ export default class render {
     }
   }
 
+  drawSystemMessages() {
+    if (this.g.paused) {
+      this.drawSystemMessage(this.g.strings.paused);
+    } else if (!this.g.mp.oppIsAlive) {
+      this.drawSystemMessage(this.g.strings.opponentDisconnected);
+    } else if (this.g.mp.wait) {
+      if (this.g.mp.countingDown) {
+        this.drawSystemMessage(this.g.strings.getReady);
+      } else if (this.g.mp.connected) {
+        this.drawSystemMessage(this.g.strings.waitingForPeer);
+      } else {
+        this.drawSystemMessage(this.g.strings.connectingToServer);
+      }
+    } else if (this.g.ended) {
+      if (this.g.mp.sessionEnded) {
+        if (this.g.mp.isWinner) {
+          this.drawSystemMessage(this.g.strings.youWin);
+        } else {
+          this.drawSystemMessage(this.g.strings.youLose);
+        }
+      } else {
+        this.drawSystemMessage(this.g.strings.gameOver);
+      }
+    } else if (this.g.wait) {
+      this.drawSystemMessage(this.g.strings.pressSpaceToBegin);
+    }
+  }
+
   drawSystemMessage(msg) {
     this.ctx.save();
     const grad = this.ctx.createLinearGradient(
@@ -223,10 +229,7 @@ export default class render {
     this.ctx.save();
     this.ctx.font = this.font.systemMessage.string();
     this.ctx.fillStyle = this.g.config.theme.systemMessage;
-    this.ctx.shadowColor = this.g.config.theme.systemMessageShadow;
-    this.ctx.shadowBlur = 0;
-    this.ctx.shadowOffsetX = 2;
-    this.ctx.shadowOffsetY = 2;
+    this.shadow(this.g.config.theme.systemMessageShadow, 0, 2, 2);
     this.ctx.textBaseline = 'top';
     const pauseX =
       this.pWidth * MAGIC_NUM.HALF - this.ctx.measureText(msg).width * MAGIC_NUM.HALF + this.halfTile;
@@ -322,10 +325,7 @@ export default class render {
     this.ctx.font = this.font.next.string();
     this.ctx.textBaseline = 'top';
     this.ctx.fillStyle = this.g.config.theme.nextLabel;
-    this.ctx.shadowColor = this.g.config.theme.nextLabelShadow;
-    this.ctx.shadowBlur = 0;
-    this.ctx.shadowOffsetX = 2;
-    this.ctx.shadowOffsetY = 2;
+    this.shadow(this.g.config.theme.nextLabelShadow, 0, 2, 2);
     this.ctx.fillText(
       this.g.strings.next,
       this.mStartX + this.halfTile * MAGIC_NUM.HALF,
@@ -424,10 +424,7 @@ export default class render {
     this.ctx.font = this.font.hold.string();
     this.ctx.textBaseline = 'top';
     this.ctx.fillStyle = this.g.config.theme.holdLabel;
-    this.ctx.shadowColor = this.g.config.theme.holdLabelShadow;
-    this.ctx.shadowBlur = 0;
-    this.ctx.shadowOffsetX = 2;
-    this.ctx.shadowOffsetY = 2;
+    this.shadow(this.g.config.theme.holdLabelShadow, 0, 2, 2);
     this.ctx.fillText(
       this.g.strings.hold,
       this.mStartX + this.halfTile * MAGIC_NUM.HALF,
@@ -466,7 +463,7 @@ export default class render {
       const percent = Math.round(
         (dif / this.g.config.animateCycle.score) * MAGIC_NUM.PERCENT
       );
-      const counter = percent * (Math.PI / MAGIC_NUM.PERCENT);
+      const counter = percent * this.percentPi;
       const v = (Math.sin(counter) * this.scoreDif) | 0;
       fontSize = this.font.scoreNormal.size + v;
     }
@@ -482,10 +479,7 @@ export default class render {
     this.ctx.font = fontSize + 'px ' + this.font.scoreNormal.family;
     this.ctx.fillStyle = this.g.config.theme.score;
     this.ctx.textBaseline = 'top';
-    this.ctx.shadowColor = this.g.config.theme.scoreShadow;
-    this.ctx.shadowBlur = 0;
-    this.ctx.shadowOffsetX = 2;
-    this.ctx.shadowOffsetY = 2;
+    this.shadow(this.g.config.theme.scoreShadow, 0, 2, 2);
     const textDim = this.ctx.measureText(this.g.player.score);
     const textHeight =
       textDim.actualBoundingBoxAscent + textDim.actualBoundingBoxDescent;
@@ -511,10 +505,7 @@ export default class render {
     this.ctx.fillStyle = this.g.config.theme.level;
     this.ctx.textBaseline = 'top';
     const str = this.g.strings.level.replace('{level}', this.g.player.level);
-    this.ctx.shadowColor = this.g.config.theme.levelShadow;
-    this.ctx.shadowBlur = 0;
-    this.ctx.shadowOffsetX = 2;
-    this.ctx.shadowOffsetY = 2;
+    this.shadow(this.g.config.theme.levelShadow, 0, 2, 2);
     const textDim = this.ctx.measureText(str);
     const textHeight =
       textDim.actualBoundingBoxAscent + textDim.actualBoundingBoxDescent;
@@ -541,10 +532,7 @@ export default class render {
     this.ctx.font = this.font.time.size + 'px ' + this.font.time.family;
     this.ctx.fillStyle = this.g.config.theme.time;
     this.ctx.textBaseline = 'top';
-    this.ctx.shadowColor = this.g.config.theme.timeShadow;
-    this.ctx.shadowBlur = 0;
-    this.ctx.shadowOffsetX = 3;
-    this.ctx.shadowOffsetY = 3;
+    this.shadow(this.g.config.theme.timeShadow, 0, 3, 3);
     this.ctx.fillText(time, this.timeX, this.timeY);
     this.ctx.restore();
   }
@@ -661,7 +649,7 @@ export default class render {
             p = percent;
             if (p > 0) {
               percent = ((new Date().getTime() % MAGIC_NUM.MILISECONDS) / MAGIC_NUM.MILISECONDS) * MAGIC_NUM.PERCENT;
-              let counter = percent * (Math.PI / MAGIC_NUM.PERCENT);
+              let counter = percent * this.percentPi;
               let ver = (Math.sin(counter) * 4) | 0;
               x -= ver;
               y -= ver;
@@ -694,7 +682,7 @@ export default class render {
     this.ctx.arc(x, y, r, start, end);
     this.ctx.lineWidth = 30;
     this.ctx.strokeStyle = this.g.config.theme.loader;
-    this.ctx.rotate((Math.PI * MAGIC_NUM.DOUBLE) / 12);
+    this.ctx.rotate(this.doublePi / 12);
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
@@ -734,10 +722,7 @@ export default class render {
       if (p > 1) {
         p = 1;
       }
-      this.ctx.shadowColor = 'rgba(255, 255, 0, ' + p + ')';
-      this.ctx.shadowBlur = this.halfTile;
-      this.ctx.shadowOffsetX = 0;
-      this.ctx.shadowOffsetY = 0;
+      this.shadow('rgba(255, 255, 0, ' + p + ')', this.halfTile, 0, 0);
     }
     this.ctx.strokeStyle = this.g.config.theme.blockEdge;
     this.ctx.lineWidth = 1;
@@ -788,7 +773,7 @@ export default class render {
   drawSpecialEffects() {
     this.ctx.save();
     const percent = (((this.g.runTime / MAGIC_NUM.MILISECONDS) % 2) * MAGIC_NUM.HALF) * MAGIC_NUM.PERCENT;
-    const counter = percent * (Math.PI / MAGIC_NUM.PERCENT);
+    const counter = percent * this.percentPi;
     const v = (Math.sin(counter) * (this.g.config.tile * 0.75)) | 0;
     const defXOffset = 0;
     const defYOffset = 0;
@@ -801,10 +786,7 @@ export default class render {
     if (shadowAlpha > 1) {
       shadowAlpha = 1;
     }
-    this.ctx.shadowColor = 'rgba(255, 255, 255, ' + shadowAlpha + ')';
-    this.ctx.shadowBlur = this.g.config.tile;
-    this.ctx.shadowOffsetX = 0;
-    this.ctx.shadowOffsetY = 0;
+    this.shadow('rgba(255, 255, 255, ' + shadowAlpha + ')', this.g.config.tile, 0, 0);
     this.ctx.fillStyle = 'rgba(240, 210, 0, ' + fillAlpha + ')';
     let x = 0,
       y = 0;
@@ -821,7 +803,7 @@ export default class render {
         y + this.g.ySpecialJitter,
         v,
         0,
-        2 * Math.PI
+        this.doublePi
       );
       this.ctx.fill();
       this.ctx.closePath();
@@ -830,10 +812,10 @@ export default class render {
       for (let i = 0; i < 10; i++) {
         this.ctx.beginPath();
         let xFac = Math.round((Math.PI * i * MAGIC_NUM.MILISECONDS) % MAGIC_NUM.PERCENT);
-        let xCounter = xFac * (Math.PI / MAGIC_NUM.PERCENT);
+        let xCounter = xFac * this.percentPi;
         xOffset = defXOffset + ((Math.sin(xCounter) * this.halfTile) | 0);
         let yFac = Math.round((Math.PI * i * 1000000) % MAGIC_NUM.PERCENT);
-        let yCounter = yFac * (Math.PI / MAGIC_NUM.PERCENT);
+        let yCounter = yFac * this.percentPi;
         yOffset = defYOffset + ((Math.sin(yCounter) * this.halfTile) | 0);
         this.ctx.globalCompositeOperation = 'xor';
         this.ctx.arc(
@@ -841,7 +823,7 @@ export default class render {
           y + this.g.ySpecialJitter + (this.halfTile * MAGIC_NUM.HALF - yOffset),
           0.2 + v * 0.7,
           0,
-          2 * Math.PI
+          this.doublePi
         );
         this.ctx.fillStyle =
           'rgba(' +
@@ -851,10 +833,7 @@ export default class render {
           ', ' +
           (160 + 7 * i) +
           ', 0.147)';
-        this.ctx.shadowColor = 'rgba(255, 255, 255, ' + shadowAlpha + ')';
-        this.ctx.shadowBlur = this.g.config.tile * 3;
-        this.ctx.shadowOffsetX = 0;
-        this.ctx.shadowOffsetY = 0;
+        this.shadow('rgba(255, 255, 255, ' + shadowAlpha + ')', 3, 0, 0);
         this.ctx.fill();
         this.ctx.closePath();
       }
@@ -867,7 +846,7 @@ export default class render {
     const fBlocks = this.g.player.getFallingBlocks();
     let tmpAlpha = this.g.config.ghostAlpha * MAGIC_NUM.PERCENT;
     const percent = ((this.g.runTime % MAGIC_NUM.MILISECONDS) / MAGIC_NUM.MILISECONDS) * MAGIC_NUM.PERCENT;
-    const counter = percent * (Math.PI / MAGIC_NUM.PERCENT);
+    const counter = percent * this.percentPi;
     const v = (Math.sin(counter) * (tmpAlpha * 1)) | 0;
     tmpAlpha = tmpAlpha * MAGIC_NUM.HALF + v * MAGIC_NUM.HALF;
     const alpha = tmpAlpha / MAGIC_NUM.PERCENT;
@@ -896,17 +875,14 @@ export default class render {
         (this.g.config.scoreMsgTime - (msg.expiration - this.g.runTime)) /
         this.g.config.scoreMsgTime;
       offset += percent * this.g.config.scoreMsgDrift;
-      let a = Math.sin((1 - percent) * MAGIC_NUM.PERCENT * (Math.PI / MAGIC_NUM.PERCENT)) * MAGIC_NUM.DOUBLE;
+      let a = Math.sin((1 - percent) * MAGIC_NUM.PERCENT * this.percentPi) * MAGIC_NUM.DOUBLE;
       if (a > 1) {
         a = 1;
       } else if (a < 0) {
         a = 0;
       }
       this.ctx.globalAlpha = a;
-      this.ctx.shadowColor = this.g.config.theme.scoreMsgShadow;
-      this.ctx.shadowBlur = 5;
-      this.ctx.shadowOffsetX = 0;
-      this.ctx.shadowOffsetY = 0;
+      this.shadow(this.g.config.theme.scoreMsgShadow, 5, 0, 0);
       let points = msg.text.replace(/(\+[0-9]+)\b.*/, '$1');
       let label = msg.text.replace(/(\+[0-9]+)\b(.*)/, '$2');
       this.ctx.font = this.font.scoreMsgPoints.string();
@@ -986,26 +962,17 @@ export default class render {
             );
           }
           this.ctx.fillStyle = this.g.config.theme.lbRank;
-          this.ctx.shadowColor = this.g.config.theme.lbRankShadow;
-          this.ctx.shadowBlur = 3;
-          this.ctx.shadowOffsetX = 2;
-          this.ctx.shadowOffsetY = 2;
+          this.shadow(this.g.config.theme.lbRankShadow, 3, 2, 2);
           this.ctx.fillText(rank, x + this.lbRankX, y);
           this.ctx.fillStyle = this.g.config.theme.lbName;
-          this.ctx.shadowColor = this.g.config.theme.lbNameShadow;
-          this.ctx.shadowBlur = 3;
-          this.ctx.shadowOffsetX = 2;
-          this.ctx.shadowOffsetY = 2;
+          this.shadow(this.g.config.theme.lbNameShadow, 3, 2, 2);
           this.ctx.fillText(
             r.name,
             x + this.lbRankX + this.textWidth(rank) + 8,
             y
           );
           this.ctx.fillStyle = this.g.config.theme.lbScore;
-          this.ctx.shadowColor = this.g.config.theme.lbScoreShadow;
-          this.ctx.shadowBlur = 3;
-          this.ctx.shadowOffsetX = 2;
-          this.ctx.shadowOffsetY = 2;
+          this.shadow(this.g.config.theme.lbScoreShadow, 3, 2, 2);
           this.ctx.fillText(
             score,
             x + this.lbScoreX - this.textWidth(score),
@@ -1015,5 +982,12 @@ export default class render {
       }
       this.ctx.restore();
     }
+  }
+
+  shadow(color, blur, x, y) {
+    this.ctx.shadowColor = color;
+    this.ctx.shadowBlur = blur;
+    this.ctx.shadowOffsetX = x;
+    this.ctx.shadowOffsetY = y;
   }
 }
