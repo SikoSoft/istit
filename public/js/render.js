@@ -14,6 +14,7 @@ export default class render {
 
   init() {
     this.resize();
+    this.halfTile = this.g.config.tile * MAGIC_NUM.HALF;
     this.pWidth = this.g.config.hTiles * this.g.config.tile;
     this.pHeight = this.g.config.vTiles * this.g.config.tile;
     this.pStartX = this.g.config.tile * MAGIC_NUM.HALF;
@@ -28,8 +29,8 @@ export default class render {
     this.mEndX = this.defWidth - this.g.config.tile * MAGIC_NUM.HALF;
     this.npStartX = this.pEndX + this.g.config.tile + this.g.config.tile * MAGIC_NUM.HALF;
     this.npStartY = this.pStartY + this.g.config.tile * MAGIC_NUM.HALF;
-    this.npH = this.mW + this.g.config.tile * 2;
-    this.hStartY = this.npStartY + this.mW + this.g.config.tile * 2;
+    this.npH = this.mW + this.g.config.tile * MAGIC_NUM.DOUBLE;
+    this.hStartY = this.npStartY + this.mW + this.g.config.tile * MAGIC_NUM.DOUBLE;
     this.scoreX =
       this.pEndX + this.g.config.tile * MAGIC_NUM.HALF + this.g.config.tile * 3;
     this.scoreY = this.defHeight - this.g.config.tile * MAGIC_NUM.HALF;
@@ -56,7 +57,7 @@ export default class render {
       };
     });
     this.scoreDif = this.font.scoreLarge.size - this.font.scoreNormal.size;
-    this.levelX = this.pEndX + this.g.config.tile * 2;
+    this.levelX = this.pEndX + this.g.config.tile * MAGIC_NUM.DOUBLE;
     this.levelY = this.defHeight - 100;
     this.timeX =
       this.scoreX - this.textWidth('00:00', this.font.time.string()) * MAGIC_NUM.HALF;
@@ -228,7 +229,7 @@ export default class render {
     this.ctx.shadowOffsetY = 2;
     this.ctx.textBaseline = 'top';
     const pauseX =
-      this.pWidth * MAGIC_NUM.HALF - this.ctx.measureText(msg).width * MAGIC_NUM.HALF + this.g.halfTile;
+      this.pWidth * MAGIC_NUM.HALF - this.ctx.measureText(msg).width * MAGIC_NUM.HALF + this.halfTile;
     this.ctx.fillText(msg, pauseX, this.sysY);
     this.ctx.restore();
   }
@@ -327,8 +328,8 @@ export default class render {
     this.ctx.shadowOffsetY = 2;
     this.ctx.fillText(
       this.g.strings.next,
-      this.mStartX + this.g.halfTile * MAGIC_NUM.HALF,
-      this.pStartY + this.g.halfTile * MAGIC_NUM.HALF
+      this.mStartX + this.halfTile * MAGIC_NUM.HALF,
+      this.pStartY + this.halfTile * MAGIC_NUM.HALF
     );
     this.ctx.restore();
     if (!this.g.mp.wait && this.g.player.nextPieces.length > 0) {
@@ -429,8 +430,8 @@ export default class render {
     this.ctx.shadowOffsetY = 2;
     this.ctx.fillText(
       this.g.strings.hold,
-      this.mStartX + this.g.halfTile * MAGIC_NUM.HALF,
-      this.hStartY + this.g.halfTile * MAGIC_NUM.HALF
+      this.mStartX + this.halfTile * MAGIC_NUM.HALF,
+      this.hStartY + this.halfTile * MAGIC_NUM.HALF
     );
     this.ctx.restore();
     if (!this.g.mp.wait && this.g.player.holdPiece) {
@@ -693,7 +694,7 @@ export default class render {
     this.ctx.arc(x, y, r, start, end);
     this.ctx.lineWidth = 30;
     this.ctx.strokeStyle = this.g.config.theme.loader;
-    this.ctx.rotate((Math.PI * 2) / 12);
+    this.ctx.rotate((Math.PI * MAGIC_NUM.DOUBLE) / 12);
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
@@ -712,7 +713,7 @@ export default class render {
     this.ctx.fillStyle = this.g.config.theme.countDown;
     this.ctx.textBaseline = 'middle';
     const num = remaining.toString();
-    this.ctx.fillText(num, 450 - this.ctx.measureText(num).width / 2, 110);
+    this.ctx.fillText(num, 450 - this.ctx.measureText(num).width * MAGIC_NUM.HALF, 110);
     this.ctx.restore();
   }
 
@@ -734,7 +735,7 @@ export default class render {
         p = 1;
       }
       this.ctx.shadowColor = 'rgba(255, 255, 0, ' + p + ')';
-      this.ctx.shadowBlur = this.g.halfTile;
+      this.ctx.shadowBlur = this.halfTile;
       this.ctx.shadowOffsetX = 0;
       this.ctx.shadowOffsetY = 0;
     }
@@ -830,14 +831,14 @@ export default class render {
         this.ctx.beginPath();
         let xFac = Math.round((Math.PI * i * MAGIC_NUM.MILISECONDS) % MAGIC_NUM.PERCENT);
         let xCounter = xFac * (Math.PI / MAGIC_NUM.PERCENT);
-        xOffset = defXOffset + ((Math.sin(xCounter) * this.g.halfTile) | 0);
+        xOffset = defXOffset + ((Math.sin(xCounter) * this.halfTile) | 0);
         let yFac = Math.round((Math.PI * i * 1000000) % MAGIC_NUM.PERCENT);
         let yCounter = yFac * (Math.PI / MAGIC_NUM.PERCENT);
-        yOffset = defYOffset + ((Math.sin(yCounter) * this.g.halfTile) | 0);
+        yOffset = defYOffset + ((Math.sin(yCounter) * this.halfTile) | 0);
         this.ctx.globalCompositeOperation = 'xor';
         this.ctx.arc(
-          x + this.g.xSpecialJitter + (this.g.halfTile * MAGIC_NUM.HALF - xOffset),
-          y + this.g.ySpecialJitter + (this.g.halfTile * MAGIC_NUM.HALF - yOffset),
+          x + this.g.xSpecialJitter + (this.halfTile * MAGIC_NUM.HALF - xOffset),
+          y + this.g.ySpecialJitter + (this.halfTile * MAGIC_NUM.HALF - yOffset),
           0.2 + v * 0.7,
           0,
           2 * Math.PI
@@ -895,7 +896,7 @@ export default class render {
         (this.g.config.scoreMsgTime - (msg.expiration - this.g.runTime)) /
         this.g.config.scoreMsgTime;
       offset += percent * this.g.config.scoreMsgDrift;
-      let a = Math.sin((1 - percent) * MAGIC_NUM.PERCENT * (Math.PI / MAGIC_NUM.PERCENT)) * 2;
+      let a = Math.sin((1 - percent) * MAGIC_NUM.PERCENT * (Math.PI / MAGIC_NUM.PERCENT)) * MAGIC_NUM.DOUBLE;
       if (a > 1) {
         a = 1;
       } else if (a < 0) {
@@ -924,9 +925,10 @@ export default class render {
     const r = msg.r;
     let c = msg.c;
     let x, y;
+    const maxC = Math.floor(this.g.config.hTiles * MAGIC_NUM.HALF) + 1;
     if (r && c) {
-      if (c > 6) {
-        c = 6;
+      if (c > maxC) {
+        c = maxC;
       }
       const p = this.g.getPieceOffset(r, c);
       x = p[1] + this.pStartX;

@@ -1,5 +1,6 @@
 export default {
   HALF: 0.5,
+  DOUBLE: 2,
   MILISECONDS: 1000,
   SECONDS: 60,
   MINUTES: 60,

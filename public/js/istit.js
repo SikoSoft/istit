@@ -27,8 +27,6 @@ export default class istit {
 
   init(canvasId) {
     this.canvasId = canvasId;
-    this.halfPI = Math.PI * MAGIC_NUM.HALF;
-    this.halfTile = this.config.tile * MAGIC_NUM.HALF;
     this.opponent = new player(this);
     this.input = new input(this);
     this.mp = new mp(this);
