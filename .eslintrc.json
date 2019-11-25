@@ -75,6 +75,12 @@
     "key-spacing": 2,
     "linebreak-style": 2,
     "max-lines": 2,
+    "max-len": [
+      2,
+      {
+        "code": 100
+      }
+    ],
     "no-alert": 2,
     "no-confusing-arrow": 2,
     "no-console": 2,
