@@ -14,7 +14,7 @@
 	height: 700px;
 	padding-left: 32px;
 	}
-#restart, #mp-start
+#restart, #mp-start-local, #mp-start-remote
 	{
 	font-family: Roboto Condensed;
 	font-size: 20px;
@@ -30,7 +30,7 @@
 	cursor: pointer;
 	color: #444;
 	}
-#restart:hover, #mp-start:hover
+#restart:hover, #mp-start:hover, #mp-start-remove:hover
 	{
 	background-color: #ededed;
 	color: #000;
