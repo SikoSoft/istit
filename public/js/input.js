@@ -33,33 +33,33 @@ export default class input {
       waiting: {
         _all: () => {
           this.g.start();
-        } 
+        }
       },
       paused: {
         pause: () => {
           this.g.pause();
-        } 
+        }
       },
       gameplay: {
         pause: () => {
           this.g.pause();
         },
-        drop: (player) => {
+        drop: player => {
           player.placeFallingPieceAtBottom();
         },
-        left: (player) => {
+        left: player => {
           player.movePiece(-1);
         },
-        rotate: (player) => {
+        rotate: player => {
           player.rotatePiece();
         },
-        right: (player) => {
+        right: player => {
           player.movePiece(1);
         },
-        down: (player) => {
+        down: player => {
           player.adjustFallingHeightOffset();
         },
-        hold: (player) => {
+        hold: player => {
           player.toggleHold();
         }
       },
@@ -67,7 +67,7 @@ export default class input {
       ended: {
         _all: () => {
           this.g.restart();
-        } 
+        }
       }
     };
     this.lastButtonState = {};
@@ -102,6 +102,7 @@ export default class input {
       Object.keys(this.buttonMap).forEach(button => {
         this.lastButtonState[button] = false;
       });
+      this.setupDevice(MAGIC_NUM.DEVICE_TYPE_XBOX360);
     });
   }
 
@@ -128,9 +129,18 @@ export default class input {
     }
   }
 
+  getAvailableDevice() {
+    return this.devices.filter(device => !device.player).length > 0
+      ? this.devices.filter(device => !device.player)[0]
+      : false;
+  }
+
   isLocked() {
     const now = new Date().getTime();
-    if (now < this.g.player.animateTo.lineBreak || now < this.g.player.animateTo.lineAdd) {
+    if (
+      now < this.g.player.animateTo.lineBreak ||
+      now < this.g.player.animateTo.lineAdd
+    ) {
       return true;
     }
     return false;
@@ -158,7 +168,11 @@ export default class input {
       state = 'gameplay';
     }
     this.devices.forEach(device => {
-      if (device.type === MAGIC_NUM.DEVICE_TYPE_XBOX360 && this.gamePadDetected && this.useGamePad) {
+      if (
+        device.type === MAGIC_NUM.DEVICE_TYPE_XBOX360 &&
+        this.gamePadDetected &&
+        this.useGamePad
+      ) {
         const gamePad = navigator.getGamepads()[0];
         const buttonState = {};
         Object.keys(this.buttonMap).forEach(button => {
@@ -246,7 +260,7 @@ export default class input {
       if (this.keyState[mi]) {
         e.preventDefault();
         this.handleKeyDown({
-          keyCode: mi 
+          keyCode: mi
         });
       }
     }

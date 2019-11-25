@@ -53,6 +53,11 @@ export default class config {
       sysUp: 300,
       lbShow: 500
     };
+    this.defaultLayout = {
+      even: ['grid', 'ui'],
+      odd: ['grid', 'ui']
+    };
+    this.layout = {};
   }
 
   process(override) {

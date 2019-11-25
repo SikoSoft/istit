@@ -126,7 +126,7 @@ export default class player {
   setFallingPiece(properties) {
     this.fallingPiece = {
       ...this.fallingPiece,
-      ...properties 
+      ...properties
     };
   }
 
@@ -134,7 +134,8 @@ export default class player {
     if (!this.g.ended) {
       const startC = this.g.config.hTiles * MAGIC_NUM.HALF - 1,
         startR = 0;
-      let r = 0, c = 0;
+      let r = 0,
+        c = 0;
       for (let b = 0; b < MAGIC_NUM.BLOCKS; b++) {
         c =
           startC +
@@ -221,7 +222,7 @@ export default class player {
     let collidesWith = false;
     let tmpC = -1;
     let tmpR = -1;
-    const blocks = this.getFallingBlocks(false, oAdjust, type);
+    const blocks = this.getFallingBlocks(oAdjust, type);
     for (let b = 0; b < blocks.length; b++) {
       tmpC = blocks[b].c + cAdjust;
       tmpR = blocks[b].r + rAdjust;
@@ -245,11 +246,8 @@ export default class player {
     return collidesWith;
   }
 
-  getFallingBlocks(opponent, p, t) {
+  getFallingBlocks(p, t) {
     let fp = this.fallingPiece;
-    if (opponent) {
-      fp = this.g.opponent.fallingPiece;
-    }
     if (fp.type === -1) {
       return [];
     }
@@ -265,9 +263,9 @@ export default class player {
     for (let b = 0; b < MAGIC_NUM.BLOCKS; b++) {
       c = fp.c + this.g.config.pieces[t].orientations[p][b][0] - 1;
       r = fp.r + this.g.config.pieces[t].orientations[p][b][1] - 1;
-      blocks[b] = { 
+      blocks[b] = {
         r,
-        c 
+        c
       };
     }
     return blocks;
@@ -299,14 +297,14 @@ export default class player {
         if (lines[l] === r) {
           return {
             r,
-            c 
+            c
           };
         }
       }
     }
     return {
       r: -1,
-      c: -1 
+      c: -1
     };
   }
 
@@ -334,7 +332,7 @@ export default class player {
 
   getCompleteLines() {
     return this.grid.reduce((solidRows, row, v) => {
-      return row.every(cell => cell > 0 ) ? solidRows.concat(v) : solidRows;
+      return row.every(cell => cell > 0) ? solidRows.concat(v) : solidRows;
     }, []);
   }
 
@@ -378,7 +376,7 @@ export default class player {
     }
     if (isCleared && this.okForClearBonus) {
       this.adjustScore(this.g.config.clearBonus, {
-        text: 'all clear' 
+        text: 'all clear'
       });
     }
     this.linesToClear = [];
@@ -395,7 +393,7 @@ export default class player {
       this.adjustScore(MAGIC_NUM.POINTS_MAX_LINES, {
         text: msg,
         r: hotPiece.r,
-        c: hotPiece.c 
+        c: hotPiece.c
       });
       this.chainCount++;
       if (this.chainCount > 1) {
@@ -421,7 +419,7 @@ export default class player {
             this.adjustScore(
               this.g.config.specialBonus,
               {
-                text: this.g.strings.goldenBlock 
+                text: this.g.strings.goldenBlock
               },
               false
             );
@@ -465,7 +463,7 @@ export default class player {
       const empty = this.g.random(1, this.g.config.hTiles);
       for (let li = 0; li < this.g.config.hTiles; li++) {
         if (li !== empty) {
-          this.grid[this.g.config.vTiles-1][li] = 8;
+          this.grid[this.g.config.vTiles - 1][li] = 8;
         }
       }
     }
@@ -491,7 +489,9 @@ export default class player {
     );
     let speedBonus = 0;
     if (this.lastScoreTime > 0) {
-      const dif = Math.floor((now - this.lastScoreTime) / MAGIC_NUM.MILISECONDS);
+      const dif = Math.floor(
+        (now - this.lastScoreTime) / MAGIC_NUM.MILISECONDS
+      );
       if (dif <= this.g.config.lastScoreThreshold) {
         const remainder = this.g.config.lastScoreThreshold - dif;
         speedBonus = Math.round(
@@ -609,7 +609,12 @@ export default class player {
       this.holdPiece = this.fallingPiece.type;
       for (let c = 0; c >= -MAGIC_NUM.BLOCKS; c--) {
         let xAdjust = c;
-        let collides = this.collides(c, 0, this.fallingPiece.position, this.fallingPiece.type);
+        let collides = this.collides(
+          c,
+          0,
+          this.fallingPiece.position,
+          this.fallingPiece.type
+        );
         if (!collides) {
           this.fallingPiece.c += xAdjust;
           break;
@@ -691,5 +696,30 @@ export default class player {
       this.special[r + ':' + c] =
         this.g.runTime + this.g.config.specialDuration;
     }
+  }
+
+  getGhostBlocks() {
+    const ghost = [];
+    const blocks = this.getFallingBlocks();
+    let mostDif = this.g.config.vTiles,
+      tmpDif = 0;
+    for (let i = 0; i < blocks.length; i++) {
+      let c = blocks[i].c;
+      let h = this.getClosestToTopInColumn(c);
+      tmpDif = h - blocks[i].r - 1;
+      if (tmpDif < mostDif) {
+        mostDif = tmpDif;
+      }
+    }
+    for (let i = 0; i < blocks.length; i++) {
+      let c = blocks[i].c;
+      let r = blocks[i].r;
+      let newR = r + mostDif;
+      ghost.push({
+        c,
+        r: newR
+      });
+    }
+    return ghost;
   }
 }

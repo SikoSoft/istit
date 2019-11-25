@@ -77,14 +77,16 @@ export default class istit {
 
   start() {
     this.reset();
-    this.player.dropPiece();
+    this.players.forEach(player => {
+      player.dropPiece();
+    });
   }
 
   restart() {
     if (this.mp.sessionEnded || this.mp.wait) {
       this.mp.endSession();
     }
-    this.render.resizeForSP();
+    this.render.resize();
     this.paused = false;
     this.start();
   }
@@ -224,7 +226,9 @@ export default class istit {
   update() {
     const now = new Date().getTime();
     if (this.mp.countingDown) {
-      const remaining = Math.ceil((this.mp.countUntil - now) / MAGIC_NUM.MILISECONDS);
+      const remaining = Math.ceil(
+        (this.mp.countUntil - now) / MAGIC_NUM.MILISECONDS
+      );
       if (remaining !== this.lastCountDown) {
         if (typeof this.sounds.countDown !== 'undefined') {
           this.sounds.countDown.currentTime = 0;
@@ -294,31 +298,6 @@ export default class istit {
     return 1;
   }
 
-  getGhostBlocks() {
-    const ghost = [];
-    const blocks = this.player.getFallingBlocks();
-    let mostDif = this.config.vTiles,
-      tmpDif = 0;
-    for (let i = 0; i < blocks.length; i++) {
-      let c = blocks[i].c;
-      let h = this.player.getClosestToTopInColumn(c);
-      tmpDif = h - blocks[i].r - 1;
-      if (tmpDif < mostDif) {
-        mostDif = tmpDif;
-      }
-    }
-    for (let i = 0; i < blocks.length; i++) {
-      let c = blocks[i].c;
-      let r = blocks[i].r;
-      let newR = r + mostDif;
-      ghost.push({
-        c,
-        r: newR 
-      });
-    }
-    return ghost;
-  }
-
   getPieceOffset(r, c) {
     const rOffset = r * this.config.tile;
     const cOffset = c * this.config.tile;
@@ -358,5 +337,13 @@ export default class istit {
       }
     }
     return max - min + 1;
+  }
+
+  prepareLocalMP() {
+    const availableDevice = this.input.getAvailableDevice();
+    if (availableDevice) {
+      this.registerPlayer(availableDevice);
+      this.render.resize();
+    }
   }
 }

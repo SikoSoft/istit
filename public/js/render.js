@@ -17,24 +17,28 @@ export default class render {
   init() {
     this.resize();
     this.halfTile = this.g.config.tile * MAGIC_NUM.HALF;
-    this.pWidth = this.g.config.hTiles * this.g.config.tile;
-    this.pHeight = this.g.config.vTiles * this.g.config.tile;
-    this.pStartX = this.g.config.tile * MAGIC_NUM.HALF;
-    this.pStartY = this.g.config.tile * MAGIC_NUM.HALF;
-    this.pEndX = this.pStartX + this.pWidth;
-    this.pEndY = this.pStaryY + this.pHeight;
+    this.gridWidth = this.g.config.hTiles * this.g.config.tile;
+    this.gridHeight = this.g.config.vTiles * this.g.config.tile;
+    this.gridStartX = this.g.config.tile * MAGIC_NUM.HALF;
+    this.gridStartY = this.g.config.tile * MAGIC_NUM.HALF;
+    this.gridEndX = this.gridStartX + this.gridWidth;
+    this.gridEndY = this.pStaryY + this.gridHeight;
     this.oStartX = this.defWidth;
-    this.oStartY = this.pStartY;
+    this.oStartY = this.gridStartY;
     this.mW = this.g.config.tile * 6;
-    this.mStartX = this.pEndX + this.g.config.tile * MAGIC_NUM.HALF;
+    this.mStartX = this.gridEndX + this.g.config.tile * MAGIC_NUM.HALF;
     this.mStartY = this.g.config.tile * MAGIC_NUM.HALF;
     this.mEndX = this.defWidth - this.g.config.tile * MAGIC_NUM.HALF;
-    this.npStartX = this.pEndX + this.g.config.tile + this.g.config.tile * MAGIC_NUM.HALF;
-    this.npStartY = this.pStartY + this.g.config.tile * MAGIC_NUM.HALF;
+    this.npStartX =
+      this.gridEndX + this.g.config.tile + this.g.config.tile * MAGIC_NUM.HALF;
+    this.npStartY = this.gridStartY + this.g.config.tile * MAGIC_NUM.HALF;
     this.npH = this.mW + this.g.config.tile * MAGIC_NUM.DOUBLE;
-    this.hStartY = this.npStartY + this.mW + this.g.config.tile * MAGIC_NUM.DOUBLE;
+    this.hStartY =
+      this.npStartY + this.mW + this.g.config.tile * MAGIC_NUM.DOUBLE;
     this.scoreX =
-      this.pEndX + this.g.config.tile * MAGIC_NUM.HALF + this.g.config.tile * 3;
+      this.gridEndX +
+      this.g.config.tile * MAGIC_NUM.HALF +
+      this.g.config.tile * 3;
     this.scoreY = this.defHeight - this.g.config.tile * MAGIC_NUM.HALF;
     Object.keys(this.g.config.theme.font).forEach(font => {
       this.font[font] = {
@@ -59,32 +63,34 @@ export default class render {
       };
     });
     this.scoreDif = this.font.scoreLarge.size - this.font.scoreNormal.size;
-    this.levelX = this.pEndX + this.g.config.tile * MAGIC_NUM.DOUBLE;
-    this.levelY = this.defHeight - 200;
+    this.levelX = this.gridEndX + this.g.config.tile * MAGIC_NUM.DOUBLE;
     this.timeX =
-      this.scoreX - this.textWidth('00:00', this.font.time.string()) * MAGIC_NUM.HALF;
+      this.scoreX -
+      this.textWidth('00:00', this.font.time.string()) * MAGIC_NUM.HALF;
     this.timeY = this.defHeight - 5 * this.g.config.tile;
     this.msgH = this.font.scoreMsgPoints.size * 1.25;
-    this.hScoresX = this.pStartX + this.pWidth * 0.1;
-    this.hScoresY = this.pStartY + this.pHeight * MAGIC_NUM.HALF;
-    this.hScoresW = this.pWidth * 0.8;
+    this.hScoresX = this.gridStartX + this.gridWidth * 0.1;
+    this.hScoresY = this.gridStartY + this.gridHeight * MAGIC_NUM.HALF;
+    this.hScoresW = this.gridWidth * 0.8;
     this.sysYDef =
-      this.pStartY + this.g.config.tile * (this.g.config.vTiles * 0.4);
-    this.sysYTop = this.pStartY + this.g.config.tile;
+      this.gridStartY + this.g.config.tile * (this.g.config.vTiles * 0.4);
+    this.sysYTop = this.gridStartY + this.g.config.tile;
     this.sysY = this.sysYDef;
     this.sysYDif = this.sysYDef - this.sysYTop;
     this.lbYDef = this.canvas.height;
-    this.lbYTop = this.pStartY + this.g.config.tile * 2.5;
+    this.lbYTop = this.gridStartY + this.g.config.tile * 2.5;
     this.lbYDif = this.lbYDef - this.lbYTop;
     this.lbY = this.lbYTop;
     this.lbRankX = 0;
-    this.lbScoreX = this.pWidth - this.g.config.tile;
-    this.lbLeftXDef = this.pStartX + this.g.config.tile * MAGIC_NUM.HALF - this.pWidth;
-    this.lbLeftXEnd = this.pStartX + this.g.config.tile * MAGIC_NUM.HALF;
+    this.lbScoreX = this.gridWidth - this.g.config.tile;
+    this.lbLeftXDef =
+      this.gridStartX + this.g.config.tile * MAGIC_NUM.HALF - this.gridWidth;
+    this.lbLeftXEnd = this.gridStartX + this.g.config.tile * MAGIC_NUM.HALF;
     this.lbLeftXDif = this.lbLeftXEnd - this.lbLeftXDef;
     this.lbLeftX = this.lbLeftXDef;
-    this.lbRightXDef = this.pStartX - this.g.config.tile * MAGIC_NUM.HALF + this.pWidth;
-    this.lbRightXEnd = this.pStartX + this.g.config.tile * MAGIC_NUM.HALF;
+    this.lbRightXDef =
+      this.gridStartX - this.g.config.tile * MAGIC_NUM.HALF + this.gridWidth;
+    this.lbRightXEnd = this.gridStartX + this.g.config.tile * MAGIC_NUM.HALF;
     this.lbRightXDif = this.lbRightXEnd - this.lbRightXDef;
     this.lbRightX = this.lbRightXDef;
     this.lbWidth = this.lbRightXDef - this.lbLeftXEnd;
@@ -98,34 +104,16 @@ export default class render {
     this.defWidth =
       this.g.config.hTiles * this.g.config.tile +
       this.g.config.tile * 6 +
-      (this.g.config.tile * MAGIC_NUM.HALF) * 3;
+      this.g.config.tile * MAGIC_NUM.HALF * 3;
     this.defHeight =
       this.g.config.vTiles * this.g.config.tile + this.g.config.tile;
   }
 
   resize() {
-    if (this.mpMode) {
-      this.resizeForMP();
-    } else {
-      this.resizeForSP();
-    }
-  }
-
-  resizeForSP() {
     this.syncDefDimension();
-    this.canvas.width = this.defWidth;
+    this.canvas.width = this.defWidth * this.g.players.length;
     this.canvas.height = this.defHeight;
-    this.mpMode = false;
-  }
-
-  resizeForMP() {
-    this.syncDefDimension();
-    this.canvas.width =
-      this.defWidth +
-      this.g.config.hTiles * this.g.config.tile +
-      this.g.config.tile * MAGIC_NUM.HALF;
-    this.canvas.height = this.defHeight;
-    this.mpMode = true;
+    this.mpMode = this.g.players.length > 1 ? true : false;
   }
 
   setScaleRatio(ratio) {
@@ -133,98 +121,105 @@ export default class render {
   }
 
   draw() {
-    const now = new Date().getTime();
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.drawLayout();
-    this.drawGrid();
-    if (this.mpMode) {
-      this.drawGrid(true);
-    }
-    if (!this.g.mp.wait) {
-      if (!this.g.player.fallingPiece.placed) {
-        this.drawFallingPiece();
+    this.drawBackground();
+    this.g.players.forEach((player, i) => {
+      player.slot = i;
+      player.startX = i * this.defWidth;
+      player.startY = 0;
+      this.drawGridContainer(player);
+      this.drawGrid(player);
+      if (!this.g.mp.wait) {
+        if (!player.fallingPiece.placed) {
+          this.drawFallingPiece(player);
+        }
+        this.drawGhost(player);
+        this.drawFixedBlocks(player);
       }
-      this.drawGhost();
-      this.drawFixedBlocks();
-      if (this.mpMode) {
-        this.drawFallingPiece(true);
-        this.drawFixedBlocks(true);
+      this.drawSpecialEffects(player);
+      this.drawAnimationOverlay(player);
+      this.drawNextPieces(player);
+      this.drawHoldPiece(player);
+      this.drawScore(player);
+      this.drawTime(player);
+      this.drawLevel(player);
+      this.drawMessages(player);
+      this.drawSystemMessages(player);
+      if (this.g.mp.wait) {
+        this.drawLoader(player);
+        if (this.g.mp.countingDown) {
+          this.drawCountDown(player);
+        }
       }
-    }
-    this.drawSpecialEffects();
-    this.drawAnimationOverlay();
-    this.drawNextPieces();
-    this.drawHoldPiece();
-    this.drawScore(now);
-    this.drawTime();
-    this.drawLevel();
-    this.drawMessages();
-    this.drawSystemMessages();
-    if (this.g.mp.wait === true) {
-      this.drawLoader(now);
-      if (this.g.mp.countingDown) {
-        this.drawCountDown(now);
-      }
-    }
-    this.drawLeaderBoard();
+      this.drawLeaderBoard(player);
+    });
   }
 
-  drawAnimationOverlay() {
+  drawAnimationOverlay(player) {
     const now = new Date().getTime();
-    if (this.g.player.animateTo.lineBreak > now) {
+    if (player.animateTo.lineBreak > now) {
       const alpha =
-        ((this.g.player.animateTo.lineBreak - now) /
-          (this.g.config.animateCycle.lineBreak *
-            this.g.player.linesToClear.length)) *
+        ((player.animateTo.lineBreak - now) /
+          (this.g.config.animateCycle.lineBreak * player.linesToClear.length)) *
         1;
       this.ctx.save();
       this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
       this.ctx.globalAlpha = alpha;
-      this.ctx.fillRect(this.pStartX, this.pStartY, this.pWidth, this.pHeight);
+      this.ctx.fillRect(
+        this.gridStartX,
+        this.gridStartY,
+        this.gridWidth,
+        this.gridHeight
+      );
       this.ctx.restore();
     }
   }
 
-  drawSystemMessages() {
+  drawSystemMessages(player) {
     if (this.g.paused) {
-      this.drawSystemMessage(this.g.strings.paused);
+      this.drawSystemMessage(player, this.g.strings.paused);
     } else if (!this.g.mp.oppIsAlive) {
-      this.drawSystemMessage(this.g.strings.opponentDisconnected);
+      this.drawSystemMessage(player, this.g.strings.opponentDisconnected);
     } else if (this.g.mp.wait) {
       if (this.g.mp.countingDown) {
-        this.drawSystemMessage(this.g.strings.getReady);
+        this.drawSystemMessage(player, this.g.strings.getReady);
       } else if (this.g.mp.connected) {
-        this.drawSystemMessage(this.g.strings.waitingForPeer);
+        this.drawSystemMessage(player, this.g.strings.waitingForPeer);
       } else {
-        this.drawSystemMessage(this.g.strings.connectingToServer);
+        this.drawSystemMessage(player, this.g.strings.connectingToServer);
       }
     } else if (this.g.ended) {
       if (this.g.mp.sessionEnded) {
         if (this.g.mp.isWinner) {
-          this.drawSystemMessage(this.g.strings.youWin);
+          this.drawSystemMessage(player, this.g.strings.youWin);
         } else {
-          this.drawSystemMessage(this.g.strings.youLose);
+          this.drawSystemMessage(player, this.g.strings.youLose);
         }
       } else {
-        this.drawSystemMessage(this.g.strings.gameOver);
+        this.drawSystemMessage(player, this.g.strings.gameOver);
       }
     } else if (this.g.wait) {
-      this.drawSystemMessage(this.g.strings.pressSpaceToBegin);
+      this.drawSystemMessage(player, this.g.strings.pressSpaceToBegin);
     }
   }
 
-  drawSystemMessage(msg) {
+  drawSystemMessage(player, msg) {
     this.ctx.save();
     const grad = this.ctx.createLinearGradient(
-      this.pStartX,
-      this.pStartY,
-      this.pStartX,
-      this.pHeight
+      player.startX + this.gridStartX,
+      player.startY + this.gridStartY,
+      this.gridStartX,
+      this.gridHeight
     );
     grad.addColorStop(0, 'rgba(0, 0, 60, 0.6)');
     grad.addColorStop(1, 'rgba(0, 0, 0, 0.6)');
     this.ctx.fillStyle = grad;
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.fillRect(
+      player.startX,
+      player.startY,
+      this.defWidth,
+      this.defHeight
+    );
     this.ctx.restore();
     this.ctx.save();
     this.ctx.font = this.font.systemMessage.string();
@@ -232,12 +227,14 @@ export default class render {
     this.shadow(this.g.config.theme.systemMessageShadow, 0, 2, 2);
     this.ctx.textBaseline = 'top';
     const pauseX =
-      this.pWidth * MAGIC_NUM.HALF - this.ctx.measureText(msg).width * MAGIC_NUM.HALF + this.halfTile;
+      this.gridWidth * MAGIC_NUM.HALF -
+      this.ctx.measureText(msg).width * MAGIC_NUM.HALF +
+      this.halfTile;
     this.ctx.fillText(msg, pauseX, this.sysY);
     this.ctx.restore();
   }
 
-  drawLayout() {
+  drawBackground() {
     this.ctx.save();
     this.ctx.fillStyle = this.g.config.theme.frame;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -257,42 +254,33 @@ export default class render {
         }
       }
     }
+  }
+
+  drawGridContainer(player) {
     this.ctx.save();
     this.ctx.fillStyle = this.g.config.theme.grid;
-    this.ctx.fillRect(this.pStartX, this.pStartY, this.pWidth, this.pHeight);
-    if (this.mpMode) {
-      this.ctx.fillRect(this.oStartX, this.oStartY, this.pWidth, this.pHeight);
-    }
+    this.ctx.fillRect(
+      player.startX + this.gridStartX,
+      player.startY + this.gridStartY,
+      this.gridWidth,
+      this.gridHeight
+    );
     this.ctx.restore();
     this.ctx.save();
     this.ctx.globalAlpha = 0.6;
     let img = false;
-    if (typeof this.g.images.bg[this.g.player.level] !== 'undefined') {
-      img = this.g.images.bg[this.g.player.level];
+    if (typeof this.g.images.bg[player.level] !== 'undefined') {
+      img = this.g.images.bg[player.level];
     } else if (typeof this.g.images.bg['default'] !== 'undefined') {
       img = this.g.images.bg['default'];
     }
     if (img) {
       this.ctx.drawImage(
         img,
-        this.pStartX,
-        this.pStartY,
-        this.pWidth,
-        this.pHeight
-      );
-    }
-    if (this.mpMode) {
-      if (typeof this.g.images.bg[this.g.opponent.level] !== 'undefined') {
-        img = this.g.images.bg[this.g.opponent.level];
-      } else {
-        img = this.g.images.bg['default'];
-      }
-      this.ctx.drawImage(
-        img,
-        this.oStartX,
-        this.oStartY,
-        this.pWidth,
-        this.pHeight
+        player.startX + this.gridStartX,
+        player.startY + this.gridStartY,
+        this.gridWidth,
+        this.gridHeight
       );
     }
     this.ctx.restore();
@@ -300,56 +288,80 @@ export default class render {
     this.ctx.lineWidth = 1;
     this.ctx.strokeStyle = this.g.config.theme.gridOutline;
     this.ctx.strokeRect(
-      this.pStartX - 1,
-      this.pStartY - 1,
-      this.pWidth,
-      this.pHeight
+      player.startX + this.gridStartX - 1,
+      player.startY + this.gridStartY - 1,
+      this.gridWidth,
+      this.gridHeight
     );
-    if (this.mpMode) {
-      this.ctx.strokeRect(
-        this.oStartX - 1,
-        this.oStartY - 1,
-        this.pWidth,
-        this.pHeight
-      );
-    }
     this.ctx.restore();
   }
 
-  drawNextPieces() {
+  drawGrid(player) {
+    let sx = player.startX + this.gridStartX;
+    let sy = player.startY + this.gridStartY;
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.strokeStyle = this.g.config.theme.gridLine;
+    this.ctx.lineWidth = 1;
+    for (let v = 1; v <= this.g.config.vTiles - 1; v++) {
+      let y = this.g.config.tile * v + sy;
+      this.ctx.moveTo(sx, y - MAGIC_NUM.HALF);
+      this.ctx.lineTo(sx + this.gridWidth, y - MAGIC_NUM.HALF);
+    }
+    for (let h = 1; h <= this.g.config.hTiles - 1; h++) {
+      let x = this.g.config.tile * h + sx;
+      this.ctx.moveTo(x - MAGIC_NUM.HALF, sy);
+      this.ctx.lineTo(x - MAGIC_NUM.HALF, sy + this.gridHeight);
+    }
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
+  }
+
+  drawNextPieces(player) {
     this.ctx.save();
     this.ctx.fillStyle = this.g.config.theme.nextFrame;
-    this.ctx.fillRect(this.mStartX, this.pStartY, this.mW, this.npH);
+    this.ctx.fillRect(
+      player.startX + this.mStartX,
+      player.startY + this.gridStartY,
+      this.mW,
+      this.npH
+    );
     this.ctx.strokeStyle = this.g.config.theme.nextOutline;
-    this.ctx.strokeRect(this.mStartX, this.pStartY, this.mW, this.npH);
+    this.ctx.strokeRect(
+      player.startX + this.mStartX,
+      player.startY + this.gridStartY,
+      this.mW,
+      this.npH
+    );
     this.ctx.font = this.font.next.string();
     this.ctx.textBaseline = 'top';
     this.ctx.fillStyle = this.g.config.theme.nextLabel;
     this.shadow(this.g.config.theme.nextLabelShadow, 0, 2, 2);
     this.ctx.fillText(
       this.g.strings.next,
-      this.mStartX + this.halfTile * MAGIC_NUM.HALF,
-      this.pStartY + this.halfTile * MAGIC_NUM.HALF
+      player.startX + this.mStartX + this.halfTile * MAGIC_NUM.HALF,
+      player.startY + this.gridStartY + this.halfTile * MAGIC_NUM.HALF
     );
     this.ctx.restore();
-    if (!this.g.mp.wait && this.g.player.nextPieces.length > 0) {
-      const pW = this.g.getPieceDimension(this.g.player.nextPieces[0], 1, 0);
-      const pH = this.g.getPieceDimension(this.g.player.nextPieces[0], 1, 1);
-      let npStartX = this.mStartX + (this.mW - pW * this.g.config.tile) * MAGIC_NUM.HALF;
-      let npStartY = this.mStartY + (this.mW - pH * this.g.config.tile) * MAGIC_NUM.HALF;
+    if (!this.g.mp.wait && player.nextPieces.length > 0) {
+      const pW = this.g.getPieceDimension(player.nextPieces[0], 1, 0);
+      const pH = this.g.getPieceDimension(player.nextPieces[0], 1, 1);
+      let npStartX =
+        this.mStartX + (this.mW - pW * this.g.config.tile) * MAGIC_NUM.HALF;
+      let npStartY =
+        this.mStartY + (this.mW - pH * this.g.config.tile) * MAGIC_NUM.HALF;
       for (let b = 0; b < MAGIC_NUM.BLOCKS; b++) {
         this.drawBlock(
-          this.g.player.nextPieces[0],
-          npStartX +
-            (this.g.config.pieces[this.g.player.nextPieces[0]].orientations[1][
-              b
-            ][0] -
+          player.nextPieces[0],
+          player.startX +
+            npStartX +
+            (this.g.config.pieces[player.nextPieces[0]].orientations[1][b][0] -
               1) *
               this.g.config.tile,
-          npStartY +
-            (this.g.config.pieces[this.g.player.nextPieces[0]].orientations[1][
-              b
-            ][1] -
+          player.startY +
+            npStartY +
+            (this.g.config.pieces[player.nextPieces[0]].orientations[1][b][1] -
               1) *
               this.g.config.tile
         );
@@ -357,33 +369,34 @@ export default class render {
       npStartX -= this.g.config.tile;
       npStartY += 196;
       const npStartX2 =
+        player.startX +
         this.g.config.tile * (this.g.config.hTiles + 2) +
         this.mStartX +
         (this.mW - pW * this.g.config.tile) * MAGIC_NUM.HALF -
         this.g.config.tile * MAGIC_NUM.HALF;
       const npStartX3 =
+        player.startX +
         this.g.config.tile * (this.g.config.hTiles + 2) +
         this.mStartX +
         (this.mW - pW * this.g.config.tile) * MAGIC_NUM.HALF +
         this.g.config.tile * 4;
       npStartY =
+        player.startY +
         this.mStartY +
         (this.mW - pH * this.g.config.tile) * MAGIC_NUM.HALF +
         this.g.config.tile * 6;
       for (let b = 0; b < MAGIC_NUM.BLOCKS; b++) {
         this.drawBlock(
-          this.g.player.nextPieces[1],
-          npStartX2 +
-            (this.g.config.pieces[this.g.player.nextPieces[1]].orientations[1][
-              b
-            ][0] -
+          player.nextPieces[1],
+          player.startX +
+            npStartX2 +
+            (this.g.config.pieces[player.nextPieces[1]].orientations[1][b][0] -
               1) *
               this.g.config.tile,
-          npStartY +
+          player.startY +
+            npStartY +
             120 +
-            (this.g.config.pieces[this.g.player.nextPieces[1]].orientations[1][
-              b
-            ][1] -
+            (this.g.config.pieces[player.nextPieces[1]].orientations[1][b][1] -
               1) *
               this.g.config.tile,
           1,
@@ -393,18 +406,16 @@ export default class render {
       }
       for (let b = 0; b < MAGIC_NUM.BLOCKS; b++) {
         this.drawBlock(
-          this.g.player.nextPieces[2],
-          npStartX3 +
-            (this.g.config.pieces[this.g.player.nextPieces[2]].orientations[1][
-              b
-            ][0] -
+          player.nextPieces[2],
+          player.startX +
+            npStartX3 +
+            (this.g.config.pieces[player.nextPieces[2]].orientations[1][b][0] -
               1) *
               this.g.config.tile,
-          npStartY +
+          player.startY +
+            npStartY +
             120 +
-            (this.g.config.pieces[this.g.player.nextPieces[2]].orientations[1][
-              b
-            ][1] -
+            (this.g.config.pieces[player.nextPieces[2]].orientations[1][b][1] -
               1) *
               this.g.config.tile,
           1,
@@ -415,51 +426,60 @@ export default class render {
     }
   }
 
-  drawHoldPiece() {
+  drawHoldPiece(player) {
     this.ctx.save();
     this.ctx.fillStyle = this.g.config.theme.holdFrame;
-    this.ctx.fillRect(this.mStartX, this.hStartY, this.mW, this.mW);
+    this.ctx.fillRect(
+      player.startX + this.mStartX,
+      player.startY + this.hStartY,
+      this.mW,
+      this.mW
+    );
     this.ctx.strokeStyle = this.g.config.theme.holdOutline;
-    this.ctx.strokeRect(this.mStartX, this.hStartY, this.mW, this.mW);
+    this.ctx.strokeRect(
+      player.startX + this.mStartX,
+      player.startY + this.hStartY,
+      this.mW,
+      this.mW
+    );
     this.ctx.font = this.font.hold.string();
     this.ctx.textBaseline = 'top';
     this.ctx.fillStyle = this.g.config.theme.holdLabel;
     this.shadow(this.g.config.theme.holdLabelShadow, 0, 2, 2);
     this.ctx.fillText(
       this.g.strings.hold,
-      this.mStartX + this.halfTile * MAGIC_NUM.HALF,
-      this.hStartY + this.halfTile * MAGIC_NUM.HALF
+      player.startX + this.mStartX + this.halfTile * MAGIC_NUM.HALF,
+      player.startY + this.hStartY + this.halfTile * MAGIC_NUM.HALF
     );
     this.ctx.restore();
-    if (!this.g.mp.wait && this.g.player.holdPiece) {
-      const pW = this.g.getPieceDimension(this.g.player.holdPiece, 1, 0);
-      const pH = this.g.getPieceDimension(this.g.player.holdPiece, 1, 1);
-      const npStartX = this.mStartX + (this.mW - pW * this.g.config.tile) * MAGIC_NUM.HALF;
-      const npStartY = this.hStartY + (this.mW - pH * this.g.config.tile) * MAGIC_NUM.HALF;
+    if (!this.g.mp.wait && player.holdPiece) {
+      const pW = this.g.getPieceDimension(player.holdPiece, 1, 0);
+      const pH = this.g.getPieceDimension(player.holdPiece, 1, 1);
+      const npStartX =
+        this.mStartX + (this.mW - pW * this.g.config.tile) * MAGIC_NUM.HALF;
+      const npStartY =
+        this.hStartY + (this.mW - pH * this.g.config.tile) * MAGIC_NUM.HALF;
       for (let b = 0; b < MAGIC_NUM.BLOCKS; b++) {
         this.drawBlock(
-          this.g.player.holdPiece,
-          npStartX +
-            (this.g.config.pieces[this.g.player.holdPiece].orientations[1][
-              b
-            ][0] -
-              1) *
+          player.holdPiece,
+          player.startX +
+            npStartX +
+            (this.g.config.pieces[player.holdPiece].orientations[1][b][0] - 1) *
               this.g.config.tile,
-          npStartY +
-            (this.g.config.pieces[this.g.player.holdPiece].orientations[1][
-              b
-            ][1] -
-              1) *
+          player.startY +
+            npStartY +
+            (this.g.config.pieces[player.holdPiece].orientations[1][b][1] - 1) *
               this.g.config.tile
         );
       }
     }
   }
 
-  drawScore(now) {
+  drawScore(player) {
+    const now = new Date().getTime();
     let fontSize = this.font.scoreNormal.size;
-    if (this.g.player.animateTo.score > now) {
-      const dif = this.g.player.animateTo.score - now;
+    if (player.animateTo.score > now) {
+      const dif = player.animateTo.score - now;
       const percent = Math.round(
         (dif / this.g.config.animateCycle.score) * MAGIC_NUM.PERCENT
       );
@@ -468,9 +488,9 @@ export default class render {
       fontSize = this.font.scoreNormal.size + v;
     }
     this.ctx.save();
-    const rX = this.mStartX;
+    const rX = player.startX + this.mStartX;
     const rW = this.mW;
-    const rY = this.canvas.height - this.g.config.tile * 3;
+    const rY = player.startY + this.canvas.height - this.g.config.tile * 3;
     const rH = this.g.config.tile * 1.5;
     this.ctx.fillStyle = this.g.config.theme.scoreFrame;
     this.ctx.strokeStyle = this.g.config.theme.scoreOutline;
@@ -480,20 +500,20 @@ export default class render {
     this.ctx.fillStyle = this.g.config.theme.score;
     this.ctx.textBaseline = 'top';
     this.shadow(this.g.config.theme.scoreShadow, 0, 2, 2);
-    const textDim = this.ctx.measureText(this.g.player.score);
+    const textDim = this.ctx.measureText(player.score);
     const textHeight =
       textDim.actualBoundingBoxAscent + textDim.actualBoundingBoxDescent;
     this.ctx.fillText(
-      this.g.player.score,
-      this.scoreX - textDim.width * MAGIC_NUM.HALF,
+      player.score,
+      player.startX + this.scoreX - textDim.width * MAGIC_NUM.HALF,
       rY + (rH - textHeight) * MAGIC_NUM.HALF
     );
     this.ctx.restore();
   }
 
-  drawLevel() {
+  drawLevel(player) {
     this.ctx.save();
-    const rX = this.mStartX;
+    const rX = player.startX + this.mStartX;
     const rW = this.mW;
     const rY = this.canvas.height - this.g.config.tile * 1.5;
     const rH = this.g.config.tile;
@@ -504,20 +524,20 @@ export default class render {
     this.ctx.font = this.font.level.string();
     this.ctx.fillStyle = this.g.config.theme.level;
     this.ctx.textBaseline = 'top';
-    const str = this.g.strings.level.replace('{level}', this.g.player.level);
+    const str = this.g.strings.level.replace('{level}', player.level);
     this.shadow(this.g.config.theme.levelShadow, 0, 2, 2);
     const textDim = this.ctx.measureText(str);
     const textHeight =
       textDim.actualBoundingBoxAscent + textDim.actualBoundingBoxDescent;
     this.ctx.fillText(
       str,
-      this.scoreX - textDim.width * MAGIC_NUM.HALF,
+      player.startX + this.scoreX - textDim.width * MAGIC_NUM.HALF,
       rY + (rH - textHeight) * MAGIC_NUM.HALF
     );
     this.ctx.restore();
   }
 
-  drawTime() {
+  drawTime(player) {
     const fTime = this.g.parseMiliSeconds(this.g.runTime);
     let minutes = fTime[2];
     let seconds = fTime[3];
@@ -533,62 +553,34 @@ export default class render {
     this.ctx.fillStyle = this.g.config.theme.time;
     this.ctx.textBaseline = 'top';
     this.shadow(this.g.config.theme.timeShadow, 0, 3, 3);
-    this.ctx.fillText(time, this.timeX, this.timeY);
+    this.ctx.fillText(
+      time,
+      player.startX + this.timeX,
+      player.startY + this.timeY
+    );
     this.ctx.restore();
   }
 
-  drawGrid(opponent) {
-    let sx = this.pStartX;
-    let sy = this.pStartY;
-    if (opponent) {
-      sx = this.oStartX;
-      sy = this.oStartY;
-    }
-    this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.strokeStyle = this.g.config.theme.gridLine;
-    this.ctx.lineWidth = 1;
-    for (let v = 1; v <= this.g.config.vTiles - 1; v++) {
-      let y = this.g.config.tile * v + sy;
-      this.ctx.moveTo(sx, y - MAGIC_NUM.HALF);
-      this.ctx.lineTo(sx + this.pWidth, y - MAGIC_NUM.HALF);
-    }
-    for (let h = 1; h <= this.g.config.hTiles - 1; h++) {
-      let x = this.g.config.tile * h + sx;
-      this.ctx.moveTo(x - MAGIC_NUM.HALF, sy);
-      this.ctx.lineTo(x - MAGIC_NUM.HALF, sy + this.pHeight);
-    }
-    this.ctx.stroke();
-    this.ctx.closePath();
-    this.ctx.restore();
-  }
-
-  drawFallingPiece(opponent) {
-    let fp = this.g.player.fallingPiece;
-    let sX = this.pStartX;
-    let sY = this.pStartY;
-    if (opponent) {
-      fp = this.g.opponent.fallingPiece;
-      sX = this.oStartX;
-      sY = this.oStartY;
-    }
-    if (fp.type === -1) {
+  drawFallingPiece(player) {
+    let sX = player.startX + this.gridStartX;
+    let sY = player.startY + this.gridStartY;
+    if (player.fallingPiece.type === -1) {
       return;
     }
     this.ctx.save();
     this.ctx.fillStyle =
       'rgba(' +
-      this.g.config.pieces[fp.type].color.red +
+      this.g.config.pieces[player.fallingPiece.type].color.red +
       ', ' +
-      this.g.config.pieces[fp.type].color.green +
+      this.g.config.pieces[player.fallingPiece.type].color.green +
       ', ' +
-      this.g.config.pieces[fp.type].color.blue +
+      this.g.config.pieces[player.fallingPiece.type].color.blue +
       ', 1)';
-    const blocks = this.g.player.getFallingBlocks(opponent);
+    const blocks = player.getFallingBlocks();
     for (let b = 0; b < blocks.length; b++) {
       let block = blocks[b];
       this.drawBlock(
-        fp.type,
+        player.fallingPiece.type,
         block.c * this.g.config.tile + sX,
         block.r * this.g.config.tile + sY
       );
@@ -596,21 +588,16 @@ export default class render {
     this.ctx.restore();
   }
 
-  drawFixedBlocks(opponent) {
-    let sX = this.pStartX;
-    let sY = this.pStartY;
-    let grid = this.g.player.grid;
-    if (opponent) {
-      sX = this.oStartX;
-      sY = this.oStartY;
-      grid = this.g.opponent.grid;
-    }
+  drawFixedBlocks(player) {
+    let sX = player.startX + this.gridStartX;
+    let sY = player.startY + this.gridStartY;
+    let grid = player.grid;
     let x = 0,
       y = 0;
     const now = new Date().getTime();
     let mPer = 0;
-    if (this.g.player.animateTo.lineBreak > now) {
-      const dif = this.g.player.animateTo.lineBreak - now;
+    if (player.animateTo.lineBreak > now) {
+      const dif = player.animateTo.lineBreak - now;
       const mod = dif % this.g.config.animateCycle.lineBreak;
       const opMod = this.g.config.animateCycle.lineBreak - mod;
       mPer = opMod / this.g.config.animateCycle.lineBreak;
@@ -622,7 +609,7 @@ export default class render {
           let offset = this.g.getPieceOffset(r, c);
           x = offset[1];
           y = offset[0];
-          if (!opponent && this.g.player.rowIsCleared(r)) {
+          if (player.rowIsCleared(r)) {
             let d2x = this.scoreX - this.g.config.tile - x;
             let d2y = this.scoreY - 30 - y;
             let tPer = mPer + c * 0.01;
@@ -642,13 +629,15 @@ export default class render {
             }
           }
           let p = 0;
-          if (typeof this.g.player.placedBlocks[r + ':' + c] === 'number') {
-            let dif =
-              this.g.player.placedBlocks[r + ':' + c] - new Date().getTime();
+          if (typeof player.placedBlocks[r + ':' + c] === 'number') {
+            let dif = player.placedBlocks[r + ':' + c] - new Date().getTime();
             let percent = dif / this.g.config.dropDelay;
             p = percent;
             if (p > 0) {
-              percent = ((new Date().getTime() % MAGIC_NUM.MILISECONDS) / MAGIC_NUM.MILISECONDS) * MAGIC_NUM.PERCENT;
+              percent =
+                ((new Date().getTime() % MAGIC_NUM.MILISECONDS) /
+                  MAGIC_NUM.MILISECONDS) *
+                MAGIC_NUM.PERCENT;
               let counter = percent * this.percentPi;
               let ver = (Math.sin(counter) * 4) | 0;
               x -= ver;
@@ -656,13 +645,10 @@ export default class render {
             }
           }
           let bType = grid[r][c];
-          if (
-            typeof this.g.player.special[r + ':' + c] !== 'undefined' &&
-            !opponent
-          ) {
+          if (typeof player.special[r + ':' + c] !== 'undefined') {
             bType = 9;
-            x += this.g.player.xSpecialJitter;
-            y += this.g.player.ySpecialJitter;
+            x += player.xSpecialJitter;
+            y += player.ySpecialJitter;
           }
           this.drawBlock(bType, x + sX, y + sY, a, p);
         }
@@ -671,11 +657,15 @@ export default class render {
   }
 
   drawLoader() {
-    const percent = (new Date().getTime() % MAGIC_NUM.MILISECONDS) / MAGIC_NUM.MILISECONDS;
+    const percent =
+      (new Date().getTime() % MAGIC_NUM.MILISECONDS) / MAGIC_NUM.MILISECONDS;
     const x = 450,
       y = 110,
       r = 50;
-    const start = percent * MAGIC_NUM.CIRCLE * (Math.PI / (MAGIC_NUM.CIRCLE*MAGIC_NUM.HALF));
+    const start =
+      percent *
+      MAGIC_NUM.CIRCLE *
+      (Math.PI / (MAGIC_NUM.CIRCLE * MAGIC_NUM.HALF));
     const end = start - Math.PI * 1.5;
     this.ctx.save();
     this.ctx.beginPath();
@@ -688,8 +678,11 @@ export default class render {
     this.ctx.restore();
   }
 
-  drawCountDown(now) {
-    const remaining = Math.ceil((this.g.mp.countUntil - now) / MAGIC_NUM.MILISECONDS);
+  drawCountDown() {
+    const now = new Date().getTime();
+    const remaining = Math.ceil(
+      (this.g.mp.countUntil - now) / MAGIC_NUM.MILISECONDS
+    );
     if (remaining !== this.g.lastCountDown) {
       if (typeof this.g.sounds.countDown !== 'undefined') {
         this.g.sounds.countDown.currentTime = 0;
@@ -701,7 +694,11 @@ export default class render {
     this.ctx.fillStyle = this.g.config.theme.countDown;
     this.ctx.textBaseline = 'middle';
     const num = remaining.toString();
-    this.ctx.fillText(num, 450 - this.ctx.measureText(num).width * MAGIC_NUM.HALF, 110);
+    this.ctx.fillText(
+      num,
+      450 - this.ctx.measureText(num).width * MAGIC_NUM.HALF,
+      110
+    );
     this.ctx.restore();
   }
 
@@ -770,9 +767,12 @@ export default class render {
     this.ctx.restore();
   }
 
-  drawSpecialEffects() {
+  drawSpecialEffects(player) {
     this.ctx.save();
-    const percent = (((this.g.runTime / MAGIC_NUM.MILISECONDS) % 2) * MAGIC_NUM.HALF) * MAGIC_NUM.PERCENT;
+    const percent =
+      ((this.g.runTime / MAGIC_NUM.MILISECONDS) % 2) *
+      MAGIC_NUM.HALF *
+      MAGIC_NUM.PERCENT;
     const counter = percent * this.percentPi;
     const v = (Math.sin(counter) * (this.g.config.tile * 0.75)) | 0;
     const defXOffset = 0;
@@ -786,11 +786,16 @@ export default class render {
     if (shadowAlpha > 1) {
       shadowAlpha = 1;
     }
-    this.shadow('rgba(255, 255, 255, ' + shadowAlpha + ')', this.g.config.tile, 0, 0);
+    this.shadow(
+      'rgba(255, 255, 255, ' + shadowAlpha + ')',
+      this.g.config.tile,
+      0,
+      0
+    );
     this.ctx.fillStyle = 'rgba(240, 210, 0, ' + fillAlpha + ')';
     let x = 0,
       y = 0;
-    for (let key in this.g.player.special) {
+    for (let key in player.special) {
       let pair = key.split(':');
       let r = parseInt(pair[0]);
       let c = parseInt(pair[1]);
@@ -811,7 +816,9 @@ export default class render {
         yOffset = defYOffset;
       for (let i = 0; i < 10; i++) {
         this.ctx.beginPath();
-        let xFac = Math.round((Math.PI * i * MAGIC_NUM.MILISECONDS) % MAGIC_NUM.PERCENT);
+        let xFac = Math.round(
+          (Math.PI * i * MAGIC_NUM.MILISECONDS) % MAGIC_NUM.PERCENT
+        );
         let xCounter = xFac * this.percentPi;
         xOffset = defXOffset + ((Math.sin(xCounter) * this.halfTile) | 0);
         let yFac = Math.round((Math.PI * i * 1000000) % MAGIC_NUM.PERCENT);
@@ -819,8 +826,12 @@ export default class render {
         yOffset = defYOffset + ((Math.sin(yCounter) * this.halfTile) | 0);
         this.ctx.globalCompositeOperation = 'xor';
         this.ctx.arc(
-          x + this.g.xSpecialJitter + (this.halfTile * MAGIC_NUM.HALF - xOffset),
-          y + this.g.ySpecialJitter + (this.halfTile * MAGIC_NUM.HALF - yOffset),
+          x +
+            this.g.xSpecialJitter +
+            (this.halfTile * MAGIC_NUM.HALF - xOffset),
+          y +
+            this.g.ySpecialJitter +
+            (this.halfTile * MAGIC_NUM.HALF - yOffset),
           0.2 + v * 0.7,
           0,
           this.doublePi
@@ -841,11 +852,13 @@ export default class render {
     this.ctx.restore();
   }
 
-  drawGhost() {
-    const ghost = this.g.getGhostBlocks();
-    const fBlocks = this.g.player.getFallingBlocks();
+  drawGhost(player) {
+    const ghost = player.getGhostBlocks();
+    const fBlocks = player.getFallingBlocks();
     let tmpAlpha = this.g.config.ghostAlpha * MAGIC_NUM.PERCENT;
-    const percent = ((this.g.runTime % MAGIC_NUM.MILISECONDS) / MAGIC_NUM.MILISECONDS) * MAGIC_NUM.PERCENT;
+    const percent =
+      ((this.g.runTime % MAGIC_NUM.MILISECONDS) / MAGIC_NUM.MILISECONDS) *
+      MAGIC_NUM.PERCENT;
     const counter = percent * this.percentPi;
     const v = (Math.sin(counter) * (tmpAlpha * 1)) | 0;
     tmpAlpha = tmpAlpha * MAGIC_NUM.HALF + v * MAGIC_NUM.HALF;
@@ -854,28 +867,30 @@ export default class render {
       for (let i = 0; i < ghost.length; i++) {
         let o = this.g.getPieceOffset(ghost[i].r, ghost[i].c);
         this.drawBlock(
-          this.g.player.fallingPiece.type,
-          o[1] + this.pStartX,
-          o[0] + this.pStartY,
+          player.fallingPiece.type,
+          player.startX + o[1] + this.gridStartX,
+          player.startY + o[0] + this.gridStartY,
           alpha
         );
       }
     }
   }
 
-  drawMessages() {
+  drawMessages(player) {
     this.ctx.save();
     this.ctx.textBaseline = 'bottom';
-    for (let i = 0; i < this.g.player.messages.length; i++) {
-      let o = this.g.player.messages.length - i;
-      let msg = this.g.player.messages[i];
+    for (let i = 0; i < player.messages.length; i++) {
+      let o = player.messages.length - i;
+      let msg = player.messages[i];
       let offset = (o - 1) * this.msgH;
       let p = this.getMsgPos(msg);
       let percent =
         (this.g.config.scoreMsgTime - (msg.expiration - this.g.runTime)) /
         this.g.config.scoreMsgTime;
       offset += percent * this.g.config.scoreMsgDrift;
-      let a = Math.sin((1 - percent) * MAGIC_NUM.PERCENT * this.percentPi) * MAGIC_NUM.DOUBLE;
+      let a =
+        Math.sin((1 - percent) * MAGIC_NUM.PERCENT * this.percentPi) *
+        MAGIC_NUM.DOUBLE;
       if (a > 1) {
         a = 1;
       } else if (a < 0) {
@@ -907,15 +922,15 @@ export default class render {
         c = maxC;
       }
       const p = this.g.getPieceOffset(r, c);
-      x = p[1] + this.pStartX;
-      y = p[0] + this.pStartY;
+      x = p[1] + this.gridStartX;
+      y = p[0] + this.gridStartY;
     } else {
       y = this.canvas.height - this.g.config.tile * 1;
-      x = this.pStartX + this.g.config.tile * 3;
+      x = this.gridStartX + this.g.config.tile * 3;
     }
     return {
       x,
-      y 
+      y
     };
   }
 
@@ -927,7 +942,7 @@ export default class render {
     return width;
   }
 
-  drawLeaderBoard() {
+  drawLeaderBoard(player) {
     if (this.g.leaderBoard.isShowing) {
       this.ctx.save();
       this.ctx.textBaseline = 'top';
@@ -952,7 +967,7 @@ export default class render {
           y = this.lbY + rowHeight * i;
           rank = pad.substr(0, pad.length - r.rank.toString().length) + r.rank;
           score = r.score.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          if (this.g.player.lastRank > 0 && this.g.player.lastRank === r.rank) {
+          if (player.lastRank > 0 && player.lastRank === r.rank) {
             this.ctx.fillStyle = this.g.config.theme.lbHighlight;
             this.ctx.fillRect(
               x,
