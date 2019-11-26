@@ -14,7 +14,7 @@
     "rotate": 220,
     "down": 50,
     "drop": 300,
-    "pause": 200,
+    "pause": 500,
     "hold": 300,
     "inputToggle": 250
   },

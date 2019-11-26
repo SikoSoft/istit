@@ -40,7 +40,7 @@ export default class config {
       rotate: 200,
       down: 50,
       drop: 300,
-      pause: 200,
+      pause: 500,
       hold: 300
     };
     this.minKeyRepeat = 20;
