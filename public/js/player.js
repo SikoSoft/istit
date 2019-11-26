@@ -382,6 +382,12 @@ export default class player {
     this.linesToClear = [];
     if (this.g.mp.session > -1) {
       this.g.mp.sendLines(numLines);
+    } else if (this.g.players.length > 1) {
+      this.g.players.forEach(player => {
+        if (this !== player) {
+          player.getLines(numLines);
+        }
+      });
     }
     this.handleGridChange();
   }
@@ -443,9 +449,9 @@ export default class player {
 
   getLines(num) {
     this.linesToGet += num;
-    if (typeof this.sounds.newLine !== 'undefined') {
-      this.sounds.newLine.currentTime = 0;
-      this.sounds.newLine.play();
+    if (typeof this.g.sounds.newLine !== 'undefined') {
+      this.g.sounds.newLine.currentTime = 0;
+      this.g.sounds.newLine.play();
     }
     this.animateTo.lineAdd =
       new Date().getTime() + this.g.config.animateCycle.lineAdd;
@@ -456,8 +462,10 @@ export default class player {
       for (let r = 0; r < this.g.config.vTiles; r++) {
         for (let c = 0; c < this.g.config.hTiles; c++) {
           let tmpVal = this.grid[r][c];
-          this.grid[r][c] = false;
-          this.grid[r][c - 1] = tmpVal;
+          this.grid[r][c] = 0;
+          if (r > 0) {
+            this.grid[r - 1][c] = tmpVal;
+          }
         }
       }
       const empty = this.g.random(1, this.g.config.hTiles);
