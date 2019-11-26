@@ -703,7 +703,7 @@ export default class render {
   }
 
   drawBlock(t, x, y, a = 1, p = 0, s) {
-    if (y < this.g.pStartX) {
+    if (!t) {
       return;
     }
     const color = this.g.config.pieces[t].color;
