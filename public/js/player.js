@@ -38,6 +38,7 @@ export default class player {
     this.nextSpecialJitterTime = 0;
     this.lastRank = -1;
     this.input = -1;
+    this.lost = 0;
     this.nextPieces = [
       this.g.randomPiece(),
       this.g.randomPiece(),
@@ -146,7 +147,7 @@ export default class player {
           this.g.config.pieces[this.nextPieces[0]].orientations[1][b][1] -
           1;
         if (this.grid[r][c]) {
-          this.g.end();
+          this.end();
           return;
         }
       }
@@ -729,5 +730,27 @@ export default class player {
       });
     }
     return ghost;
+  }
+
+  end() {
+    this.lost = new Date().getTime();
+    if (this.g.config.mpContinueOnLose) {
+      if (this.g.players.every(player => player.lost)) {
+        this.g.end();
+      }
+    } else {
+      this.g.end();
+    }
+  }
+
+  wasFirstPlace() {
+    if (this.g.ended) {
+      return (
+        this.g.players.sort(
+          (player1, player2) => player1.lost > player2.lost
+        )[0] !== this
+      );
+    }
+    return false;
   }
 }

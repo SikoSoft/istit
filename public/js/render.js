@@ -196,8 +196,16 @@ export default class render {
           this.drawSystemMessage(player, this.g.strings.youLose);
         }
       } else {
-        this.drawSystemMessage(player, this.g.strings.gameOver);
+        if (player.wasFirstPlace()) {
+          this.drawSystemMessage(player, this.g.strings.youWin);
+        } else if (this.g.players.length > 1) {
+          this.drawSystemMessage(player, this.g.strings.youLose);
+        } else {
+          this.drawSystemMessage(player, this.g.strings.gameOver);
+        }
       }
+    } else if (player.lost) {
+      this.drawSystemMessage(player, this.g.strings.youLose);
     } else if (this.g.wait) {
       this.drawSystemMessage(player, this.g.strings.pressSpaceToBegin);
     }
@@ -230,7 +238,7 @@ export default class render {
       this.gridWidth * MAGIC_NUM.HALF -
       this.ctx.measureText(msg).width * MAGIC_NUM.HALF +
       this.halfTile;
-    this.ctx.fillText(msg, pauseX, this.sysY);
+    this.ctx.fillText(msg, player.startX + pauseX, player.startY + this.sysY);
     this.ctx.restore();
   }
 
@@ -883,7 +891,7 @@ export default class render {
       let o = player.messages.length - i;
       let msg = player.messages[i];
       let offset = (o - 1) * this.msgH;
-      let p = this.getMsgPos(msg);
+      let p = this.getMsgPos(player, msg);
       let percent =
         (this.g.config.scoreMsgTime - (msg.expiration - this.g.runTime)) /
         this.g.config.scoreMsgTime;
@@ -912,7 +920,7 @@ export default class render {
     this.ctx.restore();
   }
 
-  getMsgPos(msg) {
+  getMsgPos(player, msg) {
     const r = msg.r;
     let c = msg.c;
     let x, y;
@@ -922,11 +930,11 @@ export default class render {
         c = maxC;
       }
       const p = this.g.getPieceOffset(r, c);
-      x = p[1] + this.gridStartX;
-      y = p[0] + this.gridStartY;
+      x = p[1] + player.startX + this.gridStartX;
+      y = p[0] + player.startY + this.gridStartY;
     } else {
-      y = this.canvas.height - this.g.config.tile * 1;
-      x = this.gridStartX + this.g.config.tile * 3;
+      y = player.startY + this.canvas.height - this.g.config.tile * 1;
+      x = player.startX + this.gridStartX + this.g.config.tile * 3;
     }
     return {
       x,
