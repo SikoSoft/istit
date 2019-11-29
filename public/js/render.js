@@ -584,7 +584,7 @@ export default class render {
       ', ' +
       this.g.config.pieces[player.fallingPiece.type].color.blue +
       ', 1)';
-    const blocks = player.getFallingBlocks();
+    const blocks = player.grid.getFallingBlocks();
     for (let b = 0; b < blocks.length; b++) {
       let block = blocks[b];
       this.drawBlock(
@@ -599,7 +599,7 @@ export default class render {
   drawFixedBlocks(player) {
     let sX = player.startX + this.gridStartX;
     let sY = player.startY + this.gridStartY;
-    let grid = player.grid;
+    let grid = player.grid.matrix;
     let x = 0,
       y = 0;
     const now = new Date().getTime();
@@ -617,7 +617,7 @@ export default class render {
           let offset = this.g.getPieceOffset(r, c);
           x = offset[1];
           y = offset[0];
-          if (player.rowIsCleared(r)) {
+          if (player.grid.rowIsCleared(r)) {
             let d2x = this.scoreX - this.g.config.tile - x;
             let d2y = this.scoreY - 30 - y;
             let tPer = mPer + c * 0.01;
@@ -861,8 +861,8 @@ export default class render {
   }
 
   drawGhost(player) {
-    const ghost = player.getGhostBlocks();
-    const fBlocks = player.getFallingBlocks();
+    const ghost = player.grid.getGhostBlocks();
+    const fBlocks = player.grid.getFallingBlocks();
     let tmpAlpha = this.g.config.ghostAlpha * MAGIC_NUM.PERCENT;
     const percent =
       ((this.g.runTime % MAGIC_NUM.MILISECONDS) / MAGIC_NUM.MILISECONDS) *
