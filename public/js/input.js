@@ -181,7 +181,7 @@ export default class input {
       state = 'gameplay';
     }
     this.devices.forEach(device => {
-      if (this.isLocked(device.player)) {
+      if (this.isLocked(device.player) || device.player.endLocked) {
         state = 'gameplayerLocked';
       }
       if (

@@ -13,6 +13,7 @@ export default class player {
     this.grid = new grid(this);
     this.reset();
     this.name = 'Player';
+    this.endLocked = false;
     this.mpProps = ['score', 'level', 'lines', 'grid', 'special'];
   }
 
@@ -451,6 +452,10 @@ export default class player {
   }
 
   end() {
+    this.endLocked = true;
+    setTimeout(() => {
+      this.endLocked = false;
+    }, this.g.config.endLock);
     this.lost = new Date().getTime();
     if (this.g.config.mpContinueOnLose) {
       if (this.g.players.every(player => player.lost)) {

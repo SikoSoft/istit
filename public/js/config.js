@@ -59,6 +59,7 @@ export default class config {
       odd: ['grid', 'ui']
     };
     this.layout = {};
+    this.endLock = 3000;
   }
 
   process(override) {
