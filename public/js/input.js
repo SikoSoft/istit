@@ -63,7 +63,11 @@ export default class input {
           player.toggleHold();
         }
       },
-      gameplayLocked: {},
+      gameplayLocked: {
+        pause: () => {
+          this.g.pause();
+        }
+      },
       ended: {
         _all: () => {
           this.g.restart();
@@ -147,12 +151,9 @@ export default class input {
       : false;
   }
 
-  isLocked() {
+  isLocked(player) {
     const now = new Date().getTime();
-    if (
-      now < this.g.player.animateTo.lineBreak ||
-      now < this.g.player.animateTo.lineAdd
-    ) {
+    if (now < player.animateTo.lineBreak || now < player.animateTo.lineAdd) {
       return true;
     }
     return false;
@@ -180,6 +181,9 @@ export default class input {
       state = 'gameplay';
     }
     this.devices.forEach(device => {
+      if (this.isLocked(device.player)) {
+        state = 'gameplayerLocked';
+      }
       if (
         device.type === MAGIC_NUM.DEVICE_TYPE_XBOX360 &&
         this.gamePadDetected &&
