@@ -25,7 +25,7 @@ export default class render {
     this.gridEndY = this.pStaryY + this.gridHeight;
     this.oStartX = this.defWidth;
     this.oStartY = this.gridStartY;
-    this.mW = this.g.config.tile * 6;
+    this.mW = this.g.config.tile * MAGIC_NUM.UI_WIDTH;
     this.mStartX = this.gridEndX + this.g.config.tile * MAGIC_NUM.HALF;
     this.mStartY = this.g.config.tile * MAGIC_NUM.HALF;
     this.mEndX = this.defWidth - this.g.config.tile * MAGIC_NUM.HALF;
@@ -38,7 +38,7 @@ export default class render {
     this.scoreX =
       this.gridEndX +
       this.g.config.tile * MAGIC_NUM.HALF +
-      this.g.config.tile * 3;
+      this.g.config.tile * (MAGIC_NUM.UI_WIDTH * MAGIC_NUM.HALF);
     this.scoreY = this.defHeight - this.g.config.tile * MAGIC_NUM.HALF;
     Object.keys(this.g.config.theme.font).forEach(font => {
       this.font[font] = {
@@ -67,7 +67,9 @@ export default class render {
     this.timeX =
       this.scoreX -
       this.textWidth('00:00', this.font.time.string()) * MAGIC_NUM.HALF;
-    this.timeY = this.defHeight - 5 * this.g.config.tile;
+    this.timeY =
+      this.defHeight -
+      Math.floor(MAGIC_NUM.QUARTER * this.g.config.vTiles) * this.g.config.tile;
     this.msgH = this.font.scoreMsgPoints.size * 1.25;
     this.hScoresX = this.gridStartX + this.gridWidth * 0.1;
     this.hScoresY = this.gridStartY + this.gridHeight * MAGIC_NUM.HALF;
@@ -103,8 +105,10 @@ export default class render {
   syncDefDimension() {
     this.defWidth =
       this.g.config.hTiles * this.g.config.tile +
-      this.g.config.tile * 6 +
-      this.g.config.tile * MAGIC_NUM.HALF * 3;
+      this.g.config.tile * MAGIC_NUM.UI_WIDTH +
+      this.g.config.tile *
+        MAGIC_NUM.HALF *
+        (MAGIC_NUM.UI_WIDTH * MAGIC_NUM.HALF);
     this.defHeight =
       this.g.config.vTiles * this.g.config.tile + this.g.config.tile;
   }

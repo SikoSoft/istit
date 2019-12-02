@@ -1,4 +1,5 @@
 export default {
+  QUARTER: 0.25,
   HALF: 0.5,
   DOUBLE: 2,
   MILISECONDS: 1000,
@@ -16,5 +17,6 @@ export default {
   NEXT_PIECES: 3,
   LEADERBOARD: 25,
   DEVICE_TYPE_KEYBOARD: 1,
-  DEVICE_TYPE_XBOX360: 2
+  DEVICE_TYPE_XBOX360: 2,
+  UI_WIDTH: 6
 };
