@@ -208,7 +208,7 @@ export default class render {
           this.drawSystemMessage(player, this.g.strings.gameOver);
         }
       }
-    } else if (player.lost) {
+    } else if (player.ended) {
       this.drawSystemMessage(player, this.g.strings.youLose);
     } else if (this.g.wait) {
       this.drawSystemMessage(player, this.g.strings.pressSpaceToBegin);
@@ -550,7 +550,11 @@ export default class render {
   }
 
   drawTime(player) {
-    const fTime = this.g.parseMiliSeconds(this.g.runTime);
+    let duration = this.g.runTime;
+    if (player.ended) {
+      duration = player.ended - this.g.startTime;
+    }
+    const fTime = this.g.parseMiliSeconds(duration);
     let minutes = fTime[2];
     let seconds = fTime[3];
     if (String(minutes).length === 1) {

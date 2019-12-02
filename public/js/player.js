@@ -14,14 +14,13 @@ export default class player {
     this.reset();
     this.name = 'Player';
     this.endLocked = false;
-    this.mpProps = ['score', 'level', 'lines', 'grid', 'special'];
+    this.mpProps = ['score', 'level', 'lines', 'special'];
   }
 
   reset() {
     this.score = 0;
     this.level = 0;
     this.lines = 0;
-    //this.grid = [];
     this.fallTime = 0;
     this.lastScoreTime = 0;
     this.dropAt = 0;
@@ -34,14 +33,13 @@ export default class player {
     this.nextPiece = false;
     this.holdPiece = false;
     this.special = {};
-    //this.gridWeightHistory = [];
     this.messages = [];
     this.nextSafetyAt = 0;
     this.nextSpecialTime = 0;
     this.nextSpecialJitterTime = 0;
     this.lastRank = -1;
     this.input = -1;
-    this.lost = 0;
+    this.ended = 0;
     this.nextPieces = [
       this.g.randomPiece(),
       this.g.randomPiece(),
@@ -90,7 +88,9 @@ export default class player {
   }
 
   state() {
-    let copy = {};
+    let copy = {
+      grid: this.grid.matrix
+    };
     Object.keys(this).forEach(key => {
       if (this.mpProps.indexOf(key) > -1) {
         copy[key] = this[key];
@@ -452,13 +452,16 @@ export default class player {
   }
 
   end() {
+    if (this.ended) {
+      return;
+    }
+    this.ended = new Date().getTime();
     this.endLocked = true;
     setTimeout(() => {
       this.endLocked = false;
     }, this.g.config.endLock);
-    this.lost = new Date().getTime();
     if (this.g.config.mpContinueOnLose) {
-      if (this.g.players.every(player => player.lost)) {
+      if (this.g.players.every(player => player.ended)) {
         this.g.end();
       }
     } else {
@@ -470,7 +473,7 @@ export default class player {
     if (this.g.ended) {
       return (
         this.g.players.sort(
-          (player1, player2) => player1.lost > player2.lost
+          (player1, player2) => player1.ended > player2.ended
         )[0] !== this
       );
     }

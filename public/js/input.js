@@ -181,8 +181,11 @@ export default class input {
       state = 'gameplay';
     }
     this.devices.forEach(device => {
-      if (this.isLocked(device.player) || device.player.endLocked) {
-        state = 'gameplayerLocked';
+      if (
+        device.player &&
+        (this.isLocked(device.player) || device.player.endLocked)
+      ) {
+        state = 'gameplayLocked';
       }
       if (
         device.type === MAGIC_NUM.DEVICE_TYPE_XBOX360 &&
