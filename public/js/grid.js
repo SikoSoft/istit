@@ -72,15 +72,12 @@ export default class grid {
     return collidesWith;
   }
 
-  getFallingBlocks(p, t) {
+  getFallingBlocks(
+    p = this.player.fallingPiece.position,
+    t = this.player.fallingPiece.type
+  ) {
     if (this.player.fallingPiece.type === -1) {
       return [];
-    }
-    if (typeof p === 'undefined') {
-      p = this.player.fallingPiece.position;
-    }
-    if (typeof t === 'undefined') {
-      t = this.player.fallingPiece.type;
     }
     let r = 0;
     let c = 0;
