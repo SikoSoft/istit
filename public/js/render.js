@@ -622,7 +622,7 @@ export default class render {
       for (let r = 0; r < this.g.config.vTiles; r++) {
         let a = 1;
         if (grid[r][c] !== 0) {
-          let offset = this.g.getPieceOffset(r, c);
+          let offset = this.getPieceOffset(r, c);
           x = offset[1];
           y = offset[0];
           if (player.grid.rowIsCleared(r)) {
@@ -815,7 +815,7 @@ export default class render {
       let pair = key.split(':');
       let r = parseInt(pair[0]);
       let c = parseInt(pair[1]);
-      let offset = this.g.getPieceOffset(r, c);
+      let offset = this.getPieceOffset(r, c);
       x = offset[1] + this.g.config.tile;
       y = offset[0] + this.g.config.tile;
       this.ctx.beginPath();
@@ -881,7 +881,7 @@ export default class render {
     const alpha = tmpAlpha / MAGIC_NUM.PERCENT;
     if (fBlocks.length > 0 && fBlocks[0].r < ghost[0].r) {
       for (let i = 0; i < ghost.length; i++) {
-        let o = this.g.getPieceOffset(ghost[i].r, ghost[i].c);
+        let o = this.getPieceOffset(ghost[i].r, ghost[i].c);
         this.drawBlock(
           player.fallingPiece.type,
           player.startX + o[1] + this.gridStartX,
@@ -937,7 +937,7 @@ export default class render {
       if (c > maxC) {
         c = maxC;
       }
-      const p = this.g.getPieceOffset(r, c);
+      const p = this.getPieceOffset(r, c);
       x = p[1] + player.startX + this.gridStartX;
       y = p[0] + player.startY + this.gridStartY;
     } else {
@@ -1020,5 +1020,11 @@ export default class render {
     this.ctx.shadowBlur = blur;
     this.ctx.shadowOffsetX = x;
     this.ctx.shadowOffsetY = y;
+  }
+
+  getPieceOffset(r, c) {
+    const rOffset = r * this.g.config.tile;
+    const cOffset = c * this.g.config.tile;
+    return [rOffset, cOffset];
   }
 }

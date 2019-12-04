@@ -298,12 +298,6 @@ export default class istit {
     return 1;
   }
 
-  getPieceOffset(r, c) {
-    const rOffset = r * this.config.tile;
-    const cOffset = c * this.config.tile;
-    return [rOffset, cOffset];
-  }
-
   getLevelScores(mLevel) {
     let score;
     let lastScore = 0;
