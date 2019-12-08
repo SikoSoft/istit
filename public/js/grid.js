@@ -181,7 +181,7 @@ export default class grid {
     } else if (this.player.g.players.length > 1) {
       this.player.g.players.forEach(player => {
         if (this.player !== player) {
-          player.getLines(numLines);
+          player.grid.getLines(numLines);
         }
       });
     }
