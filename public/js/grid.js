@@ -193,7 +193,7 @@ export default class grid {
   }
 
   clearLines(lines) {
-    const msg = this.player.g.strings.linesClearedX.replace(
+    const msg = this.player.g.assets.strings.linesClearedX.replace(
       '{lines}',
       lines.length
     );
@@ -209,7 +209,7 @@ export default class grid {
         this.player.adjustScore(
           MAGIC_NUM.POINTS_MAX_LINES * this.player.chainCount,
           {
-            text: this.player.g.strings.istitChain,
+            text: this.player.g.assets.strings.istitChain,
             r: hotPiece.r,
             c: hotPiece.c
           }
@@ -231,7 +231,7 @@ export default class grid {
             this.player.adjustScore(
               this.player.g.config.specialBonus,
               {
-                text: this.player.g.strings.goldenBlock
+                text: this.player.g.assets.strings.goldenBlock
               },
               false
             );
@@ -239,14 +239,8 @@ export default class grid {
         }
       }
     }
-    if (typeof this.player.g.sounds.clearLine !== 'undefined') {
-      this.player.g.sounds.clearLine.currentTime = 0;
-      this.player.g.sounds.clearLine.play();
-    }
-    if (typeof this.player.g.sounds['lines' + lines.length] !== 'undefined') {
-      this.player.g.sounds['lines' + lines.length].currentTime = 0;
-      this.player.g.sounds['lines' + lines.length].play();
-    }
+    this.player.g.assets.playSound('clearLine');
+    this.player.g.assets.playSound('lines' + lines.length);
     this.player.lines += lines.length;
     this.player.linesToClear = lines;
     this.player.animateTo.lineBreak =
@@ -255,10 +249,7 @@ export default class grid {
 
   getLines(num) {
     this.player.linesToGet += num;
-    if (typeof this.player.g.sounds.newLine !== 'undefined') {
-      this.player.g.sounds.newLine.currentTime = 0;
-      this.player.g.sounds.newLine.play();
-    }
+    this.player.g.assets.playSound('newLine');
     this.player.animateTo.lineAdd =
       new Date().getTime() + this.player.g.config.animateCycle.lineAdd;
   }

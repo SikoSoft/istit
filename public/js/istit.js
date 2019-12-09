@@ -1,4 +1,5 @@
 import config from './config.js';
+import assets from './assets.js';
 import localPlayer from './localPlayer.js';
 import remotePlayer from './remotePlayer.js';
 import input from './input.js';
@@ -13,14 +14,13 @@ export default class istit {
     window.istit = this;
     this.version = '1.2.0';
     this.config = new config(this);
-    this.strings = {};
+    this.assets = new assets(this);
     this.runTime = 0;
     this.startTime = 0;
     this.paused = false;
     this.ended = false;
     this.wait = false;
     this.levels = {};
-    this.images = {};
     this.players = [];
     this.volume = this.config.defVolume;
     this.showingNamePrompt = false;
@@ -130,13 +130,13 @@ export default class istit {
       this.config
         .load()
         .then(() => {
-          return this.loadStrings();
+          return this.assets.loadStrings();
         })
         .then(() => {
-          return this.loadImages();
+          return this.assets.loadImages();
         })
         .then(() => {
-          return this.loadSounds();
+          return this.assets.loadSounds();
         })
         .then(() => {
           resolve();
@@ -144,74 +144,6 @@ export default class istit {
         .catch(error => {
           console.log('Encountered an error while loading!', error); //eslint-disable-line
         });
-    });
-  }
-
-  loadStrings() {
-    return new Promise((resolve, reject) => {
-      fetch('strings.json')
-        .then(data => data.json())
-        .then(json => {
-          this.strings = json;
-          resolve(json);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
-  }
-
-  loadImages() {
-    return new Promise((resolve, reject) => {
-      let imagesLoaded = 0,
-        numImages = 0;
-      this.images.bg = {};
-      if (this.config.theme.frameTexture) {
-        numImages++;
-        this.images.frameTexture = new Image();
-        this.images.frameTexture.src = this.config.theme.frameTexture;
-        this.images.frameTexture.onload = () => {
-          imagesLoaded++;
-          if (imagesLoaded === numImages) {
-            resolve();
-          }
-        };
-        this.images.frameTexture.onerror = reject;
-      }
-      for (let l in this.config.theme.bgImages) {
-        numImages++;
-        this.images.bg[l] = new Image();
-        this.images.bg[l].src = this.config.theme.bgImages[l];
-        this.images.bg[l].onload = () => {
-          imagesLoaded++;
-          if (imagesLoaded === numImages) {
-            resolve();
-          }
-        };
-      }
-      if (numImages === 0) {
-        resolve();
-      }
-    });
-  }
-
-  loadSounds() {
-    return new Promise((resolve, reject) => {
-      let soundsLoaded = 0,
-        numSounds = 0;
-      this.sounds = {};
-      for (let snd in this.config.theme.sounds) {
-        numSounds++;
-        this.sounds[snd] = new Audio(this.config.theme.sounds[snd]);
-        this.sounds[snd].volume = this.config.defVolume;
-        this.sounds[snd].onloadeddata = () => {
-          soundsLoaded++;
-          if (soundsLoaded === numSounds) {
-            resolve();
-          }
-        };
-        this.sounds[snd].onerror = reject;
-      }
     });
   }
 
@@ -237,10 +169,7 @@ export default class istit {
         (this.mp.countUntil - now) / MAGIC_NUM.MILISECONDS
       );
       if (remaining !== this.lastCountDown) {
-        if (typeof this.sounds.countDown !== 'undefined') {
-          this.sounds.countDown.currentTime = 0;
-          this.sounds.countDown.play();
-        }
+        this.assets.playSound('countDown');
       }
       this.lastCountDown = remaining;
     }

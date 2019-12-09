@@ -268,14 +268,16 @@ export default class player {
       this.addScoreMessage('+' + p + ' ' + msg.text, msg.r, msg.c);
       if (levelBonus > 0) {
         this.addScoreMessage(
-          '+' + this.g.strings.levelBonus.replace('{points}', levelBonus),
+          '+' +
+            this.g.assets.strings.levelBonus.replace('{points}', levelBonus),
           msg.r,
           msg.c
         );
       }
       if (speedBonus > 0 && giveSpeedBonus) {
         this.addScoreMessage(
-          '+' + this.g.strings.speedBonus.replace('{points}', speedBonus),
+          '+' +
+            this.g.assets.strings.speedBonus.replace('{points}', speedBonus),
           msg.r,
           msg.c
         );

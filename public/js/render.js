@@ -181,37 +181,43 @@ export default class render {
 
   drawSystemMessages(player) {
     if (this.g.paused) {
-      this.drawSystemMessage(player, this.g.strings.paused);
+      this.drawSystemMessage(player, this.g.assets.strings.paused);
     } else if (!this.g.mp.oppIsAlive) {
-      this.drawSystemMessage(player, this.g.strings.opponentDisconnected);
+      this.drawSystemMessage(
+        player,
+        this.g.assets.strings.opponentDisconnected
+      );
     } else if (this.g.mp.wait) {
       if (this.g.mp.countingDown) {
-        this.drawSystemMessage(player, this.g.strings.getReady);
+        this.drawSystemMessage(player, this.g.assets.strings.getReady);
       } else if (this.g.mp.connected) {
-        this.drawSystemMessage(player, this.g.strings.waitingForPeer);
+        this.drawSystemMessage(player, this.g.assets.strings.waitingForPeer);
       } else {
-        this.drawSystemMessage(player, this.g.strings.connectingToServer);
+        this.drawSystemMessage(
+          player,
+          this.g.assets.strings.connectingToServer
+        );
       }
     } else if (this.g.ended) {
       if (this.g.mp.sessionEnded) {
         if (this.g.mp.isWinner) {
-          this.drawSystemMessage(player, this.g.strings.youWin);
+          this.drawSystemMessage(player, this.g.assets.strings.youWin);
         } else {
-          this.drawSystemMessage(player, this.g.strings.youLose);
+          this.drawSystemMessage(player, this.g.assets.strings.youLose);
         }
       } else {
         if (player.wasFirstPlace()) {
-          this.drawSystemMessage(player, this.g.strings.youWin);
+          this.drawSystemMessage(player, this.g.assets.strings.youWin);
         } else if (this.g.players.length > 1) {
-          this.drawSystemMessage(player, this.g.strings.youLose);
+          this.drawSystemMessage(player, this.g.assets.strings.youLose);
         } else {
-          this.drawSystemMessage(player, this.g.strings.gameOver);
+          this.drawSystemMessage(player, this.g.assets.strings.gameOver);
         }
       }
     } else if (player.ended) {
-      this.drawSystemMessage(player, this.g.strings.youLose);
+      this.drawSystemMessage(player, this.g.assets.strings.youLose);
     } else if (this.g.wait) {
-      this.drawSystemMessage(player, this.g.strings.pressSpaceToBegin);
+      this.drawSystemMessage(player, this.g.assets.strings.pressSpaceToBegin);
     }
   }
 
@@ -251,18 +257,18 @@ export default class render {
     this.ctx.fillStyle = this.g.config.theme.frame;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.restore();
-    if (this.g.images.frameTexture) {
+    if (this.g.assets.images.frameTexture) {
       const numH = Math.ceil(
-        this.canvas.width / this.g.images.frameTexture.width
+        this.canvas.width / this.g.assets.images.frameTexture.width
       );
       const numV = Math.ceil(
-        this.canvas.height / this.g.images.frameTexture.height
+        this.canvas.height / this.g.assets.images.frameTexture.height
       );
       for (let v = 0; v < numV; v++) {
         for (let h = 0; h < numH; h++) {
-          let x = h * this.g.images.frameTexture.width;
-          let y = v * this.g.images.frameTexture.height;
-          this.ctx.drawImage(this.g.images.frameTexture, x, y);
+          let x = h * this.g.assets.images.frameTexture.width;
+          let y = v * this.g.assets.images.frameTexture.height;
+          this.ctx.drawImage(this.g.assets.images.frameTexture, x, y);
         }
       }
     }
@@ -281,10 +287,10 @@ export default class render {
     this.ctx.save();
     this.ctx.globalAlpha = 0.6;
     let img = false;
-    if (typeof this.g.images.bg[player.level] !== 'undefined') {
-      img = this.g.images.bg[player.level];
-    } else if (typeof this.g.images.bg['default'] !== 'undefined') {
-      img = this.g.images.bg['default'];
+    if (typeof this.g.assets.images.bg[player.level] !== 'undefined') {
+      img = this.g.assets.images.bg[player.level];
+    } else if (typeof this.g.assets.images.bg['default'] !== 'undefined') {
+      img = this.g.assets.images.bg['default'];
     }
     if (img) {
       this.ctx.drawImage(
@@ -351,7 +357,7 @@ export default class render {
     this.ctx.fillStyle = this.g.config.theme.nextLabel;
     this.shadow(this.g.config.theme.nextLabelShadow, 0, 2, 2);
     this.ctx.fillText(
-      this.g.strings.next,
+      this.g.assets.strings.next,
       player.startX + this.mStartX + this.halfTile * MAGIC_NUM.HALF,
       player.startY + this.gridStartY + this.halfTile * MAGIC_NUM.HALF
     );
@@ -459,7 +465,7 @@ export default class render {
     this.ctx.fillStyle = this.g.config.theme.holdLabel;
     this.shadow(this.g.config.theme.holdLabelShadow, 0, 2, 2);
     this.ctx.fillText(
-      this.g.strings.hold,
+      this.g.assets.strings.hold,
       player.startX + this.mStartX + this.halfTile * MAGIC_NUM.HALF,
       player.startY + this.hStartY + this.halfTile * MAGIC_NUM.HALF
     );
@@ -536,7 +542,7 @@ export default class render {
     this.ctx.font = this.font.level.string();
     this.ctx.fillStyle = this.g.config.theme.level;
     this.ctx.textBaseline = 'top';
-    const str = this.g.strings.level.replace('{level}', player.level);
+    const str = this.g.assets.strings.level.replace('{level}', player.level);
     this.shadow(this.g.config.theme.levelShadow, 0, 2, 2);
     const textDim = this.ctx.measureText(str);
     const textHeight =
@@ -700,10 +706,7 @@ export default class render {
       (this.g.mp.countUntil - now) / MAGIC_NUM.MILISECONDS
     );
     if (remaining !== this.g.lastCountDown) {
-      if (typeof this.g.sounds.countDown !== 'undefined') {
-        this.g.sounds.countDown.currentTime = 0;
-        this.g.sounds.countDown.play();
-      }
+      this.g.assets.playSound('countDown');
     }
     this.ctx.save();
     this.ctx.font = '50px Lucida Console';
