@@ -1,3 +1,5 @@
+import MAGIC_NUM from './magicNum.js';
+
 export default class mp {
   constructor(g) {
     this.g = g;
@@ -11,6 +13,7 @@ export default class mp {
     this.syncTimes = 0;
     this.connected = false;
     this.sessionEnded = false;
+    this.opponent = false;
   }
 
   prepare() {
@@ -29,38 +32,47 @@ export default class mp {
     this.ws.onmessage = msg => {
       this.handleMessage(msg);
     };
-    this.g.render.resize();
   }
 
   handleMessage(msg) {
     const json = JSON.parse(msg.data);
-    if (json.event === 'sessionReady') {
+    switch (json.event) {
+    case 'sessionReady':
       this.startSession(json.session);
-    } else if (json.event === 'end') {
+      break;
+    case 'end':
       this.g.end(true);
-    } else if (json.event === 'linesGet') {
-      this.g.getLines(json.num);
-    } else if (json.event === 'statePull') {
-      this.g.opponent = json.state;
-    } else if (json.event === 'fpPull') {
-      this.g.opponent.fallingPiece = json.fallingPiece;
-    } else if (json.event === 'sync') {
+      break;
+    case 'linesGet':
+      this.g.player.grid.getLines(json.num);
+      break;
+    case 'statePull':
+      this.opponent.setState(json.state);
+      break;
+    case 'fpPull':
+      this.opponent.setFallingPiece(json.fallingPiece);
+      break;
+    case 'sync':
       if (!this.wait) {
         const now = new Date().getTime();
         this.syncTimes++;
         this.g.runTime = now - this.g.startTime;
         this.lastSync = new Date().getTime();
-        this.g.adjustFallingHeight();
+        this.g.player.adjustFallingHeight();
       }
-    } else if (json.event === 'oppDisconnect') {
+      break;
+    case 'oppDisconnect':
       this.oppIsAlive = false;
       this.ws.close();
+      break;
     }
   }
 
   startSession(sID) {
     this.countingDown = true;
     this.countUntil = new Date().getTime() + this.g.config.mpCountDown;
+    const playerNum = this.g.registerRemotePlayer(-1);
+    this.opponent = this.g.players[playerNum];
     setTimeout(() => {
       this.g.start();
       this.countingDown = false;
@@ -84,10 +96,12 @@ export default class mp {
   }
 
   sendLines(num) {
-    this.ws.send(JSON.stringify({
-      event: 'linesPut',
-      num
-    }));
+    this.ws.send(
+      JSON.stringify({
+        event: 'linesPut',
+        num
+      })
+    );
   }
 
   sendState() {

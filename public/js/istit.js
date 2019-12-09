@@ -1,5 +1,6 @@
 import config from './config.js';
-import player from './player.js';
+import localPlayer from './localPlayer.js';
+import remotePlayer from './remotePlayer.js';
 import input from './input.js';
 import mp from './mp.js';
 import render from './render.js';
@@ -27,21 +28,27 @@ export default class istit {
 
   init(canvasId) {
     this.canvasId = canvasId;
-    this.opponent = new player(this);
     this.input = new input(this);
     this.mp = new mp(this);
     this.leaderBoard = new leaderBoard(this);
     this.render = new render(this);
     this.viewport = new viewport(this);
-    this.registerPlayer(0);
+    this.registerLocalPlayer(0);
     this.player = this.players[0];
     this.run();
   }
 
-  registerPlayer(inputDevice = 0) {
-    const p = new player(this);
-    p.registerInput(inputDevice);
+  registerLocalPlayer(inputDevice = 0) {
+    const p = new localPlayer(this);
+    if (inputDevice > -1) {
+      p.registerInput(inputDevice);
+    }
     this.players.push(p);
+    return this.players.length - 1;
+  }
+
+  registerRemotePlayer() {
+    this.players.push(new remotePlayer(this));
     return this.players.length - 1;
   }
 
@@ -336,7 +343,7 @@ export default class istit {
   prepareLocalMP() {
     const availableDevice = this.input.getAvailableDevice();
     if (availableDevice) {
-      this.registerPlayer(availableDevice);
+      this.registerLocalPlayer(MAGIC_NUM.PLAYER_TYPE_LOCAL, availableDevice);
       this.render.resize();
     }
   }

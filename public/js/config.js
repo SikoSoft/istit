@@ -66,8 +66,9 @@ export default class config {
     for (let key in override) {
       this[key] = override[key];
       if (key === 'hTiles' || key === 'vTiles') {
-        this.g.player.resetGrid();
-        this.g.opponent.resetGrid();
+        this.g.players.forEach(player => {
+          player.grid.reset();
+        });
       }
     }
   }

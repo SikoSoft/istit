@@ -22,6 +22,10 @@ export default class grid {
     }
   }
 
+  set(matrix) {
+    this.matrix = matrix;
+  }
+
   handleGridChange() {
     if (this.player.g.mp.session > -1) {
       this.player.g.mp.sendState();
