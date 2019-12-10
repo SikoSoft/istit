@@ -30,7 +30,6 @@ export default class player {
     this.linesToClear = [];
     this.linesToGet = 0;
     this.nextPieces = [];
-    this.nextPiece = false;
     this.holdPiece = false;
     this.special = {};
     this.messages = [];
@@ -128,7 +127,7 @@ export default class player {
         this.g.runTime > this.nextSafetyAt
       ) {
         this.nextSafetyAt = this.runTime + this.g.config.safetyInterval;
-        this.nextPieces[this.nextPiece.length - 1] = this.g.config.safetyPiece;
+        this.nextPieces[this.nextPieces.length - 1] = this.g.config.safetyPiece;
       } else if (this.grid.weightHistory.length > 0) {
         const wDif = cWeight - this.grid.weightHistory[0].weight;
         if (
@@ -137,7 +136,7 @@ export default class player {
         ) {
           this.nextSafetyAt = this.g.runTime + this.g.config.safetyInterval;
           this.nextPieces[
-            this.nextPiece.length - 1
+            this.nextPieces.length - 1
           ] = this.g.config.safetyPiece;
         }
       }
