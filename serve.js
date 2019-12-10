@@ -22,6 +22,7 @@ router.get('/config.json', (req, res) => {
 app.use(router);
 
 app.listen(config.webPort, function() {
+  // eslint-disable-next-line
   console.log(`Web server listening on port ${config.webPort}`);
 });
 
@@ -30,7 +31,9 @@ app.listen(config.webPort, function() {
 const clients = [],
   sessions = [];
 const httpServer = http.createServer();
-const wsServer = new webSocketServer({ httpServer: httpServer });
+const wsServer = new webSocketServer({
+  httpServer
+});
 
 setInterval(function() {
   const now = new Date().getTime();
@@ -43,10 +46,15 @@ setInterval(function() {
   }
   for (let i = 0; i < clients.length; i++) {
     if (now - clients[i].lastPulse <= config.activeTime) {
-      clients[i].connection.sendUTF(JSON.stringify({ event: 'elapsed' }));
+      clients[i].connection.sendUTF(
+        JSON.stringify({
+          event: 'elapsed'
+        })
+      );
       numActiveClients++;
     }
   }
+  // eslint-disable-next-line
   console.log(
     'STATUS > ' +
       numActiveSessions +
@@ -54,7 +62,7 @@ setInterval(function() {
       numActiveClients +
       ' active clients'
   );
-}, 10000);
+}, config.statusInterval);
 
 setInterval(function() {
   for (let i = 0; i < sessions.length; i++) {
@@ -63,14 +71,17 @@ setInterval(function() {
       sessions[i].player1 > -1 &&
       sessions[i].player2 > -1
     ) {
-      const data = JSON.stringify({ event: 'sync' });
+      const data = JSON.stringify({
+        event: 'sync'
+      });
       clients[sessions[i].player1].connection.sendUTF(data);
       clients[sessions[i].player2].connection.sendUTF(data);
     }
   }
-}, 100);
+}, config.syncInterval);
 
 wsServer.on('request', function(request) {
+  // eslint-disable-next-line
   console.log(
     new Date().toTimeString() + ': new connection from ' + request.remoteAddress
   );
@@ -79,9 +90,9 @@ wsServer.on('request', function(request) {
   const client = {
     index: clients.length,
     oppIndex: -1,
-    connection: connection,
+    connection,
     ip: request.remoteAddress,
-    join: Math.round(new Date().getTime() / 1000),
+    join: Math.round(new Date().getTime() / 1000), // eslint-disable-line
     session: -1,
     lastPulse: 0
   };
@@ -89,7 +100,7 @@ wsServer.on('request', function(request) {
 
   let tmpSession = -1;
   for (let i = 0; i < sessions.length; i++) {
-    if (sessions[i].player2 == -1 && sessions[i].isActive) {
+    if (sessions[i].player2 === -1 && sessions[i].isActive) {
       tmpSession = i;
       break;
     }
@@ -99,12 +110,18 @@ wsServer.on('request', function(request) {
     client.session = tmpSession;
     client.oppIndex = sessions[tmpSession].player1;
     client.connection.sendUTF(
-      JSON.stringify({ event: 'sessionReady', session: tmpSession })
+      JSON.stringify({
+        event: 'sessionReady',
+        session: tmpSession
+      })
     );
     client.playerNum = 2;
     clients[sessions[tmpSession].player1].oppIndex = client.index;
     clients[sessions[tmpSession].player1].connection.sendUTF(
-      JSON.stringify({ event: 'sessionReady', session: tmpSession })
+      JSON.stringify({
+        event: 'sessionReady',
+        session: tmpSession
+      })
     );
   } else {
     sessions.push({
@@ -121,37 +138,52 @@ wsServer.on('request', function(request) {
   connection.on('message', function(message) {
     if (message.type === 'utf8') {
       const json = JSON.parse(message.utf8Data);
-      if (json.event == 'end') {
+      if (json.event === 'end') {
         clients[client.oppIndex].connection.sendUTF('{"event": "end"}');
-      } else if (json.event == 'linesPut') {
+      } else if (json.event === 'linesPut') {
         clients[client.oppIndex].connection.sendUTF(
-          JSON.stringify({ event: 'linesGet', num: json.num })
+          JSON.stringify({
+            event: 'linesGet',
+            num: json.num
+          })
         );
-      } else if (json.event == 'statePush') {
+      } else if (json.event === 'statePush') {
         clients[client.oppIndex].connection.sendUTF(
-          JSON.stringify({ event: 'statePull', state: json.state })
+          JSON.stringify({
+            event: 'statePull',
+            state: json.state
+          })
         );
-      } else if (json.event == 'fpPush') {
+      } else if (json.event === 'fpPush') {
         clients[client.oppIndex].connection.sendUTF(
-          JSON.stringify({ event: 'fpPull', fallingPiece: json.fallingPiece })
+          JSON.stringify({
+            event: 'fpPull',
+            fallingPiece: json.fallingPiece
+          })
         );
-      } else if (json.event == 'pulse') {
+      } else if (json.event === 'pulse') {
         const now = new Date().getTime();
         const isAlive =
           now - clients[client.oppIndex].lastPulse <= config.activeTime;
         client.lastPulse = now;
         clients[client.oppIndex].connection.sendUTF(
-          JSON.stringify({ event: 'pulseStatus', oppIsAlive: isAlive })
+          JSON.stringify({
+            event: 'pulseStatus',
+            oppIsAlive: isAlive
+          })
         );
       }
     }
   });
 
   connection.on('close', function() {
+    // eslint-disable-next-line
     console.log('Client ' + client.index + ' disconnected');
     if (client.oppIndex > -1) {
       clients[client.oppIndex].connection.sendUTF(
-        JSON.stringify({ event: 'oppDisconnect' })
+        JSON.stringify({
+          event: 'oppDisconnect'
+        })
       );
     }
     sessions[client.session].isActive = false;
@@ -159,5 +191,6 @@ wsServer.on('request', function(request) {
 });
 
 httpServer.listen(config.webSocketPort, function() {
+  // eslint-disable-next-line
   console.log(`WebSocket server is listening on port ${config.webSocketPort}`);
 });
