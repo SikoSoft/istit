@@ -50,6 +50,9 @@ export default class mp {
     case 'fpPull':
       this.opponent.setFallingPiece(json.fallingPiece);
       break;
+    case 'holdPiecePull':
+      this.opponent.setHoldPiece(json.holdPiece);
+      break;
     case 'sync':
       if (!this.wait) {
         const now = new Date().getTime();
@@ -116,6 +119,15 @@ export default class mp {
       JSON.stringify({
         event: 'fpPush',
         fallingPiece: this.g.player.fallingPiece
+      })
+    );
+  }
+
+  sendHoldState() {
+    this.ws.send(
+      JSON.stringify({
+        event: 'holdPiecePush',
+        holdPiece: this.g.player.holdPiece
       })
     );
   }

@@ -14,4 +14,8 @@ export default class remotePlayer extends player {
     this.score = state.score;
     this.special = state.special;
   }
+
+  setHoldPiece(piece) {
+    this.holdPiece = piece;
+  }
 }

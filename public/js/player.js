@@ -316,6 +316,10 @@ export default class player {
       }
       this.fallingPiece.type = cHP;
     }
+    if (this.g.mp.session > -1) {
+      this.g.mp.sendFPState();
+      this.g.mp.sendHoldState();
+    }
   }
 
   addNextPiece() {

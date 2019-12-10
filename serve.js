@@ -138,33 +138,46 @@ wsServer.on('request', function(request) {
   connection.on('message', function(message) {
     if (message.type === 'utf8') {
       const json = JSON.parse(message.utf8Data);
-      if (json.event === 'end') {
+      switch (json.event) {
+      case 'end':
         clients[client.oppIndex].connection.sendUTF('{"event": "end"}');
-      } else if (json.event === 'linesPut') {
+        break;
+      case 'linesPut':
         clients[client.oppIndex].connection.sendUTF(
           JSON.stringify({
             event: 'linesGet',
             num: json.num
           })
         );
-      } else if (json.event === 'statePush') {
+        break;
+      case 'statePush':
         clients[client.oppIndex].connection.sendUTF(
           JSON.stringify({
             event: 'statePull',
             state: json.state
           })
         );
-      } else if (json.event === 'fpPush') {
+        break;
+      case 'fpPush':
         clients[client.oppIndex].connection.sendUTF(
           JSON.stringify({
             event: 'fpPull',
             fallingPiece: json.fallingPiece
           })
         );
-      } else if (json.event === 'pulse') {
+        break;
+      case 'holdPiecePush':
+        clients[client.oppIndex].connection.sendUTF(
+          JSON.stringify({
+            event: 'holdPiecePull',
+            holdPiece: json.holdPiece
+          })
+        );
+        break;
+      case 'pulse':
         const now = new Date().getTime();
         const isAlive =
-          now - clients[client.oppIndex].lastPulse <= config.activeTime;
+            now - clients[client.oppIndex].lastPulse <= config.activeTime;
         client.lastPulse = now;
         clients[client.oppIndex].connection.sendUTF(
           JSON.stringify({
