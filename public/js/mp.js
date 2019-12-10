@@ -1,5 +1,3 @@
-import MAGIC_NUM from './magicNum.js';
-
 export default class mp {
   constructor(g) {
     this.g = g;

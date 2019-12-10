@@ -26,7 +26,7 @@ export default class grid {
     this.matrix = matrix;
   }
 
-  handleGridChange() {
+  handleChange() {
     if (this.player.g.mp.session > -1) {
       this.player.g.mp.sendState();
     }
@@ -189,7 +189,7 @@ export default class grid {
         }
       });
     }
-    this.handleGridChange();
+    this.handleChange();
   }
 
   clearLines(lines) {
@@ -273,7 +273,7 @@ export default class grid {
       }
     }
     this.player.linesToGet = 0;
-    this.handleGridChange();
+    this.handleChange();
   }
 
   getClosestToTopInColumn(c) {

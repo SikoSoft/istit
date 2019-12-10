@@ -217,7 +217,7 @@ export default class player {
       }
       this.dropAt = this.g.runTime + this.g.config.dropDelay;
       this.fallingPiece.placed = true;
-      this.grid.handleGridChange();
+      this.grid.handleChange();
     }
   }
 
@@ -334,6 +334,7 @@ export default class player {
   }
 
   spawnSpecial() {
+    console.log('spawnSpecial');
     let num = 0,
       low = this.g.config.vTiles;
     for (let c = 0; c < this.g.config.hTiles; c++) {
