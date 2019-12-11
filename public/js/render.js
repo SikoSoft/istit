@@ -362,7 +362,7 @@ export default class render {
       player.startY + this.gridStartY + this.halfTile * MAGIC_NUM.HALF
     );
     this.ctx.restore();
-    if (!this.g.mp.wait && player.nextPieces.length > 0) {
+    if (!this.g.mp.wait && this.g.runTime > 0 && player.nextPieces.length > 0) {
       const pW = this.g.getPieceDimension(player.nextPieces[0], 1, 0);
       const pH = this.g.getPieceDimension(player.nextPieces[0], 1, 1);
       let npStartX =
