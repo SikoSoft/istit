@@ -53,6 +53,9 @@ export default class mp {
     case 'holdPiecePull':
       this.opponent.setHoldPiece(json.holdPiece);
       break;
+    case 'nextPiecesPull':
+      this.opponent.setNextPieces(json.nextPieces);
+      break;
     case 'sync':
       if (!this.wait) {
         const now = new Date().getTime();
@@ -128,6 +131,15 @@ export default class mp {
       JSON.stringify({
         event: 'holdPiecePush',
         holdPiece: this.g.player.holdPiece
+      })
+    );
+  }
+
+  sendNextPieces() {
+    this.ws.send(
+      JSON.stringify({
+        event: 'nextPiecesPush',
+        nextPieces: this.g.player.nextPieces
       })
     );
   }

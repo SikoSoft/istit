@@ -39,11 +39,11 @@ export default class player {
     this.lastRank = -1;
     this.input = -1;
     this.ended = 0;
-    this.nextPieces = [
+    this.setNextPieces([
       this.g.randomPiece(),
       this.g.randomPiece(),
       this.g.randomPiece()
-    ];
+    ]);
     this.setLevel(1);
     this.grid.reset();
     this.resetFallingPiece();
@@ -88,6 +88,13 @@ export default class player {
     };
   }
 
+  setNextPieces(pieces) {
+    this.nextPieces = pieces;
+    if (this.g.mp.session > -1) {
+      this.g.mp.sendNextPieces();
+    }
+  }
+
   dropPiece() {
     if (!this.g.ended) {
       const startC = this.g.config.hTiles * MAGIC_NUM.HALF - 1,
@@ -119,15 +126,16 @@ export default class player {
         placed: false,
         elapsed: 0
       });
-      this.nextPieces.splice(0, 1);
-      this.addNextPiece();
+      let nextPieces = [...this.nextPieces];
+      nextPieces.splice(0, 1);
+      nextPieces = this.addNextPiece(nextPieces);
       const cWeight = this.grid.getCompoundedWeight();
       if (
         cWeight >= this.g.config.safetyThreshold &&
         this.g.runTime > this.nextSafetyAt
       ) {
         this.nextSafetyAt = this.runTime + this.g.config.safetyInterval;
-        this.nextPieces[this.nextPieces.length - 1] = this.g.config.safetyPiece;
+        nextPieces[nextPieces.length - 1] = this.g.config.safetyPiece;
       } else if (this.grid.weightHistory.length > 0) {
         const wDif = cWeight - this.grid.weightHistory[0].weight;
         if (
@@ -135,14 +143,13 @@ export default class player {
           this.g.runTime > this.nextSafetyAt
         ) {
           this.nextSafetyAt = this.g.runTime + this.g.config.safetyInterval;
-          this.nextPieces[
-            this.nextPieces.length - 1
-          ] = this.g.config.safetyPiece;
+          nextPieces[nextPieces.length - 1] = this.g.config.safetyPiece;
         }
       }
       if (this.g.mp.session > -1) {
         this.g.mp.sendFPState();
       }
+      this.setNextPieces(nextPieces);
     }
   }
 
@@ -321,10 +328,11 @@ export default class player {
     }
   }
 
-  addNextPiece() {
-    if (this.nextPieces.length < MAGIC_NUM.NEXT_PIECES) {
-      this.nextPieces.push(this.g.randomPiece());
+  addNextPiece(nextPieces) {
+    if (nextPieces.length < MAGIC_NUM.NEXT_PIECES) {
+      nextPieces.push(this.g.randomPiece());
     }
+    return nextPieces;
   }
 
   addScoreMessage(text, r, c) {

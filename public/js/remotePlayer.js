@@ -18,4 +18,8 @@ export default class remotePlayer extends player {
   setHoldPiece(piece) {
     this.holdPiece = piece;
   }
+
+  setNextPieces(pieces) {
+    this.nextPieces = pieces;
+  }
 }
