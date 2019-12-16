@@ -82,6 +82,7 @@ export default class mp {
       this.countingDown = false;
       this.wait = false;
       this.session = sID;
+      this.sendFPState();
     }, this.g.config.mpCountDown);
   }
 
