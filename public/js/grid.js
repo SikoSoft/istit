@@ -53,9 +53,9 @@ export default class grid {
     let tmpC = -1;
     let tmpR = -1;
     const blocks = this.getFallingBlocks(oAdjust, type);
-    for (let b = 0; b < blocks.length; b++) {
-      tmpC = blocks[b].c + cAdjust;
-      tmpR = blocks[b].r + rAdjust;
+    blocks.forEach(block => {
+      tmpC = block.c + cAdjust;
+      tmpR = block.r + rAdjust;
       if (tmpC < 0) {
         collidesWith = 'left';
       } else if (tmpC > this.columns - 1) {
@@ -72,7 +72,7 @@ export default class grid {
       ) {
         collidesWith = 'bottom';
       }
-    }
+    });
     return collidesWith;
   }
 
@@ -108,23 +108,20 @@ export default class grid {
     const blocks = this.getFallingBlocks();
     let mostDif = this.rows,
       tmpDif = 0;
-    for (let i = 0; i < blocks.length; i++) {
-      let c = blocks[i].c;
+    blocks.forEach(block => {
+      let c = block.c;
       let h = this.getClosestToTopInColumn(c);
-      tmpDif = h - blocks[i].r - 1;
+      tmpDif = h - block.r - 1;
       if (tmpDif < mostDif) {
         mostDif = tmpDif;
       }
-    }
-    for (let i = 0; i < blocks.length; i++) {
-      let c = blocks[i].c;
-      let r = blocks[i].r;
-      let newR = r + mostDif;
+    });
+    blocks.forEach(block => {
       ghost.push({
-        c,
-        r: newR
+        c: block.c,
+        r: block.r + mostDif
       });
-    }
+    });
     return ghost;
   }
 
@@ -136,9 +133,7 @@ export default class grid {
 
   destroyLines() {
     const lines = this.player.linesToClear;
-    const numLines = lines.length;
-    for (let l = 0; l < numLines; l++) {
-      let line = lines[l];
+    lines.forEach(line => {
       for (let r = 0; r < this.rows; r++) {
         if (r === line) {
           for (let c = 0; c < this.columns; c++) {
@@ -161,7 +156,7 @@ export default class grid {
           }
         }
       }
-    }
+    });
     let isCleared = true;
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.columns; c++) {
@@ -181,11 +176,11 @@ export default class grid {
     }
     this.player.linesToClear = [];
     if (this.player.g.mp.session > -1) {
-      this.player.g.mp.sendLines(numLines);
+      this.player.g.mp.sendLines(lines.length);
     } else if (this.player.g.players.length > 1) {
       this.player.g.players.forEach(player => {
         if (this.player !== player) {
-          player.grid.getLines(numLines);
+          player.grid.getLines(lines.length);
         }
       });
     }
@@ -223,11 +218,11 @@ export default class grid {
         c: hotPiece.c
       });
     }
-    for (let i = 0; i < lines.length; i++) {
+    lines.forEach(line => {
       for (let s in this.player.special) {
         for (let c = 0; c < this.columns; c++) {
-          if (typeof this.player.special[lines[i] + ':' + c] !== 'undefined') {
-            delete this.player.special[lines[i] + ':' + c];
+          if (typeof this.player.special[line + ':' + c] !== 'undefined') {
+            delete this.player.special[line + ':' + c];
             this.player.adjustScore(
               this.player.g.config.specialBonus,
               {
@@ -238,7 +233,7 @@ export default class grid {
           }
         }
       }
-    }
+    });
     this.player.g.assets.playSound('clearLine');
     this.player.g.assets.playSound('lines' + lines.length);
     this.player.lines += lines.length;
@@ -300,11 +295,6 @@ export default class grid {
   }
 
   rowIsCleared(r) {
-    for (let i = 0; i < this.player.linesToClear.length; i++) {
-      if (this.player.linesToClear[i] === r) {
-        return true;
-      }
-    }
-    return false;
+    return this.player.linesToClear.some(line => line === r);
   }
 }
