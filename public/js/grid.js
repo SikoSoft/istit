@@ -171,7 +171,7 @@ export default class grid {
     }
     if (isCleared && this.player.okForClearBonus) {
       this.player.adjustScore(this.player.g.config.clearBonus, {
-        text: 'all clear'
+        text: this.player.g.assets.strings.allClearBonus
       });
     }
     this.player.linesToClear = [];

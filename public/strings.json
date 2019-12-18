@@ -15,5 +15,6 @@
   "istitChain": "ISTiT chain",
   "linesClearedX": "Lines cleared X {lines}",
   "levelBonus": "{points} level bonus",
-  "speedBonus": "{points} speed bonus"
+  "speedBonus": "{points} speed bonus",
+  "allClearBonus": "All clear bonus"
 }
