@@ -361,6 +361,7 @@ export default class player {
       chance += perRow;
       const percent = chance / this.g.config.vTiles;
       const rand = this.g.random(1, MAGIC_NUM.PERCENT);
+      console.log('percent', percent, 'rand', rand);
       if (rand <= percent * MAGIC_NUM.PERCENT) {
         rows.push(r);
       }
@@ -375,6 +376,7 @@ export default class player {
     }
     const columnIndex = this.g.random(1, cells.length) - 1;
     const c = cells[columnIndex];
+    console.log("r", r, "c", c);
     if (r && c) {
       this.special[r + ':' + c] =
         this.g.runTime + this.g.config.specialDuration;
