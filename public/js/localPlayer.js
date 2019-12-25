@@ -28,7 +28,7 @@ export default class localPlayer extends player {
         this.messages.splice(i, 1);
       }
     }
-    if (this.g.runTime > this.nextSpecialTime) {
+    if (!this.ended && this.g.runTime > this.nextSpecialTime) {
       this.spawnSpecial();
       this.nextSpecialTime = this.g.runTime + this.g.config.specialInterval;
     }
