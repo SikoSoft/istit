@@ -182,6 +182,14 @@ wsServer.on('request', function(request) {
           })
         );
         break;
+      case 'specialPiecesPush':
+        clients[client.oppIndex].connection.sendUTF(
+          JSON.stringify({
+            event: 'specialPiecesPull',
+            specialPieces: json.specialPieces
+          })
+        );
+        break;
       case 'pulse':
         const now = new Date().getTime();
         const isAlive =

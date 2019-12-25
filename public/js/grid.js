@@ -147,11 +147,15 @@ export default class grid {
             let tmpVal = this.matrix[r][c];
             this.matrix[r][c] = 0;
             this.matrix[r + 1][c] = tmpVal;
-            if (typeof this.player.special[r + ':' + c] !== 'undefined') {
-              this.player.special[r + 1 + ':' + c] = this.player.special[
+            if (typeof this.player.specialPieces[r + ':' + c] !== 'undefined') {
+              const specialPieces = {
+                ...this.player.specialPieces 
+              };
+              specialPieces[r + 1 + ':' + c] = specialPieces[
                 r + ':' + c
               ];
-              delete this.player.special[r + ':' + c];
+              delete specialPieces[r + ':' + c];
+              this.player.setSpecialPieces(specialPieces);
             }
           }
         }
@@ -218,11 +222,14 @@ export default class grid {
         c: hotPiece.c
       });
     }
+    const specialPieces = {
+      ...this.player.specialPieces
+    };
     lines.forEach(line => {
-      for (let s in this.player.special) {
+      for (let s in specialPieces) {
         for (let c = 0; c < this.columns; c++) {
-          if (typeof this.player.special[line + ':' + c] !== 'undefined') {
-            delete this.player.special[line + ':' + c];
+          if (typeof specialPieces[line + ':' + c] !== 'undefined') {
+            delete specialPieces[line + ':' + c];
             this.player.adjustScore(
               this.player.g.config.specialBonus,
               {
@@ -233,6 +240,9 @@ export default class grid {
           }
         }
       }
+    });
+    this.player.setSpecialPieces({
+      ...specialPieces
     });
     this.player.g.assets.playSound('clearLine');
     this.player.g.assets.playSound('lines' + lines.length);

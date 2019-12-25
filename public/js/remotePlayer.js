@@ -12,7 +12,6 @@ export default class remotePlayer extends player {
     this.level = state.level;
     this.lines = state.lines;
     this.score = state.score;
-    this.special = state.special;
   }
 
   setHoldPiece(piece) {

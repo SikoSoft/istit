@@ -667,8 +667,8 @@ export default class render {
             }
           }
           let bType = grid[r][c];
-          if (typeof player.special[r + ':' + c] !== 'undefined') {
-            bType = 9;
+          if (typeof player.specialPieces[r + ':' + c] !== 'undefined') {
+            bType = MAGIC_NUM.SPECIAL_PIECE;
             x += player.xSpecialJitter;
             y += player.ySpecialJitter;
           }
@@ -814,7 +814,7 @@ export default class render {
     this.ctx.fillStyle = 'rgba(240, 210, 0, ' + fillAlpha + ')';
     let x = 0,
       y = 0;
-    for (let key in player.special) {
+    for (let key in player.specialPieces) {
       let pair = key.split(':');
       let r = parseInt(pair[0]);
       let c = parseInt(pair[1]);

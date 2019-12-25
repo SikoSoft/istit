@@ -14,7 +14,7 @@ export default class player {
     this.reset();
     this.name = 'Player';
     this.endLocked = false;
-    this.mpProps = ['score', 'level', 'lines', 'special'];
+    this.mpProps = ['score', 'level', 'lines'];
   }
 
   reset() {
@@ -31,7 +31,7 @@ export default class player {
     this.linesToGet = 0;
     this.nextPieces = [];
     this.holdPiece = false;
-    this.special = {};
+    this.specialPieces = {};
     this.messages = [];
     this.nextSafetyAt = 0;
     this.nextSpecialTime = 0;
@@ -49,7 +49,14 @@ export default class player {
     this.resetFallingPiece();
   }
 
-  update() {}
+  update() {
+    if (this.g.runTime > this.nextSpecialJitterTime) {
+      let joa = [-1, 0, 1];
+      this.xSpecialJitter = joa[this.g.random(1, joa.length) - 1];
+      this.ySpecialJitter = joa[this.g.random(1, joa.length) - 1];
+      this.nextSpecialJitterTime = this.g.runTime + this.g.config.specialJitter;
+    }
+  }
 
   state() {
     let copy = {
@@ -90,9 +97,10 @@ export default class player {
 
   setNextPieces(pieces) {
     this.nextPieces = pieces;
-    if (this.g.mp.session > -1) {
-      this.g.mp.sendNextPieces();
-    }
+  }
+
+  setSpecialPieces(pieces) {
+    this.specialPieces = pieces;
   }
 
   dropPiece() {
@@ -345,7 +353,6 @@ export default class player {
   }
 
   spawnSpecial() {
-    console.log('spawnSpecial');
     let num = 0,
       low = this.g.config.vTiles;
     for (let c = 0; c < this.g.config.hTiles; c++) {
@@ -361,7 +368,6 @@ export default class player {
       chance += perRow;
       const percent = chance / this.g.config.vTiles;
       const rand = this.g.random(1, MAGIC_NUM.PERCENT);
-      console.log('percent', percent, 'rand', rand);
       if (rand <= percent * MAGIC_NUM.PERCENT) {
         rows.push(r);
       }
@@ -376,10 +382,12 @@ export default class player {
     }
     const columnIndex = this.g.random(1, cells.length) - 1;
     const c = cells[columnIndex];
-    console.log("r", r, "c", c);
     if (r && c) {
-      this.special[r + ':' + c] =
-        this.g.runTime + this.g.config.specialDuration;
+      this.setSpecialPieces({
+        ...this.specialPieces,
+        [r + ':' + c]:
+        this.g.runTime + this.g.config.specialDuration
+      });
     }
   }
 

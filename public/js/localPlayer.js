@@ -8,6 +8,7 @@ export default class localPlayer extends player {
   }
 
   update() {
+    super.update();
     const now = new Date().getTime();
     if (now > this.animateTo.lineBreak && now > this.animateTo.lineAdd) {
       if (this.linesToClear.length > 0) {
@@ -31,16 +32,16 @@ export default class localPlayer extends player {
       this.spawnSpecial();
       this.nextSpecialTime = this.g.runTime + this.g.config.specialInterval;
     }
-    for (let i in this.special) {
-      if (this.g.runTime > this.special[i]) {
-        delete this.special[i];
+    const specialPieces = {
+      ...this.specialPieces
+    };
+    for (let i in specialPieces) {
+      if (this.g.runTime > specialPieces[i]) {
+        delete specialPieces[i];
       }
     }
-    if (this.g.runTime > this.nextSpecialJitterTime) {
-      let joa = [-1, 0, 1];
-      this.xSpecialJitter = joa[this.g.random(1, joa.length) - 1];
-      this.ySpecialJitter = joa[this.g.random(1, joa.length) - 1];
-      this.nextSpecialJitterTime = this.g.runTime + this.g.config.specialJitter;
+    if (Object.keys(specialPieces).join(',') !== Object.keys(this.specialPieces).join(',')) {
+      this.setSpecialPieces(specialPieces);
     }
   }
 
@@ -91,5 +92,19 @@ export default class localPlayer extends player {
       this.placePiece();
     }
     return this.fallingPiece.r;
+  }
+
+  setNextPieces(pieces) {
+    super.setNextPieces(pieces);
+    if (this.g.mp.session > -1) {
+      this.g.mp.sendNextPieces();
+    }
+  }
+
+  setSpecialPieces(pieces) {
+    super.setSpecialPieces(pieces);
+    if (this.g.mp.session > -1) {
+      this.g.mp.sendSpecialPieces();
+    }
   }
 }
