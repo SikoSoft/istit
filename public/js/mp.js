@@ -11,6 +11,7 @@ export default class mp {
     this.syncTimes = 0;
     this.connected = false;
     this.sessionEnded = false;
+    this.opponent = false;
   }
 
   prepare() {
@@ -29,43 +30,62 @@ export default class mp {
     this.ws.onmessage = msg => {
       this.handleMessage(msg);
     };
-    this.g.render.resizeForMP();
   }
 
   handleMessage(msg) {
     const json = JSON.parse(msg.data);
-    if (json.event == 'sessionReady') {
+    switch (json.event) {
+    case 'sessionReady':
       this.startSession(json.session);
-    } else if (json.event == 'end') {
+      break;
+    case 'end':
       this.g.end(true);
-    } else if (json.event == 'linesGet') {
-      this.g.getLines(json.num);
-    } else if (json.event == 'statePull') {
-      this.g.opponent = json.state;
-    } else if (json.event == 'fpPull') {
-      this.g.opponent.fallingPiece = json.fallingPiece;
-    } else if (json.event == 'sync') {
+      break;
+    case 'linesGet':
+      this.g.player.grid.getLines(json.num);
+      break;
+    case 'statePull':
+      this.opponent.setState(json.state);
+      break;
+    case 'fpPull':
+      this.opponent.setFallingPiece(json.fallingPiece);
+      break;
+    case 'holdPiecePull':
+      this.opponent.setHoldPiece(json.holdPiece);
+      break;
+    case 'nextPiecesPull':
+      this.opponent.setNextPieces(json.nextPieces);
+      break;
+    case 'specialPiecesPull':
+      this.opponent.setSpecialPieces(json.specialPieces);
+      break;
+    case 'sync':
       if (!this.wait) {
         const now = new Date().getTime();
         this.syncTimes++;
         this.g.runTime = now - this.g.startTime;
         this.lastSync = new Date().getTime();
-        this.g.adjustFallingHeight();
+        this.g.player.adjustFallingHeight();
       }
-    } else if (json.event == 'oppDisconnect') {
+      break;
+    case 'oppDisconnect':
       this.oppIsAlive = false;
       this.ws.close();
+      break;
     }
   }
 
   startSession(sID) {
     this.countingDown = true;
     this.countUntil = new Date().getTime() + this.g.config.mpCountDown;
+    const playerNum = this.g.registerRemotePlayer(-1);
+    this.opponent = this.g.players[playerNum];
     setTimeout(() => {
       this.g.start();
       this.countingDown = false;
       this.wait = false;
       this.session = sID;
+      this.sendFPState();
     }, this.g.config.mpCountDown);
   }
 
@@ -84,12 +104,20 @@ export default class mp {
   }
 
   sendLines(num) {
-    this.ws.send(JSON.stringify({ event: 'linesPut', num: num }));
+    this.ws.send(
+      JSON.stringify({
+        event: 'linesPut',
+        num
+      })
+    );
   }
 
   sendState() {
     this.ws.send(
-      JSON.stringify({ event: 'statePush', state: this.g.player.state() })
+      JSON.stringify({
+        event: 'statePush',
+        state: this.g.player.state()
+      })
     );
   }
 
@@ -98,6 +126,33 @@ export default class mp {
       JSON.stringify({
         event: 'fpPush',
         fallingPiece: this.g.player.fallingPiece
+      })
+    );
+  }
+
+  sendHoldState() {
+    this.ws.send(
+      JSON.stringify({
+        event: 'holdPiecePush',
+        holdPiece: this.g.player.holdPiece
+      })
+    );
+  }
+
+  sendNextPieces() {
+    this.ws.send(
+      JSON.stringify({
+        event: 'nextPiecesPush',
+        nextPieces: this.g.player.nextPieces
+      })
+    );
+  }
+
+  sendSpecialPieces() {
+    this.ws.send(
+      JSON.stringify({
+        event: 'specialPiecesPush',
+        specialPieces: this.g.player.specialPieces
       })
     );
   }

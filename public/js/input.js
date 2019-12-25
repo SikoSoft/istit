@@ -1,8 +1,10 @@
+import MAGIC_NUM from './magicNum.js';
+
 export default class input {
   constructor(g) {
     this.g = g;
     this.keyState = {};
-    this.floodTimers = {};
+    this.keyBoardDevice = false;
     this.gamePadDetected = false;
     this.useGamePad = false;
     this.keyMap = {
@@ -42,26 +44,30 @@ export default class input {
         pause: () => {
           this.g.pause();
         },
-        drop: () => {
-          this.g.placeFallingPieceAtBottom();
+        drop: player => {
+          player.placeFallingPieceAtBottom();
         },
-        left: () => {
-          this.g.movePiece(-1);
+        left: player => {
+          player.movePiece(-1);
         },
-        rotate: () => {
-          this.g.rotatePiece();
+        rotate: player => {
+          player.rotatePiece();
         },
-        right: () => {
-          this.g.movePiece(1);
+        right: player => {
+          player.movePiece(1);
         },
-        down: () => {
-          this.g.adjustFallingHeightOffset();
+        down: player => {
+          player.adjustFallingHeightOffset();
         },
-        hold: () => {
-          this.g.toggleHold();
+        hold: player => {
+          player.toggleHold();
         }
       },
-      gameplayLocked: {},
+      gameplayLocked: {
+        pause: () => {
+          this.g.pause();
+        }
+      },
       ended: {
         _all: () => {
           this.g.restart();
@@ -69,14 +75,14 @@ export default class input {
       }
     };
     this.lastButtonState = {};
+    this.devices = [];
+    this.setupDevice(MAGIC_NUM.DEVICE_TYPE_KEYBOARD);
   }
 
   init() {
     this.floodWait = {};
-    this.lastFloodWait = {};
     Object.keys(this.keyMap).forEach(key => {
       this.floodWait[key] = this.g.config.coolDown[key];
-      this.lastFloodWait[key] = 0;
     });
     window.addEventListener(
       'keydown',
@@ -92,13 +98,13 @@ export default class input {
       },
       false
     );
-    window.addEventListener('gamepadconnected', e => {
+    window.addEventListener('gamepadconnected', () => {
       this.gamePadDetected = true;
       this.lastButtonState = {};
-      console.log(e);
       Object.keys(this.buttonMap).forEach(button => {
         this.lastButtonState[button] = false;
       });
+      this.setupDevice(MAGIC_NUM.DEVICE_TYPE_XBOX360);
     });
   }
 
@@ -111,9 +117,43 @@ export default class input {
     }
   }
 
-  isLocked() {
+  setupDevice(type) {
+    const device = {
+      type,
+      id: this.devices.length,
+      player: false,
+      floodTimers: {},
+      lastFloodWait: {}
+    };
+    this.devices.push(device);
+    if (MAGIC_NUM.DEVICE_TYPE_KEYBOARD === type) {
+      this.keyBoardDevice = device;
+      Object.keys(this.keyMap).forEach(key => {
+        device.lastFloodWait[key] = 0;
+      });
+    } else if (MAGIC_NUM.DEVICE_TYPE_XBOX360 === type) {
+      Object.keys(this.buttonMap).forEach(button => {
+        device.lastFloodWait[button] = 0;
+      });
+    }
+    return device.id;
+  }
+
+  register(deviceId, player) {
+    if (this.devices[deviceId] && this.devices[deviceId].player === false) {
+      this.devices[deviceId].player = player;
+    }
+  }
+
+  getAvailableDevice() {
+    return this.devices.filter(device => !device.player).length > 0
+      ? this.devices.filter(device => !device.player)[0].id
+      : false;
+  }
+
+  isLocked(player) {
     const now = new Date().getTime();
-    if (now < this.g.animateTo.lineBreak || now < this.g.animateTo.lineAdd) {
+    if (now < player.animateTo.lineBreak || now < player.animateTo.lineAdd) {
       return true;
     }
     return false;
@@ -140,56 +180,72 @@ export default class input {
     } else {
       state = 'gameplay';
     }
-    if (this.gamePadDetected && this.useGamePad) {
-      const gamePad = navigator.getGamepads()[0];
-      const buttonState = {};
-      Object.keys(this.buttonMap).forEach(button => {
-        const isPressed = gamePad.buttons[this.buttonMap[button]].pressed;
-        buttonState[button] = isPressed;
-        if (this.lastButtonState[button] && !isPressed) {
-          this.lastFloodWait[button] = 0;
-        }
-        if (isPressed && this.floodSafe(button)) {
-          typeof this.stateActions[state][button] === 'function' &&
-            this.stateActions[state][button]();
-          typeof this.stateActions[state]._all === 'function' &&
-            this.stateActions[state]._all();
-          this.setFloodTimer(button);
-        }
-      });
-      this.lastButtonState = buttonState;
-    } else {
-      Object.keys(this.keyMap).forEach(key => {
-        if (this.keyState[this.keyMap[key]] && this.floodSafe(key)) {
-          typeof this.stateActions[state][key] === 'function' &&
-            this.stateActions[state][key]();
-          typeof this.stateActions[state]._all === 'function' &&
-            this.stateActions[state]._all();
-          this.setFloodTimer(key);
-        }
-      });
-    }
+    this.devices.forEach(device => {
+      if (
+        device.player &&
+        (this.isLocked(device.player) || device.player.endLocked)
+      ) {
+        state = 'gameplayLocked';
+      }
+      if (
+        device.type === MAGIC_NUM.DEVICE_TYPE_XBOX360 &&
+        this.gamePadDetected &&
+        device.player
+      ) {
+        const gamePad = navigator.getGamepads()[0];
+        const buttonState = {};
+        Object.keys(this.buttonMap).forEach(button => {
+          const isPressed = gamePad.buttons[this.buttonMap[button]].pressed;
+          buttonState[button] = isPressed;
+          if (this.lastButtonState[button] && !isPressed) {
+            device.lastFloodWait[button] = 0;
+          }
+          if (isPressed && this.floodSafe(device, button)) {
+            if (typeof this.stateActions[state][button] === 'function') {
+              this.stateActions[state][button](device.player);
+            }
+            if (typeof this.stateActions[state]._all === 'function') {
+              this.stateActions[state]._all(device.player);
+            }
+            this.setFloodTimer(device, button);
+          }
+        });
+        this.lastButtonState = buttonState;
+      } else if (device.type === MAGIC_NUM.DEVICE_TYPE_KEYBOARD) {
+        Object.keys(this.keyMap).forEach(key => {
+          if (this.keyState[this.keyMap[key]] && this.floodSafe(device, key)) {
+            if (typeof this.stateActions[state][key] === 'function') {
+              this.stateActions[state][key](device.player);
+            }
+            if (typeof this.stateActions[state]._all === 'function') {
+              this.stateActions[state]._all(device.player);
+            }
+            this.setFloodTimer(device, key);
+          }
+        });
+      }
+    });
   }
 
-  floodSafe(key) {
-    return !this.floodTimers[key];
+  floodSafe(device, key) {
+    return !device.floodTimers[key];
   }
 
-  setFloodTimer(key) {
+  setFloodTimer(device, key) {
     let floodTime = this.floodWait[key];
-    if (this.lastFloodWait[key]) {
+    if (device.lastFloodWait[key]) {
       floodTime =
-        this.lastFloodWait[key] -
-        this.lastFloodWait[key] * this.g.config.keyDecay;
+        device.lastFloodWait[key] -
+        device.lastFloodWait[key] * this.g.config.keyDecay;
     } else {
       floodTime = this.floodWait[key];
     }
     if (floodTime < this.g.config.minKeyRepeat) {
       floodTime = this.g.config.minKeyRepeat;
     }
-    this.lastFloodWait[key] = floodTime;
-    this.floodTimers[key] = setTimeout(() => {
-      delete this.floodTimers[key];
+    device.lastFloodWait[key] = floodTime;
+    device.floodTimers[key] = setTimeout(() => {
+      delete device.floodTimers[key];
     }, floodTime);
   }
 
@@ -212,17 +268,19 @@ export default class input {
     this.keyState[e.keyCode] = false;
     let commandName = '';
     Object.keys(this.keyMap).forEach(key => {
-      if (this.keyMap[key] == e.keyCode) {
+      if (this.keyMap[key] === e.keyCode) {
         commandName = key;
       }
     });
     if (commandName) {
-      this.lastFloodWait[commandName] = 0;
+      this.keyBoardDevice.lastFloodWait[commandName] = 0;
     }
-    for (let mi = 37; mi <= 40; mi++) {
+    for (let mi = this.keyMap.left; mi <= this.keyMap.down; mi++) {
       if (this.keyState[mi]) {
         e.preventDefault();
-        this.handleKeyDown({ keyCode: mi });
+        this.handleKeyDown({
+          keyCode: mi
+        });
       }
     }
     if (e.preventDefault) {

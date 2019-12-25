@@ -4,7 +4,7 @@ export default class viewport {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
     this.fullScreen = false;
-    this.g.render.canvas.addEventListener('click', e => {
+    this.g.render.canvas.addEventListener('click', () => {
       this.toggleFullScreen();
     });
     [
@@ -20,7 +20,6 @@ export default class viewport {
           const idealTileHeight = Math.floor(
             this.height / (this.g.config.vTiles + 1)
           );
-          console.log('idealTileHeight', this.fullScreen, idealTileHeight);
           const ratio = idealTileHeight / this.g.config.tile;
           this.g.config.process({ tile: idealTileHeight });
           this.g.render.setScaleRatio(ratio);
@@ -38,7 +37,11 @@ export default class viewport {
   }
 
   toggleFullScreen() {
-    this.fullScreen ? this.closeFullScreen() : this.openFullScreen();
+    if (this.fullScreen) {
+      this.closeFullScreen();
+    } else {
+      this.openFullScreen();
+    }
   }
 
   openFullScreen() {

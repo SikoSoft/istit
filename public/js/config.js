@@ -21,6 +21,7 @@ export default class config {
     this.safetyThreshold = 0.6;
     this.safetyPiece = 1;
     this.safetyInterval = 8000;
+    this.mpContinueOnLose = false;
     this.mpServer = 'ws://localhost:76';
     this.mpCountDown = 5000;
     this.dropDelay = 100;
@@ -40,7 +41,7 @@ export default class config {
       rotate: 200,
       down: 50,
       drop: 300,
-      pause: 200,
+      pause: 500,
       hold: 300
     };
     this.minKeyRepeat = 20;
@@ -53,14 +54,21 @@ export default class config {
       sysUp: 300,
       lbShow: 500
     };
+    this.defaultLayout = {
+      even: ['grid', 'ui'],
+      odd: ['grid', 'ui']
+    };
+    this.layout = {};
+    this.endLock = 3000;
   }
 
   process(override) {
     for (let key in override) {
       this[key] = override[key];
       if (key === 'hTiles' || key === 'vTiles') {
-        this.g.player.resetGrid();
-        this.g.opponent.resetGrid();
+        this.g.players.forEach(player => {
+          player.grid.reset();
+        });
       }
     }
   }
