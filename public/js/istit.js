@@ -85,7 +85,7 @@ export default class istit {
   start() {
     this.reset();
     this.players.forEach(player => {
-      player.dropPiece();
+      player.start();
     });
   }
 
