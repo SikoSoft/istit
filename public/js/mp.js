@@ -12,14 +12,12 @@ export default class mp {
     this.connected = false;
     this.sessionEnded = false;
     this.opponent = false;
+    this.countDownTimer = 0;
   }
 
   prepare() {
     this.endSession();
-    this.sessionEnded = false;
-    this.g.reset();
-    this.wait = true;
-    this.oppIsAlive = true;
+    this.reset();
     this.ws = new WebSocket(this.g.config.mpServer);
     this.ws.onopen = () => {
       this.connected = true;
@@ -69,18 +67,35 @@ export default class mp {
       }
       break;
     case 'oppDisconnect':
-      this.oppIsAlive = false;
-      this.ws.close();
+      if (this.countingDown) {
+        this.prepare();
+      } else {
+        this.oppIsAlive = false;
+        this.ws.close();
+      }
       break;
     }
+  }
+
+  reset() {
+    clearTimeout(this.countDownTimer);
+    this.countDownTimer = 0;
+    this.countingDown = false;
+    this.countUntil = 0;
+    this.sessionEnded = false;
+    this.g.unregisterPlayer(this.opponent);
+    this.opponent = false;
+    this.g.reset();
+    this.wait = true;
+    this.oppIsAlive = true;
   }
 
   startSession(sID) {
     this.countingDown = true;
     this.countUntil = new Date().getTime() + this.g.config.mpCountDown;
-    const playerNum = this.g.registerRemotePlayer(-1);
+    const playerNum = this.g.registerRemotePlayer();
     this.opponent = this.g.players[playerNum];
-    setTimeout(() => {
+    this.countDownTimer = setTimeout(() => {
       this.g.start();
       this.countingDown = false;
       this.wait = false;

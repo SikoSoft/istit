@@ -52,6 +52,10 @@ export default class istit {
     return this.players.length - 1;
   }
 
+  unregisterPlayer(player) {
+    this.players = this.players.filter(p => p !== player);
+  }
+
   run() {
     this.load().then(() => {
       this.input.init();
