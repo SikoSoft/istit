@@ -200,7 +200,10 @@ export default class render {
       }
     } else if (this.g.ended) {
       if (this.g.mp.sessionEnded) {
-        if (this.g.mp.isWinner) {
+        if (
+          (this.g.mp.isWinner && player.type === MAGIC_NUM.PLAYER_TYPE_LOCAL) ||
+          (!this.g.mp.isWinner && player.type === MAGIC_NUM.PLAYER_TYPE_REMOTE)
+        ) {
           this.drawSystemMessage(player, this.g.assets.strings.youWin);
         } else {
           this.drawSystemMessage(player, this.g.assets.strings.youLose);
