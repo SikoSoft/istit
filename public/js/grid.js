@@ -149,11 +149,9 @@ export default class grid {
             this.matrix[r + 1][c] = tmpVal;
             if (typeof this.player.specialPieces[r + ':' + c] !== 'undefined') {
               const specialPieces = {
-                ...this.player.specialPieces 
+                ...this.player.specialPieces
               };
-              specialPieces[r + 1 + ':' + c] = specialPieces[
-                r + ':' + c
-              ];
+              specialPieces[r + 1 + ':' + c] = specialPieces[r + ':' + c];
               delete specialPieces[r + ':' + c];
               this.player.setSpecialPieces(specialPieces);
             }
@@ -179,7 +177,7 @@ export default class grid {
       });
     }
     this.player.linesToClear = [];
-    if (this.player.g.mp.session > -1) {
+    if (this.player.g.mp.session > -1 && !this.player.g.mp.opponent.ended) {
       this.player.g.mp.sendLines(lines.length);
     } else if (this.player.g.players.length > 1) {
       this.player.g.players.forEach(player => {

@@ -122,7 +122,7 @@ export default class istit {
       if (this.mp.session > -1) {
         this.mp.isWinner = isWinner || false;
         if (!isWinner) {
-          this.mp.sendEnd();
+          this.mp.sendGameEnd();
         }
         this.mp.endSession();
       }
