@@ -117,6 +117,8 @@ export default class render {
     this.syncDefDimension();
     this.canvas.width = this.defWidth * this.g.players.length;
     this.canvas.height = this.defHeight;
+    this.canvas.style.width = `${this.canvas.width}px`;
+    this.canvas.style.height = `${this.canvas.height}px`;
     this.mpMode = this.g.players.length > 1 ? true : false;
   }
 
