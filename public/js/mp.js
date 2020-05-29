@@ -74,7 +74,7 @@ export default class mp {
           this.prepare();
         } else {
           this.oppIsAlive = false;
-          this.ws.close();
+          this.endSession();
         }
         break;
     }

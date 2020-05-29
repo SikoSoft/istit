@@ -184,7 +184,10 @@ export default class render {
   drawSystemMessages(player) {
     if (this.g.paused) {
       this.drawSystemMessage(player, this.g.assets.strings.paused);
-    } else if (!this.g.mp.oppIsAlive) {
+    } else if (
+      !this.g.mp.oppIsAlive &&
+      player.type === MAGIC_NUM.PLAYER_TYPE_REMOTE
+    ) {
       this.drawSystemMessage(
         player,
         this.g.assets.strings.opponentDisconnected
