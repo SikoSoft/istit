@@ -12,7 +12,7 @@ import MAGIC_NUM from './magicNum.js';
 export default class istit {
   constructor() {
     window.istit = this;
-    this.version = '1.3.0';
+    this.version = '1.4.0';
     this.config = new config(this);
     this.assets = new assets(this);
     this.runTime = 0;
