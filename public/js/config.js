@@ -21,7 +21,7 @@ export default class config {
     this.safetyThreshold = 0.6;
     this.safetyPiece = 1;
     this.safetyInterval = 8000;
-    this.mpContinueOnLose = false;
+    this.mpContinueOnLose = true;
     this.mpServer = 'ws://localhost:76';
     this.mpCountDown = 5000;
     this.dropDelay = 100;
