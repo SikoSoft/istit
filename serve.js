@@ -37,21 +37,10 @@ const wsServer = new webSocketServer({
 
 setInterval(function() {
   const now = new Date().getTime();
-  let numActiveSessions = 0,
-    numActiveClients = 0;
+  let numActiveSessions = 0;
   for (let i = 0; i < sessions.length; i++) {
     if (sessions[i].isActive) {
       numActiveSessions++;
-    }
-  }
-  for (let i = 0; i < clients.length; i++) {
-    if (now - clients[i].lastPulse <= config.activeTime) {
-      clients[i].connection.sendUTF(
-        JSON.stringify({
-          event: 'elapsed'
-        })
-      );
-      numActiveClients++;
     }
   }
   // eslint-disable-next-line
@@ -59,7 +48,7 @@ setInterval(function() {
     'STATUS > ' +
       numActiveSessions +
       ' active sessions | ' +
-      numActiveClients +
+      clients.length +
       ' active clients'
   );
 }, config.statusInterval);
@@ -93,8 +82,7 @@ wsServer.on('request', function(request) {
     connection,
     ip: request.remoteAddress,
     join: Math.round(new Date().getTime() / 1000), // eslint-disable-line
-    session: -1,
-    lastPulse: 0
+    session: -1
   };
   clients.push(client);
 
@@ -126,9 +114,7 @@ wsServer.on('request', function(request) {
   } else {
     sessions.push({
       player1: client.index,
-      player1LastPulse: new Date().getTime(),
       player2: -1,
-      player2LastPulse: 0,
       isActive: true
     });
     client.session = sessions.length - 1;
@@ -139,68 +125,65 @@ wsServer.on('request', function(request) {
     if (message.type === 'utf8') {
       const json = JSON.parse(message.utf8Data);
       switch (json.event) {
-      case 'end':
-        clients[client.oppIndex].connection.sendUTF('{"event": "end"}');
-        break;
-      case 'linesPut':
-        clients[client.oppIndex].connection.sendUTF(
-          JSON.stringify({
-            event: 'linesGet',
-            num: json.num
-          })
-        );
-        break;
-      case 'statePush':
-        clients[client.oppIndex].connection.sendUTF(
-          JSON.stringify({
-            event: 'statePull',
-            state: json.state
-          })
-        );
-        break;
-      case 'fpPush':
-        clients[client.oppIndex].connection.sendUTF(
-          JSON.stringify({
-            event: 'fpPull',
-            fallingPiece: json.fallingPiece
-          })
-        );
-        break;
-      case 'holdPiecePush':
-        clients[client.oppIndex].connection.sendUTF(
-          JSON.stringify({
-            event: 'holdPiecePull',
-            holdPiece: json.holdPiece
-          })
-        );
-        break;
-      case 'nextPiecesPush':
-        clients[client.oppIndex].connection.sendUTF(
-          JSON.stringify({
-            event: 'nextPiecesPull',
-            nextPieces: json.nextPieces
-          })
-        );
-        break;
-      case 'specialPiecesPush':
-        clients[client.oppIndex].connection.sendUTF(
-          JSON.stringify({
-            event: 'specialPiecesPull',
-            specialPieces: json.specialPieces
-          })
-        );
-        break;
-      case 'pulse':
-        const now = new Date().getTime();
-        const isAlive =
-            now - clients[client.oppIndex].lastPulse <= config.activeTime;
-        client.lastPulse = now;
-        clients[client.oppIndex].connection.sendUTF(
-          JSON.stringify({
-            event: 'pulseStatus',
-            oppIsAlive: isAlive
-          })
-        );
+        case 'gameEnd':
+          clients[client.oppIndex].connection.sendUTF('{"event": "gameEnd"}');
+          break;
+        case 'playerEnd':
+          clients[client.oppIndex].connection.sendUTF(
+            JSON.stringify({
+              event: 'playerEnd',
+              time: json.time
+            })
+          );
+          break;
+        case 'linesPut':
+          clients[client.oppIndex].connection.sendUTF(
+            JSON.stringify({
+              event: 'linesGet',
+              num: json.num
+            })
+          );
+          break;
+        case 'statePush':
+          clients[client.oppIndex].connection.sendUTF(
+            JSON.stringify({
+              event: 'statePull',
+              state: json.state
+            })
+          );
+          break;
+        case 'fpPush':
+          clients[client.oppIndex].connection.sendUTF(
+            JSON.stringify({
+              event: 'fpPull',
+              fallingPiece: json.fallingPiece
+            })
+          );
+          break;
+        case 'holdPiecePush':
+          clients[client.oppIndex].connection.sendUTF(
+            JSON.stringify({
+              event: 'holdPiecePull',
+              holdPiece: json.holdPiece
+            })
+          );
+          break;
+        case 'nextPiecesPush':
+          clients[client.oppIndex].connection.sendUTF(
+            JSON.stringify({
+              event: 'nextPiecesPull',
+              nextPieces: json.nextPieces
+            })
+          );
+          break;
+        case 'specialPiecesPush':
+          clients[client.oppIndex].connection.sendUTF(
+            JSON.stringify({
+              event: 'specialPiecesPull',
+              specialPieces: json.specialPieces
+            })
+          );
+          break;
       }
     }
   });

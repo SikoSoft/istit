@@ -49,7 +49,7 @@ export default class player {
     this.resetFallingPiece();
   }
 
-  start(){}
+  start() {}
 
   update() {
     if (this.g.runTime > this.nextSpecialJitterTime) {
@@ -254,6 +254,8 @@ export default class player {
     if (this.g.config.mpContinueOnLose) {
       if (this.g.players.every(player => player.ended)) {
         this.g.end();
+      } else if (this.g.mp.session > -1) {
+        this.g.mp.sendPlayerEnd(this.ended);
       }
     } else {
       this.g.end();

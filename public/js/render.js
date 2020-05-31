@@ -117,6 +117,8 @@ export default class render {
     this.syncDefDimension();
     this.canvas.width = this.defWidth * this.g.players.length;
     this.canvas.height = this.defHeight;
+    this.canvas.style.width = `${this.canvas.width}px`;
+    this.canvas.style.height = `${this.canvas.height}px`;
     this.mpMode = this.g.players.length > 1 ? true : false;
   }
 
@@ -182,7 +184,10 @@ export default class render {
   drawSystemMessages(player) {
     if (this.g.paused) {
       this.drawSystemMessage(player, this.g.assets.strings.paused);
-    } else if (!this.g.mp.oppIsAlive) {
+    } else if (
+      !this.g.mp.oppIsAlive &&
+      player.type === MAGIC_NUM.PLAYER_TYPE_REMOTE
+    ) {
       this.drawSystemMessage(
         player,
         this.g.assets.strings.opponentDisconnected
@@ -200,7 +205,10 @@ export default class render {
       }
     } else if (this.g.ended) {
       if (this.g.mp.sessionEnded) {
-        if (this.g.mp.isWinner) {
+        if (
+          (this.g.mp.isWinner && player.type === MAGIC_NUM.PLAYER_TYPE_LOCAL) ||
+          (!this.g.mp.isWinner && player.type === MAGIC_NUM.PLAYER_TYPE_REMOTE)
+        ) {
           this.drawSystemMessage(player, this.g.assets.strings.youWin);
         } else {
           this.drawSystemMessage(player, this.g.assets.strings.youLose);
