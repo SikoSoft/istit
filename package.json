@@ -5,6 +5,7 @@
   "main": "serve.js",
   "dependencies": {
     "express": "^4.17.1",
+    "https": "^1.0.0",
     "path": "^0.12.7",
     "websocket": "^1.0.31"
   },
