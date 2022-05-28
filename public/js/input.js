@@ -21,13 +21,15 @@ export default class input {
       f12: 123
     };
     this.buttonMap = {
-      pause: 9,
-      drop: 3,
-      left: 14,
-      rotate: 0,
-      right: 15,
-      down: 13,
-      hold: 5
+      [MAGIC_NUM.DEVICE_TYPE_XBOX360]: {
+        pause: 9,
+        drop: 3,
+        left: 14,
+        rotate: 0,
+        right: 15,
+        down: 13,
+        hold: 5
+      }
     };
     this.stateActions = {
       waiting: {
@@ -98,13 +100,16 @@ export default class input {
       },
       false
     );
-    window.addEventListener('gamepadconnected', () => {
+    window.addEventListener('gamepadconnected', (event) => {
       this.gamePadDetected = true;
       this.lastButtonState = {};
       Object.keys(this.buttonMap).forEach(button => {
         this.lastButtonState[button] = false;
       });
-      this.setupDevice(MAGIC_NUM.DEVICE_TYPE_XBOX360);
+      const deviceType = this.getGamePadDeviceType(event.gamepad);
+      if (deviceType !== MAGIC_NUM.DEVICE_TYPE_UNKNOWN) {
+        this.setupDevice(deviceType, event.gamepad.index);
+      }
     });
   }
 
@@ -117,13 +122,23 @@ export default class input {
     }
   }
 
-  setupDevice(type) {
+  getGamePadDeviceType(gamePad) {
+    switch (gamePad.id) {
+    case "Xbox 360 Controller (XInput STANDARD GAMEPAD)":
+      return MAGIC_NUM.DEVICE_TYPE_XBOX360;
+    default:
+      return MAGIC_NUM.DEVICE_TYPE_UNKNOWN;
+    }
+  }
+
+  setupDevice(type, gamePadIndex = -1) {
     const device = {
       type,
       id: this.devices.length,
       player: false,
       floodTimers: {},
-      lastFloodWait: {}
+      lastFloodWait: {},
+      gamePadIndex
     };
     this.devices.push(device);
     if (MAGIC_NUM.DEVICE_TYPE_KEYBOARD === type) {
@@ -192,7 +207,7 @@ export default class input {
         this.gamePadDetected &&
         device.player
       ) {
-        const gamePad = navigator.getGamepads()[0];
+        const gamePad = navigator.getGamepads()[device.gamePadIndex];
         const buttonState = {};
         Object.keys(this.buttonMap).forEach(button => {
           const isPressed = gamePad.buttons[this.buttonMap[button]].pressed;

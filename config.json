@@ -1,11 +1,15 @@
 {
   "server": {
+    "secure": false,
+    "secureKey": "path/to/privatekey.pem",
+    "secureCert": "path/to/publiccert.pem",
     "webPort": 75,
     "webSocketPort": 76,
     "activeTime": 5000,
     "statusInterval": 10000,
     "syncInterval": 166
   },
+  "mpServer": "ws://localhost:76",
   "lbAdd": "https://sikosoft.azurewebsites.net/api/leaderboard",
   "lbGet": "https://sikosoft.azurewebsites.net/api/leaderboard",
   "maxFallTime": 17500,

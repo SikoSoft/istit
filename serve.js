@@ -4,6 +4,7 @@ const fs = require('fs');
 const config = require('./config.json').server;
 const webSocketServer = require('websocket').server;
 const http = require('http');
+const https = require('https');
 
 process.title = 'istit-server';
 
@@ -16,21 +17,35 @@ app.use(express.static(path.join(__dirname, '/public')));
 
 router.get('/config.json', (req, res) => {
   fs.readFile('./config.json', (error, data) => {
-    res.send(data);
+    const { server, ...sanitized } = JSON.parse(data);
+    res.send(JSON.stringify(sanitized));
   });
 });
 app.use(router);
 
-app.listen(config.webPort, function() {
-  // eslint-disable-next-line
-  console.log(`Web server listening on port ${config.webPort}`);
-});
+const secureConfig = config.secure
+  ? {
+      key: fs.readFileSync(config.secureKey),
+      cert: fs.readFileSync(config.secureCert)
+    }
+  : {};
+
+(config.secure ? https : http)
+  .createServer(secureConfig, app)
+  .listen(config.webPort, () => {
+    // eslint-disable-next-line
+    console.log(`Web server listening on port ${config.webPort}`);
+  });
 
 // WebSocket Server
 
 const clients = [],
   sessions = [];
-const httpServer = http.createServer();
+const httpServer = config.secure
+  ? https.createServer(secureConfig)
+  : http.createServer();
+console.log(config.secure ? 'httpsServer' : 'httpServer', httpServer);
+
 const wsServer = new webSocketServer({
   httpServer
 });
