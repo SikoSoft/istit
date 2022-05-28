@@ -1,6 +1,6 @@
 {
   "name": "istit",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "I Swear This Isn't Tetr*s",
   "main": "serve.js",
   "dependencies": {
@@ -14,7 +14,7 @@
     "eslint-config-prettier": "^6.7.0",
     "eslint-loader": "^3.0.3",
     "eslint-plugin-prettier": "^3.1.2",
-    "nodemon": "^1.19.4",
+    "nodemon": "^2.0.16",
     "prettier": "^1.19.1"
   },
   "scripts": {
